@@ -2,7 +2,7 @@ package main
 
 import (
 	"fyne.io/fyne"
-	//"fyne.io/fyne/dialog"
+	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
 	"fyne.io/fyne/theme"
@@ -40,9 +40,25 @@ func main() {
 
 }
 
+func NewDialog(window fyne.Window) {
+	var (
+		selectedfiles fyne.URIReadCloser
+		fileerror     error
+	)
+
+	dialog.ShowFileOpen(func(file fyne.URIReadCloser, err error) {
+		selectedfiles = file
+		err = fileerror
+	}, window)
+
+	window.Show()
+}
 
 
 func fullPipeline(window fyne.Window) fyne.Widget {
+	test := widget.NewButton("Pick input file", func() {
+			NewDialog(window)})
+
 	phenoName := widget.NewEntry()
 	phenoName.SetPlaceHolder("Exact name of the column for GWAS trait to be assessed")
 
@@ -125,6 +141,7 @@ func fullPipeline(window fyne.Window) fyne.Widget {
 		},
 	}
 
+	fullPipelineform.Append("Pick file: ", test)
 	fullPipelineform.Append("Input Tab-Delimited File: ", inputFile)
 	fullPipelineform.Append("Input Plink File Prefix: ", plinkFile)
 	fullPipelineform.Append("Human genome build: ", genomeBuild)
