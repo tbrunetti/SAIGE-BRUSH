@@ -37,10 +37,10 @@ func main() {
 
 	allChunksFinished = 1
 	// variables that need to be acquired by parsing through user input
-	chunkVariants := 15000000
+	chunkVariants := 2000000
 	chromosomeLengthFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/hg38_chrom_sizes.txt"
 	build := "hg38"
-	chromosomes := "21-22"
+	chromosomes := "1-22"
 	imputeSuffix := "_rsq70_merged_renamed.vcf.gz"
 	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
@@ -87,10 +87,16 @@ func main() {
 		if allAssocationsRunning < (nprocs*2) && len(processQueue) > 0 {
 			changeQueueSize.Lock()
 			vcfFile := processQueue[0]
-			tmp := strings.SplitN(vcfFile, "_", 1)
-			wgAssociation.Add(1)
-			go associationAnalysis(bindPoint,container,vcfFile,vcfField,outDir,tmp[0],sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
-			processQueue = processQueue[1:]
+			tmp := strings.Split(vcfFile, "_")
+			if tmp[0]+imputeSuffix == vcfFile {
+				wgAssociation.Add(1)
+				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				processQueue = processQueue[1:]
+			}else{
+				wgAssociation.Add(1)
+				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				processQueue = processQueue[1:]
+			}
 			changeQueueSize.Unlock()
 		}else{
 			time.Sleep(30* time.Minute)
@@ -271,7 +277,7 @@ func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,impu
 func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform string) {
 	defer wgNull.Done()
 	t0 := time.Now()
-	formatted := fmt.Sprintf("%d-%02d-%02dT%02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 	fmt.Printf("[func(nullModel) %s] Starting Null Model...\n", formatted)
 
 	cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
@@ -303,14 +309,14 @@ func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait
 }
 
 
-func associationAnalysis (bindpoint,container,vcfFile,vcfField,outDir,chrom,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco string) {
+func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco string) {
 	defer wgAssociation.Done()
 	queue.Lock()
 	allAssocationsRunning++
 	queue.Unlock()
 
 	t0 := time.Now()
-	formatted := fmt.Sprintf("%d-%02d-%02dT%02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 	fmt.Printf("[func(associationAnalysis) %s] Starting Association of %s...\n", formatted, vcfFile)
 
 		
@@ -329,7 +335,7 @@ func associationAnalysis (bindpoint,container,vcfFile,vcfField,outDir,chrom,samp
 		"--IsOutputAFinCaseCtrl=TRUE",
 		"--IsOutputHetHomCountsinCaseCtrl=TRUE",
 		"--IsOutputBETASEinBurdenTest=TRUE",
-		"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_chrm"+chrom+"_SNPassociationAnalysis.txt",
+		"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_"+chrom+"_SNPassociationAnalysis.txt",
 		"--LOCO="+loco)
 	cmd.Run()
 	_ = cmd.Wait()
