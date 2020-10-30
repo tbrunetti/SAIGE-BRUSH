@@ -12,7 +12,7 @@
 #write_tsv(infoFile, "allAutosomes.rs70.info.SAIGE.txt", append = FALSE, col_names = TRUE)
 
 
-cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, macFilter, mafFilter, traitType, nThreads){
+    cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, macFilter, mafFilter, traitType, nThreads){
   library(qqman)
   library(data.table)
   library(readr)
