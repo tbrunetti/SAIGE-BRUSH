@@ -18,6 +18,8 @@ import (
 var wgChunk sync.WaitGroup
 var chrLengths = make(map[string]int)
 var processQueue = make([]string, 0)
+var allChunksFinished int
+var allAssocationsRunning int
 var wgPipeline sync.WaitGroup
 var wgSmallChunk sync.WaitGroup
 var wgNull sync.WaitGroup
@@ -26,8 +28,7 @@ var wgAllChunks sync.WaitGroup
 var changeQueueSize sync.Mutex
 var queueCheck sync.Mutex
 var errorHandling sync.Mutex
-var allChunksFinished int
-var allAssocationsRunning int
+
 
 
 func main() {
@@ -62,9 +63,11 @@ func main() {
 	loco := "TRUE"
 	covTransform := "TRUE"
 	vcfField := "DS" // DS or GT
-	MAF := "0"
-	MAC := "0"
+	MAF := "0.5"
+	MAC := "10"
 	IsDropMissingDosages := "FALSE"
+	infoFile := "allAutosomes.rs70.info.SAIGE.txt"
+
 	// end of variables
 	
 
@@ -90,12 +93,12 @@ func main() {
 			subName := strings.TrimSuffix(vcfFile, imputeSuffix)
 			if tmp[0]+imputeSuffix == vcfFile {
 				wgAssociation.Add(1)
-				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
 				processQueue = processQueue[1:]
 				time.Sleep(2* time.Second)
 			}else{
 				wgAssociation.Add(1)
-				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
 				processQueue = processQueue[1:]
 				time.Sleep(2* time.Second)
 			}
@@ -110,7 +113,7 @@ func main() {
     concat := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concat.Year(), concat.Month(), concat.Day(), concat.Hour(), concat.Minute(), concat.Second())
     fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
-    concat := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/concatenate.sh")
+    concat := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/concatenate.sh", filepath.Join(outDir,outPrefix))
     concat.Run()
 
     errorHandling.Lock()
@@ -118,7 +121,30 @@ func main() {
     concat.Stderr = os.Stderr
     errorHandling.Unlock()
     
-    fmt.Printf("[func(main)] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concat).Minutes())
+    fmt.Printf("[func(main) -- concatenate] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concat).Minutes())
+
+    
+    graph := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
+    fmt.Printf("[func(main) -- clean and graph results] Start data clean up, visualization, and summarization...\n")
+    cleanAndGraph := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/Rscript", "/opt/cleanAndGraph.R",
+			"--assocFile="+filepath.Join(outDir,outPrefix) + "_allChromosomeResultsMerged.txt",
+			"--infoFile="+infoFile,
+			"--dataOutputPrefix="+filepath.Join(outDir,outPrefix),
+			"--pheno="+pheno,
+			"--covars="+covars,
+			"--macFilter="+MAC,
+			"--mafFilter="+MAF,
+			"--traitType="+trait,
+			"--nThreads="+nThreads)
+    cleanAndGraph.Run()
+
+    errorHandling.Lock()
+    graph.Stdout = os.Stdout
+    graph.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+    fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
 
     fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
 }
@@ -212,7 +238,7 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,container 
 	if err != nil{
 		tErr := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
-		fmt.Printf("[func(smallerChunk) %s] There was an error converting the total variants to an integer. The error encountered is:\n%v\n",formatted,err)
+		fmt.Printf("[func(smallerChunk) %s] There was an error converting the total variants to an integer, likely due to lack of SNPs in the region. The error encountered is:\n%v\n",formatted,err)
 		return
 	}
 	
@@ -288,7 +314,7 @@ func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,impu
 	if err1 != nil{
 		t0 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
-		fmt.Printf("[func(processing) %s] %s, chunk %s:\n\tThere was an error converting the total variants to an integer. The error encountered is:\n%v\n",formatted,chrom,loopNum,err1)
+		fmt.Printf("[func(processing) %s] %s, chunk %s:\n\tThere was an error converting the total variants to an integer, likely due to lack of SNPs in the region. The error encountered is:\n%v\n",formatted,chrom,loopNum,err1)
 		return
 	}
 			
@@ -346,7 +372,7 @@ func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait
 }
 
 
-func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco string) {
+func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco string) {
 	defer wgAssociation.Done()
 	queueCheck.Lock()
 	allAssocationsRunning++
@@ -364,8 +390,8 @@ func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subNa
 		"--sampleFile="+sampleIDFile,
 		"--chrom="+chrom,
 		"--IsDropMissingDosages="+IsDropMissingDosages,
-		"--minMAF="+MAF,
-		"--minMAC="+MAC,
+		"--minMAF=0",
+		"--minMAC=0",
 		"--GMMATmodelFile="+filepath.Join(outDir, outPrefix)+".rda",
 		"--varianceRatioFile="+filepath.Join(outDir, outPrefix)+".varianceRatio.txt",
 		"--numLinesOutput=2",
@@ -377,8 +403,8 @@ func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subNa
 	cmd.Run()
 	
 	errorHandling.Lock()
-    totalVariants.Stdout = os.Stdout
-    totalVariants.Stderr = os.Stderr
+    cmd.Stdout = os.Stdout
+    cmdts.Stderr = os.Stderr
     errorHandling.Unlock()
 
 	t1 := time.Now()
