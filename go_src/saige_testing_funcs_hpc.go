@@ -66,7 +66,7 @@ func main() {
 	MAF := "0.5"
 	MAC := "10"
 	IsDropMissingDosages := "FALSE"
-	infoFile := "allAutosomes.rs70.info.SAIGE.txt"
+	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rs70.info.SAIGE.txt"
 
 	// end of variables
 	
@@ -110,8 +110,8 @@ func main() {
 
     wgAssociation.Wait()
 
-    concat := time.Now()
-	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concat.Year(), concat.Month(), concat.Day(), concat.Hour(), concat.Minute(), concat.Second())
+    concatTime := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
     fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
     concat := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/concatenate.sh", filepath.Join(outDir,outPrefix))
     concat.Run()
@@ -121,11 +121,11 @@ func main() {
     concat.Stderr = os.Stderr
     errorHandling.Unlock()
     
-    fmt.Printf("[func(main) -- concatenate] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concat).Minutes())
+    fmt.Printf("[func(main) -- concatenate] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concatTime).Minutes())
 
     
     graph := time.Now()
-	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
+	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
     fmt.Printf("[func(main) -- clean and graph results] Start data clean up, visualization, and summarization...\n")
     cleanAndGraph := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/Rscript", "/opt/cleanAndGraph.R",
 			"--assocFile="+filepath.Join(outDir,outPrefix) + "_allChromosomeResultsMerged.txt",
@@ -140,8 +140,8 @@ func main() {
     cleanAndGraph.Run()
 
     errorHandling.Lock()
-    graph.Stdout = os.Stdout
-    graph.Stderr = os.Stderr
+    cleanAndGraph.Stdout = os.Stdout
+    cleanAndGraph.Stderr = os.Stderr
     errorHandling.Unlock()
 
     fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
@@ -213,12 +213,6 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,container 
 		"index",
 		"--nrecords",
 		filepath.Join(imputeDir, chrom+imputeSuffix)).Output()
-
-	errorHandling.Lock()
-	totalVariants.Stdout = os.Stdout
-	totalVariants.Stderr = os.Stderr
-	errorHandling.Unlock()
-
 
 
 	// if error is seen, print error and exit out of function, otherwise print the total variants in the vcf file and continue
@@ -303,11 +297,6 @@ func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,impu
 		"index",
 		"--nrecords",
 		filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
-
-	errorHandling.Lock()
-    totalVariants.Stdout = os.Stdout
-    totalVariants.Stderr = os.Stderr
-    errorHandling.Unlock()
 
 				
 	varVal,err1 := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
@@ -404,7 +393,7 @@ func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subNa
 	
 	errorHandling.Lock()
     cmd.Stdout = os.Stdout
-    cmdts.Stderr = os.Stderr
+    cmd.Stderr = os.Stderr
     errorHandling.Unlock()
 
 	t1 := time.Now()
