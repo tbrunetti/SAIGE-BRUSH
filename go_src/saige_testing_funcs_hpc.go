@@ -23,10 +23,9 @@ var wgSmallChunk sync.WaitGroup
 var wgNull sync.WaitGroup
 var wgAssociation sync.WaitGroup
 var wgAllChunks sync.WaitGroup
-var collisionPrevention sync.Mutex
 var changeQueueSize sync.Mutex
-var processingMut sync.Mutex
-var queue sync.Mutex
+var queueCheck sync.Mutex
+var errorHandling sync.Mutex
 var allChunksFinished int
 var allAssocationsRunning int
 
@@ -67,7 +66,7 @@ func main() {
 	MAC := "0"
 	IsDropMissingDosages := "FALSE"
 	// end of variables
-
+	
 
  	chroms:= strings.Split(chromosomes, "-")
  	start:= strings.TrimSpace(chroms[0])
@@ -88,27 +87,40 @@ func main() {
 			changeQueueSize.Lock()
 			vcfFile := processQueue[0]
 			tmp := strings.Split(vcfFile, "_")
+			subName := strings.TrimSuffix(vcfFile, imputeSuffix)
 			if tmp[0]+imputeSuffix == vcfFile {
 				wgAssociation.Add(1)
-				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
 				processQueue = processQueue[1:]
+				time.Sleep(2* time.Second)
 			}else{
 				wgAssociation.Add(1)
-				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
+				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco)
 				processQueue = processQueue[1:]
+				time.Sleep(2* time.Second)
 			}
 			changeQueueSize.Unlock()
 		}else{
-			time.Sleep(30* time.Minute)
+			time.Sleep(5* time.Minute)
 		}
 	}
 
     wgAssociation.Wait()
+
+    concat := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concat.Year(), concat.Month(), concat.Day(), concat.Hour(), concat.Minute(), concat.Second())
+    fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
+    concat := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/concatenate.sh")
+    concat.Run()
+
+    errorHandling.Lock()
+    concat.Stdout = os.Stdout
+    concat.Stderr = os.Stderr
+    errorHandling.Unlock()
     
-    fmt.Printf("All threads are finished and pipeline is complete!:\n")
+    fmt.Printf("[func(main)] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concat).Minutes())
 
-
-
+    fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
 }
 
 
@@ -176,6 +188,12 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,container 
 		"--nrecords",
 		filepath.Join(imputeDir, chrom+imputeSuffix)).Output()
 
+	errorHandling.Lock()
+	totalVariants.Stdout = os.Stdout
+	totalVariants.Stderr = os.Stderr
+	errorHandling.Unlock()
+
+
 
 	// if error is seen, print error and exit out of function, otherwise print the total variants in the vcf file and continue
 	if err != nil {
@@ -200,10 +218,10 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,container 
 	
 
 	// if chunk is larger than total variants in file, do not chunk and just add full imputation file to queue
-	if chunkVariants > varVal {
-		collisionPrevention.Lock()
+	if chunkVariants > 200*varVal {
+		changeQueueSize.Lock()
 		processQueue = append(processQueue, chrom+imputeSuffix)
-		collisionPrevention.Unlock()
+		changeQueueSize.Unlock()
 		t0 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 		fmt.Printf("[func(smallerChunk) %s] %s is in the queue and %d is variant value\n", formatted,chrom+imputeSuffix,varVal)
@@ -238,17 +256,32 @@ func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,impu
 		filepath.Join(imputeDir, chrom+imputeSuffix))
 	subset.Run()
 
+	errorHandling.Lock()
+    subset.Stdout = os.Stdout
+    subset.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+
 	index := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/tabix",
 	"-p",
 	"vcf",
 	filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
-
 	index.Run()
+
+	errorHandling.Lock()
+   	index.Stdout = os.Stdout
+    index.Stderr = os.Stderr
+    errorHandling.Unlock()
 
 	totalVariants,_ := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/bcftools",
 		"index",
 		"--nrecords",
 		filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
+
+	errorHandling.Lock()
+    totalVariants.Stdout = os.Stdout
+    totalVariants.Stderr = os.Stderr
+    errorHandling.Unlock()
 
 				
 	varVal,err1 := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
@@ -260,9 +293,9 @@ func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,impu
 	}
 			
 	if varVal > 0 {
-		processingMut.Lock()
+		changeQueueSize.Lock()
 		processQueue = append(processQueue, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
-		processingMut.Unlock()
+		changeQueueSize.Unlock()
 		t1 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
 		fmt.Printf("[func(processing) %s] %s, chunk %s has successfully completed and has been added to the processing queue. Time Elapsed: %.2f minutes\n", formatted,chrom,loopNum, time.Since(t0).Minutes())
@@ -301,19 +334,23 @@ func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait
 		"--isCovariateTransform="+covTransform)
 
 	cmd.Run()
-	_ = cmd.Wait()
 	
+	errorHandling.Lock()
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    errorHandling.Unlock()
+
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
 	fmt.Printf("[func(nullModel) %s] Finished Null Model. Time Elapsed: %.2f minutes\n", formatted, time.Since(t0).Minutes())
 }
 
 
-func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco string) {
+func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subName,sampleIDFile,IsDropMissingDosages,MAF,MAC,outPrefix,loco string) {
 	defer wgAssociation.Done()
-	queue.Lock()
+	queueCheck.Lock()
 	allAssocationsRunning++
-	queue.Unlock()
+	queueCheck.Unlock()
 
 	t0 := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
@@ -338,13 +375,17 @@ func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,sampl
 		"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_"+chrom+"_SNPassociationAnalysis.txt",
 		"--LOCO="+loco)
 	cmd.Run()
-	_ = cmd.Wait()
+	
+	errorHandling.Lock()
+    totalVariants.Stdout = os.Stdout
+    totalVariants.Stderr = os.Stderr
+    errorHandling.Unlock()
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
 	fmt.Printf("[func(associationAnalysis) %s] %s has successfully completed. Time Elapsed: %.2f minutes\n", formatted,vcfFile,time.Since(t0).Minutes())
 
-	queue.Lock()
+	queueCheck.Lock()
 	allAssocationsRunning--
-	queue.Unlock()
+	queueCheck.Unlock()
 }
