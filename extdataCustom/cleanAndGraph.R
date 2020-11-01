@@ -12,7 +12,7 @@
 #write_tsv(infoFile, "allAutosomes.rs70.info.SAIGE.txt", append = FALSE, col_names = TRUE)
 
 
-    cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, macFilter, mafFilter, traitType, nThreads){
+cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, macFilter, mafFilter, traitType, nThreads){
   library(qqman)
   library(data.table)
   library(readr)
@@ -23,20 +23,11 @@
   library(grid)
   library(ggplotify)
   
-  assocFile="~/SAIGE/extdataCustom/ADMIRE_AD_CCPMbb_freeze_v1.3_chrm21_associationAnalysis_results.txt"
-  infoFile="~/allAutosomes.rs70.info.SAIGE.txt"
-  dataOutputPrefix="test_new_graph"
-  macFilter="10"
-  mafFilter="0.05"
-  traitType="binary"
-  nThreads=3
-  covars="PC1,PC2,PC3,PC4,PC5,SAIGE_GENDER,age"
-  pheno="multiple_sclerosis"
   # read in concatenated SAIGE association results across all 
-  autosomalAssocResults <- fread(assocFile, header=T, showProgress = T, nThread = nThreads)
+  autosomalAssocResults <- fread(assocFile, header=TRUE, showProgress = TRUE, nThread = nThreads)
   
   # merge info fields
-  infoFields <- fread(infoFile , header = T, showProgress = T, nThread = nThreads)
+  infoFields <- fread(infoFile , header = TRUE, showProgress = TRUE, nThread = nThreads)
   
   # perform a left only merge on info fields as long as all 4 columns match and only use the first match
   autosomalAssocResults <- join(x=autosomalAssocResults, y=infoFields, match = "first", type="left", by=c("CHR", "POS", "Allele1", "Allele2"))
@@ -101,20 +92,18 @@
                                         "controlHomMinor", "controlHet", "negLog10pvalue","R2", "ER2", "GENOTYPE_STATUS")
     
     # write a copy of unfilterd table
-    fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt.gz", sep="_"), append=FALSE, col.names=TRUE, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
+    fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt.gz", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(autosomalAssocResults, paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col_names=TRUE)
     
     # filter by MAC and MAF based on user input to generate filtered common variants file (>macFilter, >mafFilter)
     commonClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                  as.numeric(autosomalAssocResults$MAF) > mafFilter),]
-    fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt.gz", sep="_"), append=FALSE, col.names = T, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
-    #write_tsv(commonClean, paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col_names=TRUE)
+    fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt.gz", sep="_"), append=FALSE, col.names = TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t",verbose = TRUE)
 
     # filter by MAC and MAF based on user input to generate filtered rare variants file (>macFilter, <=mafFilter)
     rareClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                as.numeric(autosomalAssocResults$MAF) <= mafFilter),]
-    fwrite(rareClean, file = paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt.gz", sep="_"), append=FALSE, col.names=TRUE, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
-    #write_tsv(rareClean, paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"), append=FALSE, col_names=TRUE)
+    fwrite(rareClean, file = paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt.gz", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
   }
   
   
@@ -128,13 +117,14 @@
       names(autosomalAssocResults) <- c("CHR", "POS", "majorAllele", "minorAllele", "SNPID", "BETA", "SE", "OR", "LogOR", "Lower95OR", "Upper95OR", 
                                         "MAF", "MAC", "p.value", "N", "negLog10pvalue",  "R2", "ER2", "GENOTYPE_STATUS")
     # write a copy of unfilterd table
-      fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
-      #write_tsv(autosomalAssocResults, paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col_names=TRUE)
+    fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
+    #write_tsv(autosomalAssocResults, paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col_names=TRUE)
     
     # filter by MAC and MAF based on user input to generate filtered common variants file (>macFilter, >mafFilter)
     commonClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                  as.numeric(autosomalAssocResults$MAF) > mafFilter),]
-    fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
+    print(commonClean)
+    fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(commonClean, paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col_names=TRUE)
 
     
@@ -142,7 +132,7 @@
     rareClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                as.numeric(autosomalAssocResults$MAF) <= mafFilter),]
     
-    fwrite(rareClean, file = paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = T, nThread = nThreads, compress = "gzip", sep = "\t")
+    fwrite(rareClean, file = paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(rareClean, paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"),append=FALSE, col_names=TRUE)
 
   }
@@ -200,7 +190,7 @@
             ylab="-log10(pvalue)",
             xlab="",
             annotateTop = T,
-            main=paste(prefix, ": MAC >", macFilter, ", MAF>", mafFilter, sep=" ")
+            main=paste("MAC >", macFilter, ", MAF >", mafFilter, sep=" ")
   )
   dev.off()
   
@@ -225,7 +215,7 @@
             ylab="-log10(pvalue)",
             xlab="",
             annotateTop=T,
-            main=paste(prefix, ": MAC >", macFilter, ", MAF <=", mafFilter, sep=" ")
+            main=paste("MAC >", macFilter, ", MAF <=", mafFilter, sep=" ")
   )
   dev.off()
   
