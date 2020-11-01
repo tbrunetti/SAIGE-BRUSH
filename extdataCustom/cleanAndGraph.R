@@ -90,16 +90,18 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
       names(autosomalAssocResults) <- c("CHR", "POS", "majorAllele", "minorAllele", "SNPID", "BETA", "SE", "OR", "LogOR", "Lower95OR", "Upper95OR", 
                                         "MAF", "MAC", "p.value", "N", "N.Cases", "N.Controls", "casesHomMinor", "casesHet", 
                                         "controlHomMinor", "controlHet", "negLog10pvalue","R2", "ER2", "GENOTYPE_STATUS")
-    
+    print("[func(main) -- clean and graph results] Writing out cleaned raw results...")
     # write a copy of unfilterd table
     fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt.gz", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(autosomalAssocResults, paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col_names=TRUE)
     
+    print("[func(main) -- clean and graph results] Writing out common snp filtered results...")
     # filter by MAC and MAF based on user input to generate filtered common variants file (>macFilter, >mafFilter)
     commonClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                  as.numeric(autosomalAssocResults$MAF) > mafFilter),]
     fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt.gz", sep="_"), append=FALSE, col.names = TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t",verbose = TRUE)
 
+    print("[func(main) -- clean and graph results] Writing out rare snp filtered results...")
     # filter by MAC and MAF based on user input to generate filtered rare variants file (>macFilter, <=mafFilter)
     rareClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                as.numeric(autosomalAssocResults$MAF) <= mafFilter),]
@@ -116,6 +118,8 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
     autosomalAssocResults <- autosomalAssocResults[,..columnSubset]
       names(autosomalAssocResults) <- c("CHR", "POS", "majorAllele", "minorAllele", "SNPID", "BETA", "SE", "OR", "LogOR", "Lower95OR", "Upper95OR", 
                                         "MAF", "MAC", "p.value", "N", "negLog10pvalue",  "R2", "ER2", "GENOTYPE_STATUS")
+    
+    print("[func(main) -- clean and graph results] Writing out cleaned raw results...")
     # write a copy of unfilterd table
     fwrite(autosomalAssocResults, file = paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(autosomalAssocResults, paste(dataOutputPrefix, "GWASresults_allSNPs_noFiltering.txt", sep="_"), append=FALSE, col_names=TRUE)
@@ -123,7 +127,7 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
     # filter by MAC and MAF based on user input to generate filtered common variants file (>macFilter, >mafFilter)
     commonClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                  as.numeric(autosomalAssocResults$MAF) > mafFilter),]
-    print(commonClean)
+    print("[func(main) -- clean and graph results] Writing out common snp filtered results...")
     fwrite(commonClean, file = paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(commonClean, paste(dataOutputPrefix, "GWASresults_commonSNPs_cleaned.txt", sep="_"), append=FALSE, col_names=TRUE)
 
@@ -131,13 +135,15 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
     # filter by MAC and MAF based on user input to generate filtered rare variants file (>macFilter, <=mafFilter)
     rareClean <- autosomalAssocResults[which(as.numeric(autosomalAssocResults$MAC) > macFilter & 
                                                as.numeric(autosomalAssocResults$MAF) <= mafFilter),]
-    
+   
+    print("[func(main) -- clean and graph results] Writing out rare snp filtered results...")  
     fwrite(rareClean, file = paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"), append=FALSE, col.names=TRUE, showProgress = TRUE, nThread = nThreads, compress = "gzip", sep = "\t", verbose = TRUE)
     #write_tsv(rareClean, paste(dataOutputPrefix, "GWASresults_rareSNPs_cleaned.txt", sep="_"),append=FALSE, col_names=TRUE)
 
   }
  
 
+  print("[func(main) -- clean and graph results] QQ plot for common variants being constructed...")
   # common mac filter and maf filter
   observed <- sort(commonClean$p.value)
   lobs <- -(log10(observed))
@@ -153,7 +159,7 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
   mtext(bquote(paste("QQ Plot for SNPs MAC >", .(macFilter), " and MAF > ", .(mafFilter), ":  ", lambda == .(lambda))), side=3, cex=2.0)
   dev.off()
   
-  
+  print("[func(main) -- clean and graph results] QQ plot for rare variants being constructed...")  
   # rare mac filter and maf filter
   observed <- sort(rareClean$p.value)
   lobs <- -(log10(observed))
@@ -169,6 +175,7 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
   mtext(bquote(paste("QQ Plot for SNPs MAC >", .(macFilter), " and MAF <= ", .(mafFilter), ":  ", lambda == .(lambda))), side=3, cex=2.0)
   dev.off()
   
+  print("[func(main) -- clean and graph results] Manhattan plot for common variants being constructed...")
   #common and clean Manhattan plot
   upperYlim <- max(c(15, max(commonClean$negLog10pvalue)))
   png(filename=paste(dataOutputPrefix, "manhattan_commonSNPs_cleaned.png", sep="_"), width=800, height=600, bg="white", type="cairo")
@@ -195,6 +202,7 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
   dev.off()
   
   # rare and clean manhattan plot
+  print("[func(main) -- clean and graph results] Manhattan plot for rare variants being constructed...")
   upperYlim <- max(c(15, max(rareClean$negLog10pvalue)))
   png(filename=paste(dataOutputPrefix, "manhattan_rareSNPs_cleaned.png", sep="_"), width=800, height=600, bg="white", type="cairo", )
   par(font.axis = 2)
@@ -227,9 +235,14 @@ cleanAndGraph <- function(assocFile, infoFile, dataOutputPrefix, pheno, covars, 
   
   imageGrid <- lapply(images, grid::rasterGrob)
 
-  tmp<-do.call(gridExtra::grid.arrange, c(imageGrid, top=paste(pheno, "~", stringr::str_replace_all(covars, ",", " + "), "\n cases: ", as.character(autosomalAssocResults$N.Cases[1]), 
+  if (traitType == 'binary'){
+    tmp<-do.call(gridExtra::grid.arrange, c(imageGrid, top=paste(pheno, "~", stringr::str_replace_all(covars, ",", " + "), "\n cases: ", as.character(autosomalAssocResults$N.Cases[1]), 
                                                                "  controls:", as.character(autosomalAssocResults$N.Controls[1]), sep = " ")))
   
-  
-  ggsave(file=paste(dataOutputPrefix, "_finalGWASresults.pdf", sep = ""), tmp, width = 10, height = 10, units = "in")
+    ggsave(file=paste(dataOutputPrefix, "_finalGWASresults.pdf", sep = ""), tmp, width = 10, height = 10, units = "in")
+  }else{
+    tmp<-do.call(gridExtra::grid.arrange, c(imageGrid, top=paste(pheno, "~", stringr::str_replace_all(covars, ",", " + "), sep = " ")))
+    
+    ggsave(file=paste(dataOutputPrefix, "_finalGWASresults.pdf", sep = ""), tmp, width = 10, height = 10, units = "in")
+  }
 }
