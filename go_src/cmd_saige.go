@@ -8,19 +8,49 @@ import (
 	"strconv"
 	"path/filepath"
 	"os"
+	"bufio"
+	"io"
+	"math"
+	"runtime"
+	"time"
 )
 
-var wgSchedule sync.WaitGroup
-var wgAssociation sync.WaitGroup
-var wgSummarize sync.WaitGroup
 var wgChunk sync.WaitGroup
+var chrLengths = make(map[string]int)
+var processQueue = make([]string, 0)
+var allChunksFinished int
+var allAssocationsRunning int
+var totalChunksProcessing int
+var wgPipeline sync.WaitGroup
+var wgSmallChunk sync.WaitGroup
+var wgNull sync.WaitGroup
+var wgAssociation sync.WaitGroup
+var wgAllChunks sync.WaitGroup
+var changeQueueSize sync.Mutex
+var queueCheck sync.Mutex
+var errorHandling sync.Mutex
+var chunkQueue sync.Mutex
 
-var queue []string
+
+//TODO: PRINT OUT QUEUE DOC FOR THOSE THAT WANT TO REUSE CHUNKS -- ALSO ADD OPTION TO SAVE CHUNKS
 
 func main() {
-	// TODO: parse all this info
+	runtime.GOMAXPROCS(24)
+	nprocs := 24
+
+	allChunksFinished = 1
+	// variables that need to be acquired by parsing through user input
+	chunkVariants := 1000000
+	chromosomeLengthFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/hg38_chrom_sizes.txt"
+	build := "hg38"
+	chromosomes := "21-22"
+	imputeSuffix := "_rsq70_merged_renamed.vcf.gz"
+	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
-	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/custom_SAIGEbuild_v0.39_CCPM_biobank_07292020.simg"
+	//bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
+	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_10312020.simg"
+	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
+	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
 	sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
 	sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 	phenoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/pheWAS_CCPMbb_freeze_v1.3.txt" 
@@ -30,57 +60,294 @@ func main() {
 	invNorm := "FALSE"
 	covars := "PC1,PC2,PC3,PC4,PC5,SAIGE_GENDER,age"
 	sampleID := "FULL_BBID"
-	nThreads := "24"
+	nThreads := "20"
 	sparseKin := "TRUE"
 	markers := "30"
-	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
 	rel := "0.0625"
 	loco := "TRUE"
 	covTransform := "TRUE"
-	chromosomes := "1-22"
-	build := "hg38"
-	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/multiple_sclerosis/" # requires last backslash
-	imputationFileDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation/" # requires last backslash
-	sampleFile :="/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
-	vcfField :="DS" # DS or GT
-	chunkVariants := "1000000"
-	chromosomeLengthFile="/home/brunettt/Downloads/software/github_repos/CCPM_Biobank_GWAS_Pipeline/hg38_chrom_sizes.txt"
-	//GMMMATmodelFile: ="/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/multiple_sclerosis/multiple_sclerosis_CCPMbb_freeze_v1.3.rda" # ends in .rda from step 1
-	//varianceRatioFile :="/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/multiple_sclerosis/multiple_sclerosis_CCPMbb_freeze_v1.3.varianceRatio.txt" # ends in .txt from step1
-	//outNamePrefix :="GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
+	vcfField := "DS" // DS or GT
+	MAF := "0.5"
+	MAC := "10"
+	IsDropMissingDosages := "FALSE"
+	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rs70.info.SAIGE.txt"
+	// end of variables
+	
 
-	// end parse: 
-
-
-	wgSchedule.Add(1)
-	go nullModel(bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outPrefix,rel,loco,covTransform) 
-    wgSchedule.Wait()
-
-
+	// split chroms
  	chroms:= strings.Split(chromosomes, "-")
  	start:= strings.TrimSpace(chroms[0])
  	end:= strings.TrimSpace(chroms[1])
- 	
-	chunk(start,end,build,chunkVariants,chromosomeLengthFile)
 
-    for i:=start; i < start+1; i++ {
-    	wgAssociation.Add(1)
-    	go associationAnalysis(bindpoint,container,build,vcfFile,vcfFileIndex,vcfField,sampleIDFile,strconv.Itoa(i),IsDropMissingDosages,MAF,MAC,outPrefix,LOCO)
-    }
+ 	// STEP1: Run Null Model Queue
+ 	wgNull.Add(1)
+	go nullModel(bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
+
+ 	/* STEP1a: Chunks Queue
+ 	chunk can run the same time as the null model; and the association analysis needs to wait for the 
+ 	null to finish and chunk to finish*/
+  	wgAllChunks.Add(1)
+    go chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,container,chunkVariants)
+    
+    // wait for null model to finish before proceeding with association analysis -- no need to wait for chunk to finish
+    wgNull.Wait()
+
+	
+    /* STEP2: Association Analysis Queue
+	while loop to keep submitting jobs until queue is empty and no more subsets are available*/
+	for allChunksFinished == 1 || len(processQueue) != 0 {
+		if allAssocationsRunning < (nprocs*2) && len(processQueue) > 0 {
+			changeQueueSize.Lock() // lock queue to prevent collision
+			vcfFile := processQueue[0]
+			tmp := strings.Split(vcfFile, "_") // extract chromosome name
+			subName := strings.TrimSuffix(vcfFile, imputeSuffix)
+			// if condition is true, that means the data is not chunked and need to be read from the imputeDir not outDir
+			if tmp[0]+imputeSuffix == vcfFile {
+				wgAssociation.Add(1)
+				go associationAnalysis(bindPoint,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
+				processQueue = processQueue[1:]
+				time.Sleep(1* time.Second) // prevent queue overload
+			}else{
+				wgAssociation.Add(1)
+				go associationAnalysis(bindPoint,container,filepath.Join(outDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
+				processQueue = processQueue[1:]
+				time.Sleep(1* time.Second) // prevent queue overload
+			}
+			changeQueueSize.Unlock() // unlock queue safely
+		}else{
+			time.Sleep(5* time.Minute)
+		}
+	}
+
+	// wait for all association anlayses to finish before proceeding
     wgAssociation.Wait()
 
- /*   go cleanResults()
-    wgSummarize.Wait()
-*/
-    fmt.Println("FINISHED!!!!!")
+    // STEP2a: Concatenate all results into one file
+    concatTime := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
+    fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
+    concat := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/concatenate.sh", filepath.Join(outDir,outPrefix))
+    concat.Run()
 
+    errorHandling.Lock()
+    concat.Stdout = os.Stdout
+    concat.Stderr = os.Stderr
+    errorHandling.Unlock()
+    
+    fmt.Printf("[func(main) -- concatenate] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concatTime).Minutes())
+
+    // STEP3: Clean, Visualize, and Summarize results
+    graph := time.Now()
+	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
+    fmt.Printf("[func(main) -- clean and graph results] Start data clean up, visualization, and summarization...\n")
+    cleanAndGraph := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/Rscript", "/opt/cleanAndGraph.R",
+			"--assocFile="+filepath.Join(outDir,outPrefix) + "_allChromosomeResultsMerged.txt",
+			"--infoFile="+infoFile,
+			"--dataOutputPrefix="+filepath.Join(outDir,outPrefix),
+			"--pheno="+pheno,
+			"--covars="+covars,
+			"--macFilter="+MAC,
+			"--mafFilter="+MAF,
+			"--traitType="+trait,
+			"--nThreads="+nThreads)
+    cleanAndGraph.Run()
+
+    errorHandling.Lock()
+    cleanAndGraph.Stdout = os.Stdout
+    cleanAndGraph.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+    fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
+
+    // TODO: clean up temp files
+
+    // Pipeline Finish
+    fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
+}
+
+
+
+
+func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,container string, chunkVariants int) {
+	defer wgAllChunks.Done() //once function finishes decrement sync object
+
+	fileBytes, err := os.Open(chromosomeLengthFile)
+	if err != nil {
+		fmt.Printf("There was a problems reading in the chromosome length file.")
+		os.Exit(42)
+	}
+
+	defer fileBytes.Close() // once funciton finished close file
+
+	scanBytes := bufio.NewReader(fileBytes)
+	//var line string
+	for {
+		line, err := scanBytes.ReadString('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("An error occurred when reading in the chromosome length file.")
+			os.Exit(42)
+		}
+
+		if err == io.EOF {
+			fmt.Println("Finished reading chromosome file length")
+			break
+		}
+		
+		tmp := strings.Split(line, "\t")
+		intVal, _ := strconv.Atoi(strings.TrimSpace(tmp[1]))
+		chrLengths[tmp[0]] = intVal
+	}
+
+	startInt,_ :=  strconv.Atoi(start)
+	endInt,_ := strconv.Atoi(end)
+
+	
+	for i:=startInt; i<endInt+1; i++ {
+		chromInt:= strconv.Itoa(i)
+		wgChunk.Add(1)
+		smallerChunk(chromInt,build,outDir,imputeDir,imputeSuffix,bindPoint,container,chunkVariants)
+		time.Sleep(1* time.Second)
+	}
+
+	allChunksFinished = 0
 
 }
 
-func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outPrefix,rel,loco,covTransform string) {
-	defer wgSchedule.Done()
+func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,container string, chunkVariants int){
+	defer wgChunk.Done()
 
-	cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/R/Rscript", "/opt/step1_fitNULLGLMM.R",
+	// hg38 requires the chr prefix
+	if build == "hg38" {
+		chrom = "chr"+chrom
+	}
+
+	// calculate full loops (not partial where total variants in loops remainder < chunkVariants which is always the last loop)
+	loops := int(math.Floor(float64(chrLengths[chrom])/float64(chunkVariants)))
+	maxLoops := loops + 1
+
+	//totalVariants is a byte slice but can be converted to a single string by casting it as a string() -- returns total variants in file
+	totalVariants,err := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/bcftools",
+		"index",
+		"--nrecords",
+		filepath.Join(imputeDir, chrom+imputeSuffix)).Output()
+
+
+	// if error is seen, print error and exit out of function, otherwise print the total variants in the vcf file and continue
+	if err != nil {
+		tErr := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
+		fmt.Printf("[func(smallerChunk) %s] %s overall: Error in total variants call:\n%v", formatted,chrom, err)
+		return
+	} else {
+		tErr := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
+		fmt.Printf("[func(smallerChunk) %s] A total of %s variants are in the vcf file for %s\n", formatted,strings.TrimSpace(string(totalVariants)),chrom)
+	}
+
+	// convert byte slice to string, trim any trailing whitespace of either end and then convert to integer
+	varVal,_ := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
+	/*if err != nil{
+		tErr := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
+		fmt.Printf("[func(smallerChunk) %s] There was an error converting the total variants to an integer, likely due to lack of SNPs in the region. The error encountered is:\n%v\n",formatted,err)
+		return
+	}*/
+	
+
+	// if chunk is larger than total variants in file, do not chunk and just add full imputation file to queue
+	if chunkVariants > 200*varVal {
+		changeQueueSize.Lock() // lock access to shared queue to prevent collision
+		processQueue = append(processQueue, chrom+imputeSuffix)
+		changeQueueSize.Unlock() // unlock access to shared queue
+		t0 := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+		fmt.Printf("[func(smallerChunk) %s] %s is in the queue and %d is variant value\n", formatted,chrom+imputeSuffix,varVal)
+	}else {
+		for loopId := 1; loopId < maxLoops + 1; loopId++ {
+			wgSmallChunk.Add(1)
+			go processing(loopId,chunkVariants,bindPoint,container,chrom,outDir,imputeDir,imputeSuffix)
+			time.Sleep(1* time.Second)
+		}
+	}
+	wgSmallChunk.Wait()
+
+}
+
+func processing (loopId,chunkVariants int, bindPoint,container,chrom,outDir,imputeDir,imputeSuffix string) {
+	defer wgSmallChunk.Done()
+	t0 := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+	fmt.Printf("[func(processing) %s] Processing %s, chunk %d\n", formatted, chrom, loopId)
+	
+	loopNum := strconv.Itoa(loopId)
+	upperVal := loopId*chunkVariants
+	lowerVal := (loopId*chunkVariants)-(chunkVariants)+1
+	upperValStr := strconv.Itoa(upperVal)
+	lowerValStr := strconv.Itoa(lowerVal) 
+	subset := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/bcftools",
+		"view",
+		"--regions",
+		chrom+":"+lowerValStr+"-"+upperValStr,
+		"-Oz",
+		"-o",
+		filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,
+		filepath.Join(imputeDir, chrom+imputeSuffix))
+	subset.Run()
+
+	errorHandling.Lock()
+    subset.Stdout = os.Stdout
+    subset.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+
+	index := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/tabix",
+	"-p",
+	"vcf",
+	filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
+	index.Run()
+
+	errorHandling.Lock()
+   	index.Stdout = os.Stdout
+    index.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+	totalVariants,_ := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/bcftools",
+		"index",
+		"--nrecords",
+		filepath.Join(outDir, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
+
+	fmt.Printf("%v, %s chunk %s, %s-%s", strings.TrimSpace(string(totalVariants)), chrom, loopNum, lowerValStr, upperValStr)				
+	varVal,_ := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
+	/*if err1 != nil{
+		t0 := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+		fmt.Printf("[func(processing) %s] %s, chunk %s:\n\tThere was an error converting the total variants to an integer, likely due to lack of SNPs in the region. The error encountered is:\n%v\n",formatted,chrom,loopNum,err1)
+		return
+	}*/
+			
+	if varVal > 0 {
+		changeQueueSize.Lock()
+		processQueue = append(processQueue, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
+		changeQueueSize.Unlock()
+		t1 := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
+		fmt.Printf("[func(processing) %s] %s, chunk %s has successfully completed and has been added to the processing queue. Time Elapsed: %.2f minutes\n", formatted,chrom,loopNum, time.Since(t0).Minutes())
+	}else{
+		t1 := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
+		fmt.Printf("[func(processing) %s] %s is empty with value %d and will not be added to queue.\n", formatted, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix, varVal)
+	}
+}
+	
+
+func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform string) {
+	defer wgNull.Done() // decrement wgNull sync object
+	t0 := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+	fmt.Printf("[func(nullModel) %s] Starting Null Model...\n", formatted)
+
+	// singularity command to run step1: null model
+	cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
 		"--sparseGRMFile="+sparseGRM,
 		"--sparseGRMSampleIDFile="+sampleIDFile,
 		"--phenoFile="+phenoFile,
@@ -100,158 +367,60 @@ func nullModel (bindPoint,container,sparseGRM,sampleIDFile,phenoFile,plink,trait
 		"--LOCO="+loco,
 		"--isCovariateTransform="+covTransform)
 
-	cmd.Run()
-	//err := cmd.Start()
-	//if err != nil {
-	//	fmt.Println("Oooops, error!\n %v", err)
-	//}
-	_ = cmd.Wait()
-}
-
-
-func associationAnalysis (bindpoint,container,build,vcfFile,vcfFileIndex,vcfField,sampleIDFile,chrom,IsDropMissingDosages,MAF,MAC,outPrefix,LOCO string) {
-	defer wgAssociation.Done()
-	switch {
-	case build == "hg38":
-		cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/usr/lib/R/bin/R/Rscript", "/opt/step2_SPAtests.R",
-			"--vcfFile="+vcfFile
-			"--vcfFileIndex="+vcfFileIndex,
-			"--vcfField="+vcfField,
-			"--sampleFile="+sampleIDFile,
-			"--chrom=chr"+chrom,
-			"--IsDropMissingDosages="+IsDropMissingDosages,
-			"--minMAF="+MAF,
-			"--minMAC="+MAC,
-			"--GMMATmodelFile="+filepath.Join(outDir, outPrefix)+".rda"
-			"--varianceRatioFile="+filepath.Join(outDir, outPrefix)+".varianceRatio.txt"
-			"--numLinesOutput=2",
-			"--IsOutputAFinCaseCtrl=TRUE",
-			"--IsOutputHetHomCountsinCaseCtrl=TRUE",
-			"--IsOutputBETASEinBurdenTest=TRUE",
-			"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_chrm"+chrom+"_SNPassociationAnalysis.txt",
-			"--LOCO="+loco)
-		cmd.Run()
-		_ := cmd.Wait()
-	case build == "hg19":
-		cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/step2_SPAtests.R",
-			"--vcfFile="+sparseGRM,
-			"--vcfFileIndex="+sampleIDFile,
-			"--vcfField="+phenoFile,
-			"--sampleFile="+plink,
-			"--chrom="+chrom,
-			"--IsDropMissingDosages="+IsDropMissingDosages,
-			"--minMAF="+MAF,
-			"--minMAC="+MAC,
-			"--GMMATmodelFile="+filepath.Join(outDir, outPrefix)+".rda"
-			"--varianceRatioFile="+filepath.Join(outDir, outPrefix)+".varianceRatio.txt"
-			"--numLinesOutput=2",
-			"--IsOutputAFinCaseCtrl=TRUE",
-			"--IsOutputHetHomCountsinCaseCtrl=TRUE",
-			"--IsOutputBETASEinBurdenTest=TRUE",
-			"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_chrm"+chrom+"_SNPassociationAnalysis.txt",
-			"--LOCO="+loco)
-		cmd.Run()
-		_ := cmd.Wait()
-	default:
-		fmt.Println("The build you have selected must be either hg38 or hg19.  Please note, build is defined on the build of
-			the imputed data set, not the plink file and not the build you desire your output to be based upon.")
-		os.Exit(42)
-
-	}
-}
-
-
-/*func cleanResults () {
-	defer wgSummarize.Done()
-
-	cmd := exec.Command("singularity", "run", "-B", bindPoint, container, "/opt/step3_GWASsummary.R"
-		"--assocFile=$inputAssociationFile",
-		"--infoFile=$infoFile",
-		"--dataOutputPrefix=$dataOutputPrefix",
-		"--macFilter=10",
-		"--mafFilter=0.05",
-		"--traitType=binary")
-	)
-}
-*/
-
-
-func chunk(start,end,build,chunkVariants,chromosomeLengthFile string) {
-	fmt.Println("%v\n", chunkVariants)
-	fileBytes, err := os.Open(chromosomeLengthFile)
-	if err != nil {
-		fmt.Printf("There was a problems reading in the chromosome length file.")
-		os.Exit(42)
-	}
-
-	defer fileBytes.Close()
-
-	scanBytes := bufio.NewReader(fileBytes)
-	//var line string
-	for {
-		line, err := scanBytes.ReadString('\n')
-		if err != nil && err != io.EOF {
-			fmt.Println("An error occurred when reading in the chromosome length file.")
-			os.Exit(42)
-		}
-
-		if err == io.EOF {
-			fmt.Println("Finished reading chromosome file length")
-			break
-		}
-		
-		tmp := strings.Split(line, "\t")
-		intVal, _ := strconv.Atoi(strings.TrimSpace(tmp[1]))
-		//fmt.Printf("%v\n", intVal)
-		chrLengths[tmp[0]] = intVal
-	}
-
-	//fmt.Printf("%v", chrLengths)
-	startInt,_ :=  strconv.Atoi(start)
-	endInt,_ := strconv.Atoi(end)
-	fmt.Printf("%v\n", startInt)
-	fmt.Printf("%v\n",endInt)
-	for i:=startInt; i<endInt+1; i++ {
-		chromInt:= strconv.Itoa(i)
-		fmt.Printf("%v\n", i)
-		wgChunk.Add(1)
-		go smallerChunk(chromInt,build)
-	}
-	wgChunk.Wait()
-
-
-}
-
-func smallerChunk(chrom,build string){
-	defer wgChunk.Done()
-
-	if build == "hg38" {
-		chrom = "chr"+chrom
-	}
-	time.Sleep(5 * time.Second)
-
-
-	fmt.Printf("%s\n", chrom)
+	cmd.Run() // run automatically wait for null to finish before processing next lines within function
 	
+	errorHandling.Lock()
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    errorHandling.Unlock()
+
+	t1 := time.Now()
+	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
+	fmt.Printf("[func(nullModel) %s] Finished Null Model. Time Elapsed: %.2f minutes\n", formatted, time.Since(t0).Minutes())
 }
 
 
+func associationAnalysis(bindpoint,container,vcfFile,vcfField,outDir,chrom,subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco string) {
+	defer wgAssociation.Done() // decrement wgAssociation sync object when function finishes
+	queueCheck.Lock() // lock the number of associations running to prevent collision
+	allAssocationsRunning++
+	queueCheck.Unlock() // unlock shared variable safely
 
-	/* grab vcf header and then do a split call by line
-	/homelink/brunettt/TOOLS/bcftools-1.5/bcftools view -h chr1_rsq70_merged_renamed.vcf.gz > header.txt
+	t0 := time.Now()
+	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
+	fmt.Printf("[func(associationAnalysis) %s] Starting Association of %s...\n", formatted, vcfFile)
 
-	grep -v of # and split -l <numberOfLines> --suffix-length=100000 imputationFileName prefix
+	// run step2: association analyses command in SAIGE via Singularity		
+	cmd := exec.Command("singularity", "run", "-B", bindpoint, container, "/usr/lib/R/bin/Rscript", "/opt/step2_SPAtests.R",
+		"--vcfFile="+vcfFile,
+		"--vcfFileIndex="+vcfFile+".tbi",
+		"--vcfField="+vcfField,
+		"--sampleFile="+sampleIDFile,
+		"--chrom="+chrom,
+		"--IsDropMissingDosages="+IsDropMissingDosages,
+		"--minMAF=0",
+		"--minMAC=0",
+		"--GMMATmodelFile="+filepath.Join(outDir, outPrefix)+".rda",
+		"--varianceRatioFile="+filepath.Join(outDir, outPrefix)+".varianceRatio.txt",
+		"--numLinesOutput=2",
+		"--IsOutputAFinCaseCtrl=TRUE",
+		"--IsOutputHetHomCountsinCaseCtrl=TRUE",
+		"--IsOutputBETASEinBurdenTest=TRUE",
+		"--IsOutputNinCaseCtrl=TRUE",
+		"--SAIGEOutputFile="+filepath.Join(outDir, outPrefix)+"_"+subName+"_SNPassociationAnalysis.txt",
+		"--LOCO="+loco)
+	cmd.Run()
+	
+	errorHandling.Lock()
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    errorHandling.Unlock()
 
-	cat header to each split
+	t1 := time.Now()
+	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
+	fmt.Printf("[func(associationAnalysis) %s] %s has successfully completed. Time Elapsed: %.2f minutes\n", formatted,vcfFile,time.Since(t0).Minutes())
 
-	bgzip -c file.vcf > file.vcf.gz
-	tabix -p vcf file.vcf.gz
-
-	rm .vcf non-gzipped version
-	submit to queue key is chromosome and value is the for loop replaceding the vcfFile and vcfFileIndex
-
-	rm all subset vcf.gz files -- careful not to remove the imputed files!!
-
-	all this can be a goroutine per chromsome with its own so they run concurrently and a sync object
-	*/
-
+	queueCheck.Lock() // lock shared variable to prevent collision
+	allAssocationsRunning--
+	queueCheck.Unlock() // unlock access to shared variable
+}
