@@ -15,12 +15,13 @@ import (
 	"time"
 )
 
-var wgChunk sync.WaitGroup
+var queueFileSave sync.Mutex
 var chrLengths = make(map[string]int)
 var processQueue = make([]string, 0)
 var allChunksFinished int
 var allAssocationsRunning int
 var totalChunksProcessing int
+var wgChunk sync.WaitGroup
 var wgPipeline sync.WaitGroup
 var wgSmallChunk sync.WaitGroup
 var wgNull sync.WaitGroup
@@ -32,20 +33,21 @@ var errorHandling sync.Mutex
 var chunkQueue sync.Mutex
 
 
-//TODO: PRINT OUT QUEUE DOC FOR THOSE THAT WANT TO REUSE CHUNKS -- ALSO ADD OPTION TO SAVE CHUNKS
+//TODO: PRINT OUT QUEUE DOC FOR THOSE THAT WANT TO REUSE CHUNKS -- implemented and needs testing 
+//TODO: Add Option to use queue doc and implement -- implemented needs testing
+//TODO: ALSO ADD OPTION TO SAVE CHUNKS for parsing -- logic within code and what to do with flag is already implemented
 //TODO: confirm all path and columns exist from user else, throw error
-//TODO: Need binary/quant trait check which different options and defaults for step 2 association analysis
 //TODO: Still need to print out stdout and errors from exec.Command() calls
 //TODO: In cleanAndGraph make sure dataframes are not empty before graphing or skip graph for that data set
-//TODO: Throw wanring if user input for MAF is > 0.50, because then it is not a minor allele
-//TODO: clean up temp files
+//TODO: clean up temp files  -- implemented but needs testing
 //TODO: use totalCPUsAvail to determine how many threads to allocate to Null (if no chunking required use all selse use certain percentage -- use full for graphing)
+//TODO: if sparse kinship is not provided, automatically generate one
+//TODO: for quant traits default for --invNormalize=" in null model should be set to true ,for binary default is false when parsing user input
 
 func main() {
 	totalCPUsAvail := runtime.NumCPU()
 	runtime.GOMAXPROCS(totalCPUsAvail)
 	fmt.Printf("%v total CPUs available.\n", totalCPUsAvail)
-	nprocs := 24
 
 	allChunksFinished = 1
 	// variables that need to be acquired by parsing through user input
@@ -57,7 +59,7 @@ func main() {
 	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
 	bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
-	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_10312020.simg"
+	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11092020.simg"
 	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
 	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
 	sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
@@ -80,24 +82,35 @@ func main() {
 	MAC := "10"
 	IsDropMissingDosages := "FALSE"
 	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rsq70.info.SAIGE.txt"
-	//saveChunks := false
+	saveChunks := true
+	imputationFileList := "" // this is required if skipChunking is set to true
+	skipChunking := false
 	// end of variables
-
 
 	// split chroms
  	chroms:= strings.Split(chromosomes, "-")
  	start:= strings.TrimSpace(chroms[0])
  	end:= strings.TrimSpace(chroms[1])
 
+ 	f,_:= os.Create(filepath.Join(bindPointTemp, outPrefix+"_chunkedImputationQueue.txt"))
+	defer f.Close()
+
  	// STEP1: Run Null Model Queue
  	wgNull.Add(1)
 	go nullModel(bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
 
- 	/* STEP1a: Chunks Queue
+ 	
+ 	/* STEP1a: Chunks Queue or Use of previously chunked imputation data
  	chunk can run the same time as the null model; and the association analysis needs to wait for the 
  	null to finish and chunk to finish*/
-  	wgAllChunks.Add(1)
-    go chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container,chunkVariants)
+ 	if skipChunking ==  false {
+ 		wgAllChunks.Add(1)
+    	go chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container,chunkVariants,f)
+ 	}else {
+ 		wgAllChunks.Add(1)
+ 		go usePrevChunks(imputeDir, imputationFileList)
+ 	}
+  
     
     // wait for null model to finish before proceeding with association analysis -- no need to wait for chunk to finish
     wgNull.Wait()
@@ -106,7 +119,7 @@ func main() {
     /* STEP2: Association Analysis Queue
 	while loop to keep submitting jobs until queue is empty and no more subsets are available*/
 	for allChunksFinished == 1 || len(processQueue) != 0 {
-		if allAssocationsRunning < (nprocs*2) && len(processQueue) > 0 {
+		if allAssocationsRunning < (totalCPUsAvail*2) && len(processQueue) > 0 {
 			changeQueueSize.Lock() // lock queue to prevent collision
 			vcfFile := processQueue[0]
 			tmp := strings.Split(vcfFile, "_") // extract chromosome name
@@ -136,7 +149,7 @@ func main() {
     concatTime := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
     fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
-    concat := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/concatenate.sh", filepath.Join(outDir,outPrefix))
+    concat := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/concatenate.sh", filepath.Join(bindPointTemp,outPrefix))
     concat.Stdout = os.Stdout
     concat.Stderr = os.Stderr
     concat.Run()
@@ -164,13 +177,8 @@ func main() {
 
     fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
 
-    /* TODO: clean up temp files
-    matches,_ := filepath.Glob(filepath.Join(bindPointTemp,"*_allChromosomeResultsMerged.txt"))
-    matches,_ := filepath.Glob(filepath.Join(bindPointTemp,"*.txt.gz"))
-    matches = append(matches,...)
-    */
-
-
+    //TODO: clean up temp files
+    saveResults(bindPointTemp,outDir,saveChunks)
 
     // Pipeline Finish
     fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
@@ -179,7 +187,7 @@ func main() {
 
 
 
-func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int) {
+func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int, f *os.File) {
 	defer wgAllChunks.Done() //once function finishes decrement sync object
 
 	fileBytes, err := os.Open(chromosomeLengthFile)
@@ -216,7 +224,7 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 	for i:=startInt; i<endInt+1; i++ {
 		chromInt:= strconv.Itoa(i)
 		wgChunk.Add(1)
-		smallerChunk(chromInt,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container,chunkVariants)
+		smallerChunk(chromInt,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container,chunkVariants,f)
 		time.Sleep(1* time.Second)
 	}
 
@@ -224,7 +232,7 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 
 }
 
-func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int){
+func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int, f *os.File){
 	defer wgChunk.Done()
 
 	// hg38 requires the chr prefix
@@ -270,13 +278,14 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 		changeQueueSize.Lock() // lock access to shared queue to prevent collision
 		processQueue = append(processQueue, chrom+imputeSuffix)
 		changeQueueSize.Unlock() // unlock access to shared queue
+		saveQueue(chrom+imputeSuffix,f)
 		t0 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 		fmt.Printf("[func(smallerChunk) %s] %s is in the queue and %d is variant value\n", formatted,chrom+imputeSuffix,varVal)
 	}else {
 		for loopId := 1; loopId < maxLoops + 1; loopId++ {
 			wgSmallChunk.Add(1)
-			go processing(loopId,chunkVariants,bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix)
+			go processing(loopId,chunkVariants,bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix,f)
 			time.Sleep(1* time.Second)
 		}
 	}
@@ -284,7 +293,7 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 
 }
 
-func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix string) {
+func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix string, f *os.File) {
 	defer wgSmallChunk.Done()
 	t0 := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
@@ -340,6 +349,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		changeQueueSize.Lock()
 		processQueue = append(processQueue, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
 		changeQueueSize.Unlock()
+		saveQueue(chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,f)
 		t1 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
 		fmt.Printf("[func(processing) %s] %s, chunk %s has successfully completed and has been added to the processing queue. Time Elapsed: %.2f minutes\n", formatted,chrom,loopNum, time.Since(t0).Minutes())
@@ -357,33 +367,71 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 	fmt.Printf("[func(nullModel) %s] Starting Null Model...\n", formatted)
 
-	// singularity command to run step1: null model
-	cmd := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
-		"--sparseGRMFile="+sparseGRM,
-		"--sparseGRMSampleIDFile="+sampleIDFile,
-		"--phenoFile="+phenoFile,
-		"--plinkFile="+plink,
-		"--traitType="+trait,
-		"--phenoCol="+pheno,
-		"--invNormalize="+invNorm,
-		"--covarColList="+covars,
-		"--sampleIDColinphenoFile="+sampleID,
-		"--nThreads="+nThreads,
-		"--IsSparseKin="+sparseKin,
-		"--numRandomMarkerforVarianceRatio="+markers,
-		"--skipModelFitting=False",
-		"--memoryChunk=5",
-		"--outputPrefix="+filepath.Join(bindPointTemp, outPrefix),
-		"--relatednessCutoff="+rel,
-		"--LOCO="+loco,
-		"--isCovariateTransform="+covTransform)
+	switch{
+	case strings.ToLower(strings.TrimSpace(trait)) == "binary":
+		
+		// singularity command to run step1: null model for true binary (0 controls, 1 cases) traits
+		cmd := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
+			"--sparseGRMFile="+sparseGRM,
+			"--sparseGRMSampleIDFile="+sampleIDFile,
+			"--phenoFile="+phenoFile,
+			"--plinkFile="+plink,
+			"--traitType=binary",
+			"--phenoCol="+pheno,
+			"--invNormalize="+invNorm,
+			"--covarColList="+covars,
+			"--sampleIDColinphenoFile="+sampleID,
+			"--nThreads="+nThreads,
+			"--IsSparseKin="+sparseKin,
+			"--numRandomMarkerforVarianceRatio="+markers,
+			"--skipModelFitting=False",
+			"--memoryChunk=5",
+			"--outputPrefix="+filepath.Join(bindPointTemp, outPrefix),
+			"--relatednessCutoff="+rel,
+			"--LOCO="+loco,
+			"--isCovariateTransform="+covTransform)
 
-	cmd.Run() // run automatically wait for null to finish before processing next lines within function
+		cmd.Run() // run automatically wait for null to finish before processing next lines within function
 	
-	errorHandling.Lock()
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    errorHandling.Unlock()
+		errorHandling.Lock()
+    	cmd.Stdout = os.Stdout
+    	cmd.Stderr = os.Stderr
+    	errorHandling.Unlock()
+
+	case strings.ToLower(strings.TrimSpace(trait)) == "quantitative":
+		// singularity command to run step1: null model for quantitative traits
+		cmd := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
+			"--sparseGRMFile="+sparseGRM,
+			"--sparseGRMSampleIDFile="+sampleIDFile,
+			"--phenoFile="+phenoFile,
+			"--plinkFile="+plink,
+			"--traitType=quantitative",
+			"--phenoCol="+pheno,
+			"--invNormalize="+invNorm,
+			"--covarColList="+covars,
+			"--sampleIDColinphenoFile="+sampleID,
+			"--nThreads="+nThreads,
+			"--IsSparseKin="+sparseKin,
+			"--numRandomMarkerforVarianceRatio="+markers,
+			"--skipModelFitting=False",
+			"--memoryChunk=5",
+			"--outputPrefix="+filepath.Join(bindPointTemp, outPrefix),
+			"--relatednessCutoff="+rel,
+			"--LOCO="+loco,
+			"--isCovariateTransform="+covTransform,
+			"--tauInit=1,0")
+
+		cmd.Run() // run automatically wait for null to finish before processing next lines within function
+	
+		errorHandling.Lock()
+    	cmd.Stdout = os.Stdout
+    	cmd.Stderr = os.Stderr
+    	errorHandling.Unlock()	
+
+	default:
+		fmt.Printf("Please select trait type as either binary or quantitative.  You entered: %s.\n", trait)
+		os.Exit(42)
+	}
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
@@ -460,4 +508,68 @@ func checkInput(MAC,MAF string) {
 		fmt.Printf("[func(checkInput)] Error: minor allele frequency cannot be smaller (negative) than 0 (0%). Please select a value between 0.0-0.50.\n")
 		os.Exit(42)
 	}
+}
+
+func saveResults(bindPointTemp,outDir string, saveChunks bool) {
+	save := time.Now()
+	fmt.Printf("[func(saveResults) -- begin transferring final results]\n")
+	matches := make([]string, 0)
+    findThese := [12]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
+    			"*.varianceRatio.txt", "*.rda", "*.pdf", "*.png", "*._allChromosomeResultsMerged.txt", 
+    			"*.txt.gz", "*.vcf.gz", "*.vcf.gz.tbi", "*_chunkedImputationQueue.txt"}
+    for _, suffix := range findThese {
+    	if saveChunks == false && (suffix == "*.vcf.gz" || suffix == "*.vcf.gz.tbi" || suffix == "*_chunkedImputationQueue.txt") {
+    		continue
+    	}else{
+    		tmpMatches,_ := filepath.Glob(filepath.Join(bindPointTemp, suffix))
+    		if len(tmpMatches) != 0 {
+    			matches = append(matches,tmpMatches...)
+    		}
+    	}
+    }
+    for _,fileTransfer := range matches {
+    	fileName := strings.Split(fileTransfer, "/")
+    	err := os.Rename(fileTransfer, filepath.Join(outDir,fileName[len(fileName)-1]))
+    	if err != nil {
+    		fmt.Printf("[func(saveResults) -- transferring final results] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    	}
+    }
+    fmt.Printf("[func(saveResults) -- finished transferring final results] Time Elapsed: %.2f minutes\n", time.Since(save).Minutes())
+}
+
+
+func saveQueue (queueFile string, f *os.File) {
+	queueFileSave.Lock()
+	savedQueue, err := f.WriteString(queueFile+"\n")
+	if err != nil {
+		fmt.Printf("[func(saveQueue)] There was an error when writing queue to file:\n \t%v\n", err)
+		queueFileSave.Unlock()
+
+	}else{
+		fmt.Printf("[func(saveQueue)] Saved chunked file to queue list: %v\n", savedQueue)
+		f.Sync()
+		queueFileSave.Unlock()
+	}
+}
+
+
+func usePrevChunks (imputeDir,imputationFileList string) {
+	defer wgAllChunks.Done()
+	fileQueue, err := os.Open(imputationFileList)
+	if err != nil {
+		fmt.Printf("[func(usePrevChunks)] There was an error opening the imputation chunk file list. The error is as follows: %v\n", err)
+		os.Exit(42)
+	}
+
+	scanner := bufio.NewScanner(fileQueue)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		changeQueueSize.Lock()
+		processQueue = append(processQueue, filepath.Join(imputeDir, scanner.Text()))
+		changeQueueSize.Unlock()
+		fmt.Printf("[func(usePrevChunks)] %s, has been added to the processing queue.\n", scanner.Text())
+	}
+
+	allChunksFinished++
 }
