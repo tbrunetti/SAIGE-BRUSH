@@ -56,11 +56,13 @@ func main() {
 	build := "hg38"
 	chromosomes := "21-22"
 	imputeSuffix := "_rsq70_merged_renamed.vcf.gz"
-	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
+	//imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
+	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
 	bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
 	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11092020.simg"
-	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
+	//outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
+	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline_11122020"
 	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
 	sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
 	sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
@@ -71,7 +73,7 @@ func main() {
 	invNorm := "FALSE"
 	covars := "PC1,PC2,PC3,PC4,PC5,SAIGE_GENDER,age"
 	sampleID := "FULL_BBID"
-	nThreads := "20"
+	nThreads := "24"
 	sparseKin := "TRUE"
 	markers := "30"
 	rel := "0.0625"
@@ -82,9 +84,9 @@ func main() {
 	MAC := "10"
 	IsDropMissingDosages := "FALSE"
 	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rsq70.info.SAIGE.txt"
-	saveChunks := true
-	imputationFileList := "" // this is required if skipChunking is set to true
-	skipChunking := false
+	saveChunks := false
+	imputationFileList := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3_chunkedImputationQueue.txt" // this is required if skipChunking is set to true
+	skipChunking := true
 	// end of variables
 
 	// split chroms
@@ -125,7 +127,7 @@ func main() {
 			tmp := strings.Split(vcfFile, "_") // extract chromosome name
 			subName := strings.TrimSuffix(vcfFile, imputeSuffix)
 			// if condition is true, that means the data is not chunked and need to be read from the imputeDir not outDir
-			if tmp[0]+imputeSuffix == vcfFile {
+			if ((tmp[0]+imputeSuffix == vcfFile) || (skipChunking == true)) {
 				wgAssociation.Add(1)
 				go associationAnalysis(bindPoint,bindPointTemp,container,filepath.Join(imputeDir,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
 				processQueue = processQueue[1:]
@@ -566,7 +568,7 @@ func usePrevChunks (imputeDir,imputationFileList string) {
 
 	for scanner.Scan() {
 		changeQueueSize.Lock()
-		processQueue = append(processQueue, filepath.Join(imputeDir, scanner.Text()))
+		processQueue = append(processQueue, scanner.Text())
 		changeQueueSize.Unlock()
 		fmt.Printf("[func(usePrevChunks)] %s, has been added to the processing queue.\n", scanner.Text())
 	}
