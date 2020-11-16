@@ -13,6 +13,8 @@ import (
 	"math"
 	"runtime"
 	"time"
+	"io/ioutil"
+	"archive/tar"
 )
 
 var queueFileSave sync.Mutex
@@ -43,6 +45,7 @@ var chunkQueue sync.Mutex
 //TODO: use totalCPUsAvail to determine how many threads to allocate to Null (if no chunking required use all selse use certain percentage -- use full for graphing)
 //TODO: if sparse kinship is not provided, automatically generate one
 //TODO: for quant traits default for --invNormalize=" in null model should be set to true ,for binary default is false when parsing user input
+//TODO: if bindPointTemp, outDir, and bindpoint equal eachother need logic for saveResults and default bindPointTemp
 
 func main() {
 	totalCPUsAvail := runtime.NumCPU()
@@ -56,13 +59,13 @@ func main() {
 	build := "hg38"
 	chromosomes := "21-22"
 	imputeSuffix := "_rsq70_merged_renamed.vcf.gz"
-	//imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
-	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline"
+	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
+	//imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
 	bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
 	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11092020.simg"
-	//outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
-	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline_11122020"
+	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
+	//outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline_11122020"
 	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
 	sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
 	sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
@@ -86,17 +89,30 @@ func main() {
 	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rsq70.info.SAIGE.txt"
 	saveChunks := false
 	imputationFileList := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3_chunkedImputationQueue.txt" // this is required if skipChunking is set to true
-	skipChunking := true
+	skipChunking := false
 	// end of variables
 
-	// split chroms
+	// split chroms -- only pretains to option when chunking of imputation file is required
  	chroms:= strings.Split(chromosomes, "-")
  	start:= strings.TrimSpace(chroms[0])
  	end:= strings.TrimSpace(chroms[1])
 
- 	f,_:= os.Create(filepath.Join(bindPointTemp, outPrefix+"_chunkedImputationQueue.txt"))
+ 	// create tmp folder to be deleted at end of run
+ 	err:=os.Mkdir(filepath.Join(bindPointTemp, "tmp_saige"), 0755)
+ 	if err != nil {
+ 		fmt.Printf("[func(main)] There was an error creating the tmp directory. \t%v\n", err)
+ 		os.Exit(42)
+ 	}else {
+ 		fmt.Printf("[func(main) Created tmp directory called tmp_saige in %s\n]", bindPointTemp)
+ 	}
+ 	defer os.RemoveAll(filepath.Join(bindPointTemp, "tmp_saige")) // remove tmp_saige dir after main finishes
+
+	
+
+	f,_:= os.Create(filepath.Join(bindPointTemp, "tmp_saige", outPrefix+"_chunkedImputationQueue.txt"))
 	defer f.Close()
 
+ 	
  	// STEP1: Run Null Model Queue
  	wgNull.Add(1)
 	go nullModel(bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
@@ -134,7 +150,7 @@ func main() {
 				time.Sleep(1* time.Second) // prevent queue overload
 			}else{
 				wgAssociation.Add(1)
-				go associationAnalysis(bindPoint,bindPointTemp,container,filepath.Join(bindPointTemp,vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
+				go associationAnalysis(bindPoint,bindPointTemp,container,filepath.Join(bindPointTemp,"tmp_saige",vcfFile),vcfField,outDir,tmp[0],subName,sampleIDFile,IsDropMissingDosages,outPrefix,loco)
 				processQueue = processQueue[1:]
 				time.Sleep(1* time.Second) // prevent queue overload
 			}
@@ -151,7 +167,7 @@ func main() {
     concatTime := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
     fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
-    concat := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/concatenate.sh", filepath.Join(bindPointTemp,outPrefix))
+    concat := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/concatenate.sh", filepath.Join(bindPointTemp,"tmp_saige",outPrefix))
     concat.Stdout = os.Stdout
     concat.Stderr = os.Stderr
     concat.Run()
@@ -163,9 +179,9 @@ func main() {
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
     fmt.Printf("[func(main) -- clean and graph results] Start data clean up, visualization, and summarization...\n")
     cleanAndGraph := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step3_GWASsummary.R",
-			"--assocFile="+filepath.Join(bindPointTemp, outPrefix) + "_allChromosomeResultsMerged.txt",
+			"--assocFile="+filepath.Join(bindPointTemp,"tmp_saige",outPrefix) + "_allChromosomeResultsMerged.txt",
 			"--infoFile="+infoFile,
-			"--dataOutputPrefix="+filepath.Join(bindPointTemp, outPrefix),
+			"--dataOutputPrefix="+filepath.Join(bindPointTemp,"tmp_saige",outPrefix),
 			"--pheno="+pheno,
 			"--covars="+covars,
 			"--macFilter="+MAC,
@@ -180,7 +196,7 @@ func main() {
     fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
 
     //TODO: clean up temp files
-    saveResults(bindPointTemp,outDir,saveChunks)
+    saveResults(bindPointTemp,outPrefix,outDir,saveChunks)
 
     // Pipeline Finish
     fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
@@ -312,7 +328,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		chrom+":"+lowerValStr+"-"+upperValStr,
 		"-Oz",
 		"-o",
-		filepath.Join(bindPointTemp, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,
+		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,
 		filepath.Join(imputeDir, chrom+imputeSuffix))
 	subset.Run()
 
@@ -325,7 +341,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 	index := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/tabix",
 		"-p",
 		"vcf",
-		filepath.Join(bindPointTemp, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
+		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
 	index.Run()
 
 	errorHandling.Lock()
@@ -336,7 +352,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 	totalVariants,_ := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/bcftools",
 		"index",
 		"--nrecords",
-		filepath.Join(bindPointTemp, chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
+		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
 
 	fmt.Printf("%v, %s chunk %s, %s-%s", strings.TrimSpace(string(totalVariants)), chrom, loopNum, lowerValStr, upperValStr)				
 	varVal,_ := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
@@ -388,7 +404,7 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 			"--numRandomMarkerforVarianceRatio="+markers,
 			"--skipModelFitting=False",
 			"--memoryChunk=5",
-			"--outputPrefix="+filepath.Join(bindPointTemp, outPrefix),
+			"--outputPrefix="+filepath.Join(bindPointTemp,"tmp_saige",outPrefix),
 			"--relatednessCutoff="+rel,
 			"--LOCO="+loco,
 			"--isCovariateTransform="+covTransform)
@@ -417,7 +433,7 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 			"--numRandomMarkerforVarianceRatio="+markers,
 			"--skipModelFitting=False",
 			"--memoryChunk=5",
-			"--outputPrefix="+filepath.Join(bindPointTemp, outPrefix),
+			"--outputPrefix="+filepath.Join(bindPointTemp,"tmp_saige",outPrefix),
 			"--relatednessCutoff="+rel,
 			"--LOCO="+loco,
 			"--isCovariateTransform="+covTransform,
@@ -461,14 +477,14 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 		"--IsDropMissingDosages="+IsDropMissingDosages,
 		"--minMAF=0",
 		"--minMAC=0",
-		"--GMMATmodelFile="+filepath.Join(bindPointTemp, outPrefix)+".rda",
-		"--varianceRatioFile="+filepath.Join(bindPointTemp, outPrefix)+".varianceRatio.txt",
+		"--GMMATmodelFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".rda",
+		"--varianceRatioFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".varianceRatio.txt",
 		"--numLinesOutput=2",
 		"--IsOutputAFinCaseCtrl=TRUE",
 		"--IsOutputHetHomCountsinCaseCtrl=TRUE",
 		"--IsOutputBETASEinBurdenTest=TRUE",
 		"--IsOutputNinCaseCtrl=TRUE",
-		"--SAIGEOutputFile="+filepath.Join(bindPointTemp, outPrefix)+"_"+subName+"_SNPassociationAnalysis.txt",
+		"--SAIGEOutputFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+"_"+subName+"_SNPassociationAnalysis.txt",
 		"--LOCO="+loco)
 	cmd.Run()
 	
@@ -512,9 +528,17 @@ func checkInput(MAC,MAF string) {
 	}
 }
 
-func saveResults(bindPointTemp,outDir string, saveChunks bool) {
+func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
 	save := time.Now()
 	fmt.Printf("[func(saveResults) -- begin transferring final results]\n")
+	err:=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"), 0755)
+	if err != nil {
+ 		fmt.Printf("[func(saveResults)] There was an error creating the final results directory. \t%v\n", err)
+ 		os.Exit(42)
+ 	}else {
+ 		fmt.Printf("[func(saveResults) Created final results directory called %s\n]", outputPrefix+"_finalResults")
+ 	}
+
 	matches := make([]string, 0)
     findThese := [12]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
     			"*.varianceRatio.txt", "*.rda", "*.pdf", "*.png", "*._allChromosomeResultsMerged.txt", 
@@ -523,7 +547,7 @@ func saveResults(bindPointTemp,outDir string, saveChunks bool) {
     	if saveChunks == false && (suffix == "*.vcf.gz" || suffix == "*.vcf.gz.tbi" || suffix == "*_chunkedImputationQueue.txt") {
     		continue
     	}else{
-    		tmpMatches,_ := filepath.Glob(filepath.Join(bindPointTemp, suffix))
+    		tmpMatches,_ := filepath.Glob(filepath.Join(bindPointTemp, "tmp_saige", suffix))
     		if len(tmpMatches) != 0 {
     			matches = append(matches,tmpMatches...)
     		}
@@ -531,11 +555,45 @@ func saveResults(bindPointTemp,outDir string, saveChunks bool) {
     }
     for _,fileTransfer := range matches {
     	fileName := strings.Split(fileTransfer, "/")
-    	err := os.Rename(fileTransfer, filepath.Join(outDir,fileName[len(fileName)-1]))
+    	err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults",fileName[len(fileName)-1]))
     	if err != nil {
     		fmt.Printf("[func(saveResults) -- transferring final results] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     	}
     }
+
+    //tar final file
+   	filesToTar, err := ioutil.ReadDir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
+    tarFileName, tarErr := os.Create(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"))
+    if tarErr != nil {
+    	fmt.Printf("[func(saveResults) Error encountered when creating compressed tar file \t%v\n]", tarErr)
+    }
+    defer tarFileName.Close()
+    var writeTar io.WriteCloser = tarFileName
+    tarFileWriter := tar.NewWriter(writeTar)
+    defer tarFileWriter.Close() // close when finished
+
+    for _,fileMeta := range filesToTar {
+    	file, err := os.Open(filepath.Join(bindPointTemp,outputPrefix+"_finalResults") + string(filepath.Separator) + fileMeta.Name())
+    	defer file.Close()
+    	// prepare the tar header
+     	header := new(tar.Header)
+     	header.Name = file.Name()
+     	header.Size = fileMeta.Size()
+     	header.Mode = int64(fileMeta.Mode())
+     	header.ModTime = fileMeta.ModTime()
+
+     	err = tarFileWriter.WriteHeader(header)
+      	if err != nil {
+      		fmt.Printf("[func(saveResults) -- transferring final results] Problem writing file to tar.  The following error was encountered: %v\n",err)
+      	}
+ 
+      	_, err = io.Copy(tarFileWriter, file)
+      	if err != nil {
+      		fmt.Printf("[func(saveResults) -- transferring final results] Problem copying file to tar.  The following error was encountered: %v\n",err)
+      	} 
+    }
+
+    defer os.RemoveAll(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
     fmt.Printf("[func(saveResults) -- finished transferring final results] Time Elapsed: %.2f minutes\n", time.Since(save).Minutes())
 }
 
@@ -573,5 +631,5 @@ func usePrevChunks (imputeDir,imputationFileList string) {
 		fmt.Printf("[func(usePrevChunks)] %s, has been added to the processing queue.\n", scanner.Text())
 	}
 
-	allChunksFinished++
+	allChunksFinished--
 }
