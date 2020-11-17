@@ -63,12 +63,14 @@ func main() {
 	//imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline"
 	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
 	bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
-	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11092020.simg"
+	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg"
 	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
 	//outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline_11122020"
 	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
-	sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
-	sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
+	sparseGRM := ""
+	sampleIDFile := ""
+	//sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
+	//sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
 	phenoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/pheWAS_CCPMbb_freeze_v1.3.txt" 
 	plink := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/LDprunedMEGA/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned"
 	trait := "binary"
@@ -90,6 +92,8 @@ func main() {
 	saveChunks := false
 	imputationFileList := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3_chunkedImputationQueue.txt" // this is required if skipChunking is set to true
 	skipChunking := false
+	generateGRM := true
+	grmMAF := "0.01"
 	// end of variables
 
 	// split chroms -- only pretains to option when chunking of imputation file is required
@@ -108,15 +112,78 @@ func main() {
  	defer os.RemoveAll(filepath.Join(bindPointTemp, "tmp_saige")) // remove tmp_saige dir after main finishes
 
 	
-
+ 	// create queue file for saving and re-using chunks
 	f,_:= os.Create(filepath.Join(bindPointTemp, "tmp_saige", outPrefix+"_chunkedImputationQueue.txt"))
 	defer f.Close()
+
+
+
+	// STEP0: Generate Kinship Matrix
+	if generateGRM == true {
+		plinkFloat,_ := strconv.ParseFloat(grmMAF, 64)
+		plinkFloat = plinkFloat + 0.005
+		plinkFloatString := fmt.Sprintf("%f", plinkFloat)
+		plinkLD := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/plink2",
+			"--bfile",
+			plink,
+			"--maf",
+			plinkFloatString,
+			"--make-bed",
+			"--out",
+			filepath.Join(bindPointTemp, "tmp_saige", outPrefix + "_"+grmMAF))
+		plinkLD.Stdout = os.Stdout
+		plinkLD.Stderr = os.Stderr
+		plinkLD.Run()
+		
+		totalSNPsTmp,_ := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container,
+			"wc",
+			"-l",
+			filepath.Join(bindPointTemp, "tmp_saige", outPrefix+"_"+grmMAF+".bim")).Output()
+
+		totalSNPs:=strings.Fields(string(totalSNPsTmp)) // convert byte stream to string and then split based on whitespace to get int string
+
+
+		fmt.Printf("[func(main) generate GRM] There are a total of %v snps that meet the maf requirements for GRM calculation.\n", totalSNPs[0])
+
+
+		createGRM := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/createSparseGRM.R",
+			"--plinkFile="+plink,
+			"--outputPrefix="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix),
+			"--numRandomMarkerforSparseKin="+string(totalSNPs[0]),
+			"--relatednessCutoff="+rel,
+			"--memoryChunk=2",
+			"--isDiagofKinSetAsOne=FALSE",
+			"--nThreads="+nThreads,
+			"--minMAFforGRM="+grmMAF)
+		createGRM.Stdout = os.Stdout
+		createGRM.Stderr = os.Stderr
+		createGRM.Run()
+
+		sparseGRM = filepath.Join(bindPointTemp, "tmp_saige", outPrefix+"_relatednessCutoff_"+rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx")
+		fmt.Printf("[func(main) -- generate GRM] Sparse GRM path located at: %s\n", sparseGRM)
+		sampleIDFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix+"_relatednessCutoff_"+rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt")
+		fmt.Printf("[func(main) -- generate GRM] Sparse GRM sampleID path located at: %s\n", sampleIDFile)
+	}
 
  	
  	// STEP1: Run Null Model Queue
  	wgNull.Add(1)
-	go nullModel(bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
-
+ 	if skipChunking == true {
+		go nullModel(bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,nThreads,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
+	} else {
+		threadsNull,err := strconv.Atoi(nThreads)
+		if err != nil {
+			fmt.Printf("[func(main) null thread allocation] There was an error converting threads: %v\n", err)
+			os.Exit(42)
+		}
+		toNull := math.Ceil(float64(threadsNull) * 0.75)
+		toChunk := math.Ceil(float64(threadsNull) - toNull)
+		toNullString := fmt.Sprintf("%f", toNull)
+		
+		fmt.Printf("There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", threadsNull, toNull, toChunk)
+		
+		go nullModel(bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFile,plink,trait,pheno,invNorm,covars,sampleID,toNullString,sparseKin,markers,outDir,outPrefix,rel,loco,covTransform) 
+	}
  	
  	/* STEP1a: Chunks Queue or Use of previously chunked imputation data
  	chunk can run the same time as the null model; and the association analysis needs to wait for the 
@@ -540,9 +607,9 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
  	}
 
 	matches := make([]string, 0)
-    findThese := [12]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
+    findThese := [14]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
     			"*.varianceRatio.txt", "*.rda", "*.pdf", "*.png", "*._allChromosomeResultsMerged.txt", 
-    			"*.txt.gz", "*.vcf.gz", "*.vcf.gz.tbi", "*_chunkedImputationQueue.txt"}
+    			"*.txt.gz", "*.vcf.gz", "*.vcf.gz.tbi", "*_chunkedImputationQueue.txt","*.log", "*.err"}
     for _, suffix := range findThese {
     	if saveChunks == false && (suffix == "*.vcf.gz" || suffix == "*.vcf.gz.tbi" || suffix == "*_chunkedImputationQueue.txt") {
     		continue
@@ -594,6 +661,15 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
     }
 
     defer os.RemoveAll(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
+
+	
+    // check if tmp bindpoint is different from outdir; if true then move to outdir, if false keep in tmpDir
+    tmpLoc := strings.TrimSpace(strings.TrimSuffix(bindPointTemp, "/"))
+	finalLoc := strings.TrimSpace(strings.TrimSuffix(outDir, "/"))
+
+    if tmpLoc  != finalLoc {
+    	os.Rename(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"), filepath.Join(outDir,outputPrefix+"_finalResults.tar"))
+    }	
     fmt.Printf("[func(saveResults) -- finished transferring final results] Time Elapsed: %.2f minutes\n", time.Since(save).Minutes())
 }
 
@@ -606,7 +682,7 @@ func saveQueue (queueFile string, f *os.File) {
 		queueFileSave.Unlock()
 
 	}else{
-		fmt.Printf("[func(saveQueue)] Saved chunked file to queue list: %v\n", savedQueue)
+		fmt.Printf("[func(saveQueue)] Saved chunked file to queue list: %v\n", string(savedQueue))
 		f.Sync()
 		queueFileSave.Unlock()
 	}
