@@ -120,51 +120,6 @@ func main() {
 	defer f.Close()
 
 
-	/*
-	// variables that need to be acquired by parsing through user input
-	chunkVariants := 1000000
-	chromosomeLengthFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/hg38_chrom_sizes.txt"
-	build := "hg38"
-	chromosomes := "21-22"
-	imputeSuffix := "_rsq70_merged_renamed.vcf.gz"
-	imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputation"
-	//imputeDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline"
-	bindPoint := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/"
-	bindPointTemp := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/tmp/"
-	container := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg"
-	outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/"
-	//outDir := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline_11122020"
-	outPrefix := "GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3"
-	sparseGRM := ""
-	sampleIDFile := ""
-	//sparseGRM := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx"
-	//sampleIDFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/step0_GRM/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned_relatednessCutoff_0.0625_103154_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt"
-	phenoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/biobank_paper_pheWAS/pheWAS_CCPMbb_freeze_v1.3.txt" 
-	plink := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/LDprunedMEGA/Biobank.v1.3.eigenvectors.070620.reordered.LDpruned"
-	trait := "binary"
-	pheno := "multiple_sclerosis"
-	invNorm := "FALSE"
-	covars := "PC1,PC2,PC3,PC4,PC5,SAIGE_GENDER,age"
-	sampleID := "FULL_BBID"
-	nThreads := "24"
-	sparseKin := "TRUE"
-	markers := "30"
-	rel := "0.0625"
-	loco := "TRUE"
-	covTransform := "TRUE"
-	vcfField := "DS" // DS or GT
-	MAF := "0.05"
-	MAC := "10"
-	IsDropMissingDosages := "FALSE"
-	infoFile := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/requiredData/TOPMedImputationInfo/allAutosomes.rsq70.info.SAIGE.txt"
-	saveChunks := false
-	imputationFileList := "/gpfs/scratch/brunettt/test_SAIGE/newSAIGE_test_07262020/test_new_pipeline/GO_TEST_multiple_sclerosis_CCPMbb_freeze_v1.3_chunkedImputationQueue.txt" // this is required if skipChunking is set to true
-	skipChunking := false
-	generateGRM := true
-	grmMAF := "0.01"
-	// end of variables
-	*/
-
 	////////////////////////////////////////////////
 	// START BUILDING LOGIC FOR PIPELINE START STEPS
 	////////////////////////////////////////////////
@@ -228,7 +183,8 @@ func main() {
  	if parserMap.SkipChunking == true {
 		go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
 			parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,parserMap.NThreads,parserMap.SparseKin,parserMap.Markers,
-			parserMap.OutDir,parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform) 
+			parserMap.OutDir,parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform)
+		time.Sleep(1* time.Minute) 
 	} else {
 		threadsNull,err := strconv.Atoi(parserMap.NThreads)
 		if err != nil {
@@ -244,6 +200,8 @@ func main() {
 		go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
 			parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,toNullString,parserMap.SparseKin,parserMap.Markers,parserMap.OutDir,
 			parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform) 
+		time.Sleep(1* time.Minute) 
+
 	}
  	
  	/* STEP1a: Chunks Queue or Use of previously chunked imputation data
@@ -664,7 +622,6 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	allCovsSplit := strings.Split(covars, ",")
 	allCovsSplit = append(allCovsSplit, pheno)
 	allCovsSplit = append(allCovsSplit, sampleID)
-	fmt.Printf("allCovsSplit %v\n", allCovsSplit)
 	checkPhenoFile,err := os.Open(phenoFile)
 	if err != nil {
 		fmt.Printf("There was an error opening your phenotype file: \n\t%v", err)
@@ -678,7 +635,6 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 			headerLine := readFile.Text()
 			headerLineSplit := strings.Split(headerLine,  "\t")
 			for _,value := range allCovsSplit {
-				fmt.Printf("Submitting %v\n", value)
 				findElement(headerLineSplit, value)
 			}
 		} else {
