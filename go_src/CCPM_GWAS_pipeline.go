@@ -17,6 +17,8 @@ import (
 	"archive/tar"
 )
 
+//TO DO: TAR OPTION OR UNCOMPRESSED OR MULITPLE TARS so if save chunks is true it saves it separately -- implement so that is uses only relative path!
+
 var queueFileSave sync.Mutex
 var chrLengths = make(map[string]int)
 var processQueue = make([]string, 0)
@@ -31,7 +33,7 @@ var wgAssociation sync.WaitGroup
 var wgAllChunks sync.WaitGroup
 var changeQueueSize sync.Mutex
 var queueCheck sync.Mutex
-var errorHandling sync.Mutex
+//var errorHandling sync.Mutex
 var chunkQueue sync.Mutex
 var parserMap = struct {
 	Runtype string
@@ -90,7 +92,7 @@ func main() {
 	} else {
 		maxThreads,err := strconv.Atoi(parserMap.NThreads)
 		if err != nil{
-			fmt.Printf("[func(main) Thread Allocation] There was a problem allocating your threads.  You entered: %v\n, %v", parserMap.NThreads, err)
+			fmt.Printf("[func(main) Thread Allocation %s] There was a problem allocating your threads.  You entered: %v\n, %v", time.Now(),parserMap.NThreads, err)
 			os.Exit(42)
 		}
 		runtime.GOMAXPROCS(maxThreads)
@@ -108,10 +110,10 @@ func main() {
 	 // create tmp folder to be deleted at end of run
  	err:=os.Mkdir(filepath.Join(parserMap.BindPointTemp, "tmp_saige"), 0755)
  	if err != nil {
- 		fmt.Printf("[func(main)] There was an error creating the tmp directory. \t%v\n", err)
+ 		fmt.Printf("[func(main) %s] There was an error creating the tmp directory. \t%v\n", time.Now(), err)
  		os.Exit(42)
  	}else {
- 		fmt.Printf("[func(main) Created tmp directory called tmp_saige in %s\n]", parserMap.BindPointTemp)
+ 		fmt.Printf("[func(main) %s] Created tmp directory called tmp_saige in %s\n", time.Now(), parserMap.BindPointTemp)
  	}
  	defer os.RemoveAll(filepath.Join(parserMap.BindPointTemp, "tmp_saige")) // remove tmp_saige dir after main finishes
 
@@ -155,7 +157,7 @@ func main() {
 		totalSNPs:=strings.Fields(string(totalSNPsTmp)) // convert byte stream to string and then split based on whitespace to get int string
 
 
-		fmt.Printf("[func(main) generate GRM] There are a total of %v snps that meet the maf requirements for GRM calculation.\n", totalSNPs[0])
+		fmt.Printf("[func(main) generate GRM %s] There are a total of %v snps that meet the maf requirements for GRM calculation.\n", time.Now(),totalSNPs[0])
 
 
 		createGRM := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/usr/lib/R/bin/Rscript", "/opt/createSparseGRM.R",
@@ -172,9 +174,9 @@ func main() {
 		createGRM.Run()
 
 		parserMap.SparseGRM = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx")
-		fmt.Printf("[func(main) -- generate GRM] Sparse GRM path located at: %s\n", parserMap.SparseGRM)
+		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM path located at: %s\n", time.Now(),parserMap.SparseGRM)
 		parserMap.SampleIDFile = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt")
-		fmt.Printf("[func(main) -- generate GRM] Sparse GRM sampleID path located at: %s\n", parserMap.SampleIDFile)
+		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM sampleID path located at: %s\n", time.Now(),parserMap.SampleIDFile)
 	}
 
  	
@@ -188,7 +190,7 @@ func main() {
 	} else {
 		threadsNull,err := strconv.Atoi(parserMap.NThreads)
 		if err != nil {
-			fmt.Printf("[func(main) null thread allocation] There was an error converting threads: %v\n", err)
+			fmt.Printf("[func(main) null thread allocation %s] There was an error converting threads: %v\n", time.Now(),err)
 			os.Exit(42)
 		}
 		toNull := math.Ceil(float64(threadsNull) * 0.75)
@@ -224,7 +226,8 @@ func main() {
     /* STEP2: Association Analysis Queue
 	while loop to keep submitting jobs until queue is empty and no more subsets are available*/
 	for allChunksFinished == 1 || len(processQueue) != 0 {
-		if allAssocationsRunning < (totalCPUsAvail*2) && len(processQueue) > 0 {
+		if ((allAssocationsRunning < totalCPUsAvail) && (len(processQueue) > 0)) {
+			fmt.Printf("[func(main) %s] The total number of associations running is %v.\n", time.Now(), allAssocationsRunning)
 			changeQueueSize.Lock() // lock queue to prevent collision
 			vcfFile := processQueue[0]
 			tmp := strings.Split(vcfFile, "_") // extract chromosome name
@@ -261,12 +264,12 @@ func main() {
     concat.Stderr = os.Stderr
     concat.Run()
     
-    fmt.Printf("[func(main) -- concatenate] Finished all association results. Time Elapsed: %.2f minutes\n", time.Since(concatTime).Minutes())
+    fmt.Printf("[func(main) -- concatenate %s] Finished all association results. Time Elapsed: %.2f minutes\n", time.Now(),time.Since(concatTime).Minutes())
 
     // STEP3: Clean, Visualize, and Summarize results
     graph := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
-    fmt.Printf("[func(main) -- clean and graph results] Start data clean up, visualization, and summarization...\n")
+    fmt.Printf("[func(main) -- clean and graph results %s] Start data clean up, visualization, and summarization...\n", time.Now())
     cleanAndGraph := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/usr/lib/R/bin/Rscript", "/opt/step3_GWASsummary.R",
 			"--assocFile="+filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix) + "_allChromosomeResultsMerged.txt",
 			"--infoFile="+parserMap.InfoFile,
@@ -282,13 +285,13 @@ func main() {
     cleanAndGraph.Run()
 
 
-    fmt.Printf("[func(main) -- clean and graph results] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Since(graph).Minutes())
+    fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
 
     //TODO: clean up temp files
     saveResults(parserMap.BindPointTemp,parserMap.OutPrefix,parserMap.OutDir,parserMap.SaveChunks)
 
     // Pipeline Finish
-    fmt.Printf("[func(main)] All threads are finished and pipeline is complete!\n")
+    fmt.Printf("[func(main) %s] All threads are finished and pipeline is complete!\n", time.Now())
 }
 
 
@@ -302,6 +305,7 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 		fmt.Printf("There was a problems reading in the chromosome length file.")
 		os.Exit(42)
 	}
+
 
 	defer fileBytes.Close() // once funciton finished close file
 
@@ -333,10 +337,10 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 		wgChunk.Add(1)
 		smallerChunk(chromInt,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container,chunkVariants,f)
 		time.Sleep(1* time.Second)
+		wgChunk.Wait() // one chromosome chunk at a time to limit files being open
 	}
 
 	allChunksFinished = 0
-
 }
 
 func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int, f *os.File){
@@ -363,7 +367,6 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 		tErr := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
 		fmt.Printf("[func(smallerChunk) %s] %s overall: Error in total variants call:\n%v", formatted,chrom, err)
-		return
 	} else {
 		tErr := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
@@ -419,31 +422,43 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		"-o",
 		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,
 		filepath.Join(imputeDir, chrom+imputeSuffix))
-	subset.Run()
+	bcfToolsErr := subset.Run()
+	if bcfToolsErr != nil {
+		fmt.Printf("[func(processing) %s] BcfTools subsetting of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, bcfToolsErr)
+		return
+	}
 
+	/*
 	errorHandling.Lock()
     subset.Stdout = os.Stdout
     subset.Stderr = os.Stderr
     errorHandling.Unlock()
-
+    */
 
 	index := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/tabix",
 		"-p",
 		"vcf",
 		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
-	index.Run()
+	indexErr:=index.Run()
+	if indexErr != nil {
+		fmt.Printf("[func(processing) %s] Indexing of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, indexErr)
+		return
+	}
 
+	/*
 	errorHandling.Lock()
    	index.Stdout = os.Stdout
     index.Stderr = os.Stderr
     errorHandling.Unlock()
+    */
 
 	totalVariants,_ := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/bcftools",
 		"index",
 		"--nrecords",
 		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix).Output()
 
-	fmt.Printf("%v, %s chunk %s, %s-%s", strings.TrimSpace(string(totalVariants)), chrom, loopNum, lowerValStr, upperValStr)				
+
+	//fmt.Printf("%v, %s chunk %s, %s-%s", strings.TrimSpace(string(totalVariants)), chrom, loopNum, lowerValStr, upperValStr)				
 	varVal,_ := strconv.Atoi(strings.TrimSpace(string(totalVariants)))
 	/*if err1 != nil{
 		t0 := time.Now()
@@ -498,12 +513,15 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 			"--LOCO="+loco,
 			"--isCovariateTransform="+covTransform)
 
-		cmd.Run() // run automatically wait for null to finish before processing next lines within function
-	
-		errorHandling.Lock()
-    	cmd.Stdout = os.Stdout
+			
+		//errorHandling.Lock()
+		cmd.Stdout = os.Stdout
     	cmd.Stderr = os.Stderr
-    	errorHandling.Unlock()
+    	//errorHandling.Unlock()
+		cmd.Run() // run automatically wait for null to finish before processing next lines within function
+
+  
+
 
 	case strings.ToLower(strings.TrimSpace(trait)) == "quantitative":
 		// singularity command to run step1: null model for quantitative traits
@@ -528,12 +546,13 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 			"--isCovariateTransform="+covTransform,
 			"--tauInit=1,0")
 
-		cmd.Run() // run automatically wait for null to finish before processing next lines within function
-	
-		errorHandling.Lock()
+		//errorHandling.Lock()
     	cmd.Stdout = os.Stdout
     	cmd.Stderr = os.Stderr
-    	errorHandling.Unlock()	
+    	//errorHandling.Unlock()
+
+		cmd.Run() // run automatically wait for null to finish before processing next lines within function
+		
 
 	default:
 		fmt.Printf("Please select trait type as either binary or quantitative.  You entered: %s.\n", trait)
@@ -556,6 +575,7 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
 	fmt.Printf("[func(associationAnalysis) %s] Starting Association of %s...\n", formatted, vcfFile)
 
+
 	// run step2: association analyses command in SAIGE via Singularity		
 	cmd := exec.Command("singularity", "run", "-B", bindpoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step2_SPAtests.R",
 		"--vcfFile="+vcfFile,
@@ -575,12 +595,27 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 		"--IsOutputNinCaseCtrl=TRUE",
 		"--SAIGEOutputFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+"_"+subName+"_SNPassociationAnalysis.txt",
 		"--LOCO="+loco)
-	cmd.Run()
 	
+	cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+	//assocErr := cmd.Run()
+	cmd.Run()
+
+	
+	/*
+	if assocErr != nil {
+		fmt.Printf("[func(associationAnalysis) %s] Association analysis of %s finished with error: %v\n", time.Now(), vcfFile, assocErr)
+		queueCheck.Lock() // lock shared variable to prevent collision
+		allAssocationsRunning--
+		queueCheck.Unlock() // unlock access to shared variable
+		return
+	}
+
 	errorHandling.Lock()
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
     errorHandling.Unlock()
+    */
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
@@ -646,13 +681,13 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 
 func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
 	save := time.Now()
-	fmt.Printf("[func(saveResults) -- begin transferring final results]\n")
+	fmt.Printf("[func(saveResults) -- begin transferring final results %s]\n", time.Now())
 	err:=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"), 0755)
 	if err != nil {
- 		fmt.Printf("[func(saveResults)] There was an error creating the final results directory. \t%v\n", err)
+ 		fmt.Printf("[func(saveResults) %s] There was an error creating the final results directory. \t%v\n", time.Now(), err)
  		os.Exit(42)
  	}else {
- 		fmt.Printf("[func(saveResults) Created final results directory called %s\n]", outputPrefix+"_finalResults")
+ 		fmt.Printf("[func(saveResults) %s]Created final results directory called %s\n", time.Now(), outputPrefix+"_finalResults")
  	}
 
 	matches := make([]string, 0)
@@ -673,7 +708,7 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
     	fileName := strings.Split(fileTransfer, "/")
     	err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults",fileName[len(fileName)-1]))
     	if err != nil {
-    		fmt.Printf("[func(saveResults) -- transferring final results] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     	}
     }
 
@@ -681,7 +716,7 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
    	filesToTar, err := ioutil.ReadDir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
     tarFileName, tarErr := os.Create(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"))
     if tarErr != nil {
-    	fmt.Printf("[func(saveResults) Error encountered when creating compressed tar file \t%v\n]", tarErr)
+    	fmt.Printf("[func(saveResults) %s] Error encountered when creating compressed tar file \t%v\n", time.Now(),tarErr)
     }
     defer tarFileName.Close()
     var writeTar io.WriteCloser = tarFileName
@@ -700,12 +735,12 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
 
      	err = tarFileWriter.WriteHeader(header)
       	if err != nil {
-      		fmt.Printf("[func(saveResults) -- transferring final results] Problem writing file to tar.  The following error was encountered: %v\n",err)
+      		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem writing file to tar.  The following error was encountered: %v\n",time.Now(),err)
       	}
  
       	_, err = io.Copy(tarFileWriter, file)
       	if err != nil {
-      		fmt.Printf("[func(saveResults) -- transferring final results] Problem copying file to tar.  The following error was encountered: %v\n",err)
+      		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem copying file to tar.  The following error was encountered: %v\n",time.Now(),err)
       	} 
     }
 
@@ -719,19 +754,19 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
     if tmpLoc  != finalLoc {
     	os.Rename(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"), filepath.Join(outDir,outputPrefix+"_finalResults.tar"))
     }	
-    fmt.Printf("[func(saveResults) -- finished transferring final results] Time Elapsed: %.2f minutes\n", time.Since(save).Minutes())
+    fmt.Printf("[func(saveResults) -- finished transferring final results %s] Time Elapsed: %.2f minutes\n", time.Now(), time.Since(save).Minutes())
 }
 
 
 func saveQueue (queueFile string, f *os.File) {
 	queueFileSave.Lock()
-	savedQueue, err := f.WriteString(queueFile+"\n")
+	_, err := f.WriteString(queueFile+"\n")
 	if err != nil {
-		fmt.Printf("[func(saveQueue)] There was an error when writing queue to file:\n \t%v\n", err)
+		fmt.Printf("[func(saveQueue) %s] There was an error when writing %s queue to file:\t%v\n", time.Now(),queueFile, err)
 		queueFileSave.Unlock()
 
 	}else{
-		fmt.Printf("[func(saveQueue)] Saved chunked file to queue list: %v\n", string(savedQueue))
+		fmt.Printf("[func(saveQueue)%s] Saved chunked file to queue list: %s\n", time.Now(),queueFile)
 		f.Sync()
 		queueFileSave.Unlock()
 	}
@@ -742,7 +777,7 @@ func usePrevChunks (imputeDir,imputationFileList string) {
 	defer wgAllChunks.Done()
 	fileQueue, err := os.Open(imputationFileList)
 	if err != nil {
-		fmt.Printf("[func(usePrevChunks)] There was an error opening the imputation chunk file list. The error is as follows: %v\n", err)
+		fmt.Printf("[func(usePrevChunks) %s] There was an error opening the imputation chunk file list. The error is as follows: %v\n", time.Now(),err)
 		os.Exit(42)
 	}
 
@@ -753,7 +788,7 @@ func usePrevChunks (imputeDir,imputationFileList string) {
 		changeQueueSize.Lock()
 		processQueue = append(processQueue, scanner.Text())
 		changeQueueSize.Unlock()
-		fmt.Printf("[func(usePrevChunks)] %s, has been added to the processing queue.\n", scanner.Text())
+		fmt.Printf("[func(usePrevChunks) %s] %s, has been added to the processing queue.\n", time.Now(), scanner.Text())
 	}
 
 	allChunksFinished--
