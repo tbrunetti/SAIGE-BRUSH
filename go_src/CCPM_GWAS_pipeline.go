@@ -85,7 +85,7 @@ func main() {
 	parser(configFilename)
 
 	totalCPUsAvail := runtime.NumCPU()
-	fmt.Printf("%v total CPUs available.\n", totalCPUsAvail)
+	fmt.Printf("[func(main) Thread Allocation %s] %v total CPUs available.\n", time.Now(),totalCPUsAvail)
 	if parserMap.NThreads == "" {
 		parserMap.NThreads = strconv.Itoa(totalCPUsAvail)
 		runtime.GOMAXPROCS(totalCPUsAvail)
@@ -98,7 +98,7 @@ func main() {
 		runtime.GOMAXPROCS(maxThreads)
 	}
 
-	fmt.Printf("%v total CPUs will be used.\n", parserMap.NThreads)
+	fmt.Printf("[func(main) Thread Allocation %s] %v total CPUs will be used.\n", time.Now(), parserMap.NThreads)
 	
 	
 	
@@ -197,7 +197,7 @@ func main() {
 		toChunk := math.Ceil(float64(threadsNull) - toNull)
 		toNullString := fmt.Sprintf("%f", toNull)
 		
-		fmt.Printf("There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", threadsNull, toNull, toChunk)
+		fmt.Printf("func(main) null thread allocation %s] There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", time.Now(), threadsNull, toNull, toChunk)
 		
 		go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
 			parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,toNullString,parserMap.SparseKin,parserMap.Markers,parserMap.OutDir,
@@ -302,7 +302,7 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 
 	fileBytes, err := os.Open(chromosomeLengthFile)
 	if err != nil {
-		fmt.Printf("There was a problems reading in the chromosome length file.")
+		fmt.Printf("func(chunk) %s] There was a problems reading in the chromosome length file.", time.Now())
 		os.Exit(42)
 	}
 
@@ -398,9 +398,9 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 			go processing(loopId,chunkVariants,bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix,f)
 			time.Sleep(1* time.Second)
 		}
+		wgSmallChunk.Wait()
 	}
-	wgSmallChunk.Wait()
-
+	
 }
 
 func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chrom,outDir,imputeDir,imputeSuffix string, f *os.File) {
@@ -555,7 +555,7 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 		
 
 	default:
-		fmt.Printf("Please select trait type as either binary or quantitative.  You entered: %s.\n", trait)
+		fmt.Printf("func(nullModel) %s] Please select trait type as either binary or quantitative.  You entered: %s.\n", time.Now(), trait)
 		os.Exit(42)
 	}
 
@@ -659,7 +659,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	allCovsSplit = append(allCovsSplit, sampleID)
 	checkPhenoFile,err := os.Open(phenoFile)
 	if err != nil {
-		fmt.Printf("There was an error opening your phenotype file: \n\t%v", err)
+		fmt.Printf("[func(checkInput)] There was an error opening your phenotype file: \n\t%v", err)
 	}
 	defer checkPhenoFile.Close()
 
@@ -766,7 +766,7 @@ func saveQueue (queueFile string, f *os.File) {
 		queueFileSave.Unlock()
 
 	}else{
-		fmt.Printf("[func(saveQueue)%s] Saved chunked file to queue list: %s\n", time.Now(),queueFile)
+		fmt.Printf("[func(saveQueue) %s] Saved chunked file to queue list: %s\n", time.Now(),queueFile)
 		f.Sync()
 		queueFileSave.Unlock()
 	}
@@ -809,7 +809,7 @@ func findElement (headerSlice []string, element string) {
 func parser (configFile string) {
 	fileBytes, err := os.Open(configFile)
 	if err != nil {
-		fmt.Printf("There was a problems reading config file.\n")
+		fmt.Printf("[func(parser)] There was a problems reading config file.\n")
 		os.Exit(42)
 	}
 
