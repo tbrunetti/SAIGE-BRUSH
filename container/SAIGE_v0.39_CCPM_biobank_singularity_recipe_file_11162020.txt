@@ -1,0 +1,142 @@
+Bootstrap: debootstrap
+OSVersion: bionic
+MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+Include: apt
+
+%help
+	This container will run SAIGE version 0.39. Additional custom scripts have been added to support the CCPM Biobank efforts and scope.
+
+%setup
+	cp -R SAIGE $SINGULARITY_ROOTFS/SAIGE
+	cp plink2_linux_x86_64.zip $SINGULARITY_ROOTFS
+	echo $SINGULARITY_ROOTFS
+	ls -lhrt $SINGULARITY_ROOTFS
+%post
+	echo "Installing all container dependencies!"
+	apt-get -y update
+	apt-get install -y software-properties-common
+	ls -lhrt
+	apt-get install -y gpgv gpgsm gnupg-l10n gnupg
+	apt-get install -y gcc
+	apt-get install -y make
+	apt-get install -y libbz2-dev
+	apt-get install -y zlib1g-dev
+	apt-get install -y libncurses5-dev
+	apt-get install -y liblzma-dev
+	apt-get -y install git
+	apt-get install -y unzip
+	add-apt-repository universe
+	apt-get -y install libpcre2-8-0 libcurl4-openssl-dev
+	apt-get -y install libmagick++-dev
+	apt-get install -y build-essential zlib1g-dev libncurses5-dev  libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+	add-apt-repository ppa:deadsnakes/ppa
+	apt-get -y update
+	apt-get -y install locales && locale-gen en_US.UTF-8
+	wget https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2.tar.gz
+	tar -zxvf cmake-3.15.2.tar.gz
+	echo "TESTING"
+	locale-gen en_US.UTF-8
+	echo "LC_CTYPE=\"en_US.UTF-8\"" >> /etc/default/locale
+        echo "LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_COLLATE=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_TIME=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_MESSAGES=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_MONETARY=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_PAPER=\"en_US.UTF-8\"" >> /etc/default/locale
+	echo "LC_MEASUREMENT=\"en_US.UTF-8\"" >> /etc/default/locale
+	cat /etc/default/locale
+	cd cmake-3.15.2
+	./bootstrap
+	make
+	cd ../
+	apt-get -y install libssl1.1
+	apt-get -y install libxml2-dev
+	wget https://github.com/samtools/htslib/releases/download/1.11/htslib-1.11.tar.bz2
+	tar -xjvf htslib-1.11.tar.bz2
+	cd htslib-1.11
+	./configure
+	make
+	mv bgzip /opt
+	mv tabix /opt
+	mv htslib /opt
+	cd ..
+ 	wget https://github.com/samtools/samtools/releases/download/1.11/samtools-1.11.tar.bz2
+	tar -xjvf samtools-1.11.tar.bz2
+	cd samtools-1.11
+	./configure
+	make 
+	mv samtools /opt
+	cd ..
+	wget https://github.com/samtools/bcftools/releases/download/1.11/bcftools-1.11.tar.bz2
+	tar -xjvf bcftools-1.11.tar.bz2
+	cd bcftools-1.11
+	./configure
+	make
+	mv bcftools /opt
+	cd ..
+	mv plink2_linux_x86_64.zip /opt/
+        cd /opt
+        unzip plink2_linux_x86_64.zip
+        cd ../
+	apt-get -y install python3
+	apt-get -y install python3-pip
+	apt-get -y install python3-dev
+	apt-get -y install 2to3
+	apt-get -y install python3-lib2to3
+	apt-get install python3-toolz
+	pip3 install cget
+	which python3
+	ln -s /usr/bin/python3 /usr/bin/python
+	export LC_ALL=C.UTF-8
+    	export LANG=C.UTF-8
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+	add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/'
+	apt-get -y update
+	apt-get -y install r-base-core r-recommended r-base-html
+	apt-get -y install r-base
+	R --slave -e 'install.packages("ncdf", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'BiocManager::install("limma")'
+	R --slave -e 'install.packages("tidyverse", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("Rcpp", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("RcppParallel", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("RcppArmadillo", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("data.table", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("optparse", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("RcppEigen", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("BH", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("RCurl", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("Matrix", repos="https://cloud.r-project.org", dependencies=T)'
+ 	R --slave -e 'install.packages("readr", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("plyr", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("magick", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("png", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("ggplotify", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'install.packages("gridExtra", repos="https://cloud.r-project.org", dependencies=T)'
+	R --slave -e 'BiocManager::install("SPAtest")'
+        R --slave -e 'BiocManager::install("SKAT")'
+	R --slave -e 'BiocManager::install("MetaSKAT")'
+	R --slave -e 'BiocManager::install("ggplot2")'
+	R --slave -e 'BiocManager::install("GWASTools")'
+	R --slave -e 'BiocManager::install("qqman")'	
+	R --slave -e 'BiocManager::install("SNPRelate")'
+	R --slave -e 'BiocManager::install("gdsfmt")'
+	R --slave -e 'BiocManager::install("GENESIS")'
+	ls -lhrt /usr/lib/R
+	ls -lhrt
+	mv SAIGE /usr/lib/R/site-library/
+%files
+	extdataCustom/createSparseGRM.R /opt
+	extdataCustom/step0_genesisToSaige.R /opt
+	extdataCustom/step1_fitNULLGLMM.R /opt
+	extdataCustom/step2_SPAtests.R /opt
+	extdataCustom/step3_GWASsummary.R /opt
+	extdataCustom/cleanAndGraph.R /opt
+	extdataCustom/concatenate.sh /opt
+	
+%environment
+	export NETCDF_INCLUDE=/usr/include
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/bin/
+
+%runscript
+	exec "$@"
