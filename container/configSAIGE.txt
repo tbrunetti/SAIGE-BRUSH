@@ -35,3 +35,4 @@ SkipChunking:false
 GenerateGRM:true
 GrmMAF:0.01
 ChunkVariants:1000000
+SaveAsTar:false
