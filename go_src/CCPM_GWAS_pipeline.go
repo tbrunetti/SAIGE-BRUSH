@@ -73,11 +73,12 @@ var parserMap = struct {
 	SkipChunking bool // defaults to false
 	GenerateGRM bool // defaults to true
 	GrmMAF string // defaults to 0.01
+	SaveAsTar bool // defaults as false
 }{
 	"FULL",1000000, "", "hg38", "1-22", "","","","","SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg",
 	"","myOutput","","","","","","",
 	"FALSE","","","","TRUE","30","0.0625","TRUE","TRUE","DS","0.05","10","FALSE", "",
-	true,"",false,true,"0.01"}
+	true,"",false,true,"0.01",false}
 
 func main() {
 	// always need to happen regardless of pipeline step being run
@@ -288,7 +289,7 @@ func main() {
     fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
 
     //TODO: clean up temp files
-    saveResults(parserMap.BindPointTemp,parserMap.OutPrefix,parserMap.OutDir,parserMap.SaveChunks)
+    saveResults(parserMap.BindPointTemp,parserMap.OutPrefix,parserMap.OutDir,parserMap.SaveChunks,parserMap.SaveAsTar)
 
     // Pipeline Finish
     fmt.Printf("[func(main) %s] All threads are finished and pipeline is complete!\n", time.Now())
@@ -679,7 +680,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 }
 
 
-func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
+func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bool) {
 	save := time.Now()
 	fmt.Printf("[func(saveResults) -- begin transferring final results %s]\n", time.Now())
 	err:=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"), 0755)
@@ -689,6 +690,13 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
  	}else {
  		fmt.Printf("[func(saveResults) %s]Created final results directory called %s\n", time.Now(), outputPrefix+"_finalResults")
  	}
+
+ 	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/grm_files"), 0755)
+ 	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/null_model_files"), 0755)
+ 	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/chunked_imputation_files"), 0755)
+ 	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/association_analysis_results"), 0755)
+ 	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/other"), 0755)
+
 
 	matches := make([]string, 0)
     findThese := [14]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
@@ -706,54 +714,78 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks bool) {
     }
     for _,fileTransfer := range matches {
     	fileName := strings.Split(fileTransfer, "/")
-    	err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults",fileName[len(fileName)-1]))
-    	if err != nil {
-    		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    	switch{
+    	case (strings.HasSuffix(fileName[len(fileName)-1], ".mtx.sampleIDs.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".sparseGRM.mtx") || strings.HasSuffix(fileName[len(fileName)-1], ".sparseSigma.mtx")):
+    		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/grm_files",fileName[len(fileName)-1]))
+    		if err != nil {
+    			fmt.Printf("[func(saveResults) -- transferring final results into grm_files %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		}
+    	case (strings.HasSuffix(fileName[len(fileName)-1], ".varianceRatio.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".rda")):
+    		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/null_model_files",fileName[len(fileName)-1]))
+    		if err != nil {
+    			fmt.Printf("[func(saveResults) -- transferring final results into null_model_files %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		}
+    	case (strings.HasSuffix(fileName[len(fileName)-1], ".png") || strings.HasSuffix(fileName[len(fileName)-1], ".pdf") || strings.HasSuffix(fileName[len(fileName)-1], "_allChromosomeResultsMerged.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".txt.gz")):
+    		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/association_analysis_results",fileName[len(fileName)-1]))
+    		if err != nil {
+    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		}
+    	case (strings.HasSuffix(fileName[len(fileName)-1], ".vcf.gz") || strings.HasSuffix(fileName[len(fileName)-1], ".vcf.gz.tbi") || strings.HasSuffix(fileName[len(fileName)-1], "_chunkedImputationQueue.txt")):
+    		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/chunked_imputation_files",fileName[len(fileName)-1]))
+    		if err != nil {
+    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		}
+    	case (strings.HasSuffix(fileName[len(fileName)-1], ".log") || strings.HasSuffix(fileName[len(fileName)-1], ".err")):
+    		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/other",fileName[len(fileName)-1]))
+    		if err != nil {
+    			fmt.Printf("[func(saveResults) -- transferring final results into other %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    		}
     	}
     }
 
-    //tar final file
-   	filesToTar, err := ioutil.ReadDir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
-    tarFileName, tarErr := os.Create(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"))
-    if tarErr != nil {
-    	fmt.Printf("[func(saveResults) %s] Error encountered when creating compressed tar file \t%v\n", time.Now(),tarErr)
-    }
-    defer tarFileName.Close()
-    var writeTar io.WriteCloser = tarFileName
-    tarFileWriter := tar.NewWriter(writeTar)
-    defer tarFileWriter.Close() // close when finished
+   
+    if saveTar == true {
+    	//tar final file
+   		filesToTar, _ := ioutil.ReadDir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
+    	tarFileName, tarErr := os.Create(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"))
+    	if tarErr != nil {
+    		fmt.Printf("[func(saveResults) %s] Error encountered when creating compressed tar file \t%v\n", time.Now(),tarErr)
+   		}
+    	defer tarFileName.Close()
+    	var writeTar io.WriteCloser = tarFileName
+    	tarFileWriter := tar.NewWriter(writeTar)
+    	defer tarFileWriter.Close() // close when finished
 
-    for _,fileMeta := range filesToTar {
-    	file, err := os.Open(filepath.Join(bindPointTemp,outputPrefix+"_finalResults") + string(filepath.Separator) + fileMeta.Name())
-    	defer file.Close()
-    	// prepare the tar header
-     	header := new(tar.Header)
-     	header.Name = file.Name()
-     	header.Size = fileMeta.Size()
-     	header.Mode = int64(fileMeta.Mode())
-     	header.ModTime = fileMeta.ModTime()
+    	for _,fileMeta := range filesToTar {
+    		file, err := os.Open(filepath.Join(bindPointTemp,outputPrefix+"_finalResults") + string(filepath.Separator) + fileMeta.Name())
+    		defer file.Close()
+    		// prepare the tar header
+     		header := new(tar.Header)
+     		header.Name = file.Name()
+     		header.Size = fileMeta.Size()
+     		header.Mode = int64(fileMeta.Mode())
+     		header.ModTime = fileMeta.ModTime()
 
-     	err = tarFileWriter.WriteHeader(header)
-      	if err != nil {
-      		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem writing file to tar.  The following error was encountered: %v\n",time.Now(),err)
-      	}
+     		err = tarFileWriter.WriteHeader(header)
+      		if err != nil {
+      			fmt.Printf("[func(saveResults) -- transferring final results %s] Problem writing file to tar.  The following error was encountered: %v\n",time.Now(),err)
+      		}
  
-      	_, err = io.Copy(tarFileWriter, file)
-      	if err != nil {
-      		fmt.Printf("[func(saveResults) -- transferring final results %s] Problem copying file to tar.  The following error was encountered: %v\n",time.Now(),err)
-      	} 
-    }
-
-    defer os.RemoveAll(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
-
+	      	_, err = io.Copy(tarFileWriter, file)
+   	   		if err != nil {
+      			fmt.Printf("[func(saveResults) -- transferring final results %s] Problem copying file to tar.  The following error was encountered: %v\n",time.Now(),err)
+      		} 
+    	}
 	
-    // check if tmp bindpoint is different from outdir; if true then move to outdir, if false keep in tmpDir
-    tmpLoc := strings.TrimSpace(strings.TrimSuffix(bindPointTemp, "/"))
-	finalLoc := strings.TrimSpace(strings.TrimSuffix(outDir, "/"))
+    	// check if tmp bindpoint is different from outdir; if true then move to outdir, if false keep in tmpDir
+    	tmpLoc := strings.TrimSpace(strings.TrimSuffix(bindPointTemp, "/"))
+		finalLoc := strings.TrimSpace(strings.TrimSuffix(outDir, "/"))
 
-    if tmpLoc  != finalLoc {
-    	os.Rename(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"), filepath.Join(outDir,outputPrefix+"_finalResults.tar"))
-    }	
+    	if tmpLoc  != finalLoc {
+    		os.Rename(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"), filepath.Join(outDir,outputPrefix+"_finalResults.tar"))
+    	}
+    	os.RemoveAll(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
+    }
     fmt.Printf("[func(saveResults) -- finished transferring final results %s] Time Elapsed: %.2f minutes\n", time.Now(), time.Since(save).Minutes())
 }
 
@@ -922,6 +954,16 @@ func parser (configFile string) {
 			parserMap.ImputationFileList = strings.TrimSpace(tmpParse[1])
 		case strings.TrimSpace(tmpParse[0]) == "GrmMAF":
 			parserMap.GrmMAF = strings.TrimSpace(tmpParse[1])
+		case strings.TrimSpace(tmpParse[0]) == "SaveAsTar":
+			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
+				parserMap.SaveAsTar= false
+			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
+				parserMap.SaveAsTar= true
+			} else {
+				fmt.Printf("[func(parser)] %v is not a valid option for SaveAsTar.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(42)
+			}
+
 		}
 		if err == io.EOF {
 			fmt.Println("[func(parser)] Finished parsing config file!\n")
