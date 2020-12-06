@@ -344,7 +344,7 @@ func main() {
 
 func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int, f *os.File) {
 	defer wgAllChunks.Done() //once function finishes decrement sync object
-	
+
 	fileBytes, err := os.Open(chromosomeLengthFile)
 	if err != nil {
 		fmt.Printf("func(chunk) %s] There was a problems reading in the chromosome length file.", time.Now())
@@ -745,7 +745,7 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bo
 
 	matches := make([]string, 0)
     findThese := [14]string{"*.mtx.sampleIDs.txt", "*.sparseGRM.mtx", "*.sparseSigma.mtx", 
-    			"*.varianceRatio.txt", "*.rda", "*.pdf", "*.png", "*._allChromosomeResultsMerged.txt", 
+    			"*.varianceRatio.txt", "*.rda", "*.pdf", "*.png", "*_allChromosomeResultsMerged.txt", 
     			"*.txt.gz", "*.vcf.gz", "*.vcf.gz.tbi", "*_chunkedImputationQueue.txt","*.log", "*.err"}
     for _, suffix := range findThese {
     	if saveChunks == false && (suffix == "*.vcf.gz" || suffix == "*.vcf.gz.tbi" || suffix == "*_chunkedImputationQueue.txt") {
