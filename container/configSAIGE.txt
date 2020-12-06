@@ -36,3 +36,8 @@ GenerateGRM:true
 GrmMAF:0.01
 ChunkVariants:1000000
 SaveAsTar:false
+GenerateNull:true
+GenerateAssociations:true
+GenerateResults:true
+NullModelFile:/tmp/tmp1/
+VarianceRatioFile:/tmp/tmp1/
