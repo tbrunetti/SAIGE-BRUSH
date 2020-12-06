@@ -74,11 +74,16 @@ var parserMap = struct {
 	GenerateGRM bool // defaults to true
 	GrmMAF string // defaults to 0.01
 	SaveAsTar bool // defaults as false
+	GenerateNull bool //defaults as true -- need to implement
+	GenerateAssociations bool //defaults as true -- need to implement
+	GenerateResults bool //defaults as true -- need to implement
+	NullModelFile string
+	VarianceRatioFile string
 }{
 	"FULL",1000000, "", "hg38", "1-22", "","","","","SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg",
 	"","myOutput","","","","","","",
 	"FALSE","","","","TRUE","30","0.0625","TRUE","TRUE","DS","0.05","10","FALSE", "",
-	true,"",false,true,"0.01",false}
+	true,"",false,true,"0.01",false, true, true, true, "",""}
 
 func main() {
 	// always need to happen regardless of pipeline step being run
@@ -178,34 +183,72 @@ func main() {
 		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM path located at: %s\n", time.Now(),parserMap.SparseGRM)
 		parserMap.SampleIDFile = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt")
 		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM sampleID path located at: %s\n", time.Now(),parserMap.SampleIDFile)
+	} else {
+		if _,err := os.Stat(parserMap.SparseGRM); err != nil {
+			if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+				os.Exit(42)
+			}else {
+				fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+			}
+		}
+		if _,err := os.Stat(parserMap.SampleIDFile); err != nil {
+			if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+				os.Exit(42)
+			}
+		}else {
+				fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+
+		}		
 	}
 
  	
  	// STEP1: Run Null Model Queue
- 	wgNull.Add(1)
- 	if parserMap.SkipChunking == true {
-		go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
-			parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,parserMap.NThreads,parserMap.SparseKin,parserMap.Markers,
-			parserMap.OutDir,parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform)
-		time.Sleep(1* time.Minute) 
-	} else {
-		threadsNull,err := strconv.Atoi(parserMap.NThreads)
-		if err != nil {
-			fmt.Printf("[func(main) null thread allocation %s] There was an error converting threads: %v\n", time.Now(),err)
-			os.Exit(42)
-		}
-		toNull := math.Ceil(float64(threadsNull) * 0.75)
-		toChunk := math.Ceil(float64(threadsNull) - toNull)
-		toNullString := fmt.Sprintf("%f", toNull)
-		
-		fmt.Printf("func(main) null thread allocation %s] There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", time.Now(), threadsNull, toNull, toChunk)
-		
-		go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
-			parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,toNullString,parserMap.SparseKin,parserMap.Markers,parserMap.OutDir,
-			parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform) 
-		time.Sleep(1* time.Minute) 
+ 	if parserMap.GenerateNull == true {
+	 	wgNull.Add(1)
+	 	if parserMap.SkipChunking == true {
+			go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
+				parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,parserMap.NThreads,parserMap.SparseKin,parserMap.Markers,
+				parserMap.OutDir,parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform)
+			time.Sleep(1* time.Minute) 
+		} else {
+			threadsNull,err := strconv.Atoi(parserMap.NThreads)
+			if err != nil {
+				fmt.Printf("[func(main) null thread allocation %s] There was an error converting threads: %v\n", time.Now(),err)
+				os.Exit(42)
+			}
+			toNull := math.Ceil(float64(threadsNull) * 0.75)
+			toChunk := math.Ceil(float64(threadsNull) - toNull)
+			toNullString := fmt.Sprintf("%f", toNull)
+			
+			fmt.Printf("func(main) null thread allocation %s] There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", time.Now(), threadsNull, toNull, toChunk)
+			
+			go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
+				parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,toNullString,parserMap.SparseKin,parserMap.Markers,parserMap.OutDir,
+				parserMap.OutPrefix,parserMap.Rel,parserMap.Loco,parserMap.CovTransform) 
+			time.Sleep(1* time.Minute) 
 
+		}
+	} else {
+		if _,err := os.Stat(parserMap.NullModelFile); err != nil {
+			if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+				os.Exit(42)
+			}else {
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+			}
+		}
+		if _,err := os.Stat(parserMap.VarianceRatioFile); err != nil {
+			if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+				os.Exit(42)
+			}else {
+				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+			}
+		}
 	}
+ 	
  	
  	/* STEP1a: Chunks Queue or Use of previously chunked imputation data
  	chunk can run the same time as the null model; and the association analysis needs to wait for the 
@@ -220,7 +263,8 @@ func main() {
  	}
   
     
-    // wait for null model to finish before proceeding with association analysis -- no need to wait for chunk to finish
+    // wait for null model to finish before proceeding with association analysis -- no need to wait for chunk to finish; 
+    // if GenerateNull is set to false, wgNull sync will already be 0 since no jobs addded so will move past this command
     wgNull.Wait()
 
 	
@@ -300,7 +344,7 @@ func main() {
 
 func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bindPoint,bindPointTemp,container string, chunkVariants int, f *os.File) {
 	defer wgAllChunks.Done() //once function finishes decrement sync object
-
+	
 	fileBytes, err := os.Open(chromosomeLengthFile)
 	if err != nil {
 		fmt.Printf("func(chunk) %s] There was a problems reading in the chromosome length file.", time.Now())
@@ -520,7 +564,8 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
     	cmd.Stderr = os.Stderr
     	//errorHandling.Unlock()
 		cmd.Run() // run automatically wait for null to finish before processing next lines within function
-
+		parserMap.NullModelFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".rda"
+		parserMap.VarianceRatioFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".varianceRatio.txt"
   
 
 
@@ -587,8 +632,8 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 		"--IsDropMissingDosages="+IsDropMissingDosages,
 		"--minMAF=0",
 		"--minMAC=0",
-		"--GMMATmodelFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".rda",
-		"--varianceRatioFile="+filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".varianceRatio.txt",
+		"--GMMATmodelFile="+parserMap.NullModelFile,
+		"--varianceRatioFile="+parserMap.VarianceRatioFile,
 		"--numLinesOutput=2",
 		"--IsOutputAFinCaseCtrl=TRUE",
 		"--IsOutputHetHomCountsinCaseCtrl=TRUE",
@@ -963,7 +1008,37 @@ func parser (configFile string) {
 				fmt.Printf("[func(parser)] %v is not a valid option for SaveAsTar.\n", strings.TrimSpace(tmpParse[1]))
 				os.Exit(42)
 			}
-
+		case strings.TrimSpace(tmpParse[0]) == "GenerateNull":
+			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
+				parserMap.GenerateNull= false
+			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
+				parserMap.GenerateNull= true
+			} else {
+				fmt.Printf("[func(parser)] %v is not a valid option for GenerateNull.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(42)
+			}
+		case strings.TrimSpace(tmpParse[0]) == "GenerateAssociations":
+			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
+				parserMap.GenerateAssociations= false
+			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
+				parserMap.GenerateAssociations= true
+			} else {
+				fmt.Printf("[func(parser)] %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(42)
+			}
+		case strings.TrimSpace(tmpParse[0]) == "GenerateResults":
+			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
+				parserMap.GenerateResults= false
+			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
+				parserMap.GenerateResults= true
+			} else {
+				fmt.Printf("[func(parser)] %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(42)
+			}
+		case strings.TrimSpace(tmpParse[0]) == "NullModelFile":
+			parserMap.NullModelFile = strings.TrimSpace(tmpParse[1])
+		case strings.TrimSpace(tmpParse[0]) == "VarianceRatioFile":
+			parserMap.VarianceRatioFile = strings.TrimSpace(tmpParse[1])
 		}
 		if err == io.EOF {
 			fmt.Println("[func(parser)] Finished parsing config file!\n")
@@ -971,3 +1046,11 @@ func parser (configFile string) {
 		}
 	}
 }
+
+/*
+	GenerateNull bool //defaults as true -- need to implement
+	GenerateAssociations bool //defaults as true -- need to implement
+	GenerateResults bool //defaults as true -- need to implement
+	NullModelFile string
+	VarianceRatioFile string
+*/
