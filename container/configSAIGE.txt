@@ -41,3 +41,4 @@ GenerateAssociations:true
 GenerateResults:true
 NullModelFile:/tmp/tmp1/
 VarianceRatioFile:/tmp/tmp1/
+AssociationFile:/tmp/tmp1/
