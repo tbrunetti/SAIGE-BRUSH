@@ -17,8 +17,6 @@ import (
 	"archive/tar"
 )
 
-//TO DO: TAR OPTION OR UNCOMPRESSED OR MULITPLE TARS so if save chunks is true it saves it separately -- implement so that is uses only relative path!
-
 var queueFileSave sync.Mutex
 var chrLengths = make(map[string]int)
 var processQueue = make([]string, 0)
@@ -33,7 +31,6 @@ var wgAssociation sync.WaitGroup
 var wgAllChunks sync.WaitGroup
 var changeQueueSize sync.Mutex
 var queueCheck sync.Mutex
-//var errorHandling sync.Mutex
 var chunkQueue sync.Mutex
 var parserMap = struct {
 	Runtype string
@@ -79,11 +76,12 @@ var parserMap = struct {
 	GenerateResults bool //defaults as true -- need to implement
 	NullModelFile string
 	VarianceRatioFile string
+	AssociationFile string
 }{
 	"FULL",1000000, "", "hg38", "1-22", "","","","","SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg",
 	"","myOutput","","","","","","",
 	"FALSE","","","","TRUE","30","0.0625","TRUE","TRUE","DS","0.05","10","FALSE", "",
-	true,"",false,true,"0.01",false, true, true, true, "",""}
+	true,"",false,true,"0.01",false, true, true, true, "","",""}
 
 func main() {
 	// always need to happen regardless of pipeline step being run
@@ -230,7 +228,7 @@ func main() {
 			time.Sleep(1* time.Minute) 
 
 		}
-	} else {
+	} else if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true)) {
 		if _,err := os.Stat(parserMap.NullModelFile); err != nil {
 			if os.IsNotExist(err) {
 				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
@@ -247,19 +245,25 @@ func main() {
 				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
 			}
 		}
+	} else {
+		fmt.Printf("[func(main)] null model not needed since no association analyses will be calculated.\n")
 	}
  	
  	
  	/* STEP1a: Chunks Queue or Use of previously chunked imputation data
  	chunk can run the same time as the null model; and the association analysis needs to wait for the 
  	null to finish and chunk to finish*/
- 	if parserMap.SkipChunking ==  false {
+ 	if ((parserMap.SkipChunking ==  false) && (parserMap.GenerateAssociations == true)) {
+ 		fmt.Printf("[func(main) Queue status] Chunking files for queue for association analyses\n")
  		wgAllChunks.Add(1)
     	go chunk(start,end,parserMap.Build,parserMap.OutDir,parserMap.ChromosomeLengthFile,parserMap.ImputeDir,parserMap.ImputeSuffix,parserMap.BindPoint,
     		parserMap.BindPointTemp,parserMap.Container,parserMap.ChunkVariants,f)
- 	}else {
+ 	}else if ((parserMap.SkipChunking ==  true) && (parserMap.GenerateAssociations == true)) {
+ 		fmt.Printf("[func(main) Queue status] Reusing previously chunked and index files for queue for association analyses\n")
  		wgAllChunks.Add(1)
  		go usePrevChunks(parserMap.ImputeDir, parserMap.ImputationFileList)
+ 	}else {
+ 		fmt.Printf("[func(main) Queue status] Skipping queue since no associations are required\n")
  	}
   
     
@@ -270,67 +274,83 @@ func main() {
 	
     /* STEP2: Association Analysis Queue
 	while loop to keep submitting jobs until queue is empty and no more subsets are available*/
-	for allChunksFinished == 1 || len(processQueue) != 0 {
-		if ((allAssocationsRunning < totalCPUsAvail) && (len(processQueue) > 0)) {
-			fmt.Printf("[func(main) %s] The total number of associations running is %v.\n", time.Now(), allAssocationsRunning)
-			changeQueueSize.Lock() // lock queue to prevent collision
-			vcfFile := processQueue[0]
-			tmp := strings.Split(vcfFile, "_") // extract chromosome name
-			subName := strings.TrimSuffix(vcfFile, parserMap.ImputeSuffix)
-			// if condition is true, that means the data is not chunked and need to be read from the imputeDir not outDir
-			if ((tmp[0]+parserMap.ImputeSuffix == vcfFile) || (parserMap.SkipChunking == true)) {
-				wgAssociation.Add(1)
-				go associationAnalysis(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,filepath.Join(parserMap.ImputeDir,vcfFile),parserMap.VcfField,parserMap.OutDir,
-				tmp[0],subName,parserMap.SampleIDFile,parserMap.IsDropMissingDosages,parserMap.OutPrefix,parserMap.Loco)
-				processQueue = processQueue[1:]
-				time.Sleep(1* time.Second) // prevent queue overload
+	if parserMap.GenerateAssociations == true {
+		for allChunksFinished == 1 || len(processQueue) != 0 {
+			if ((allAssocationsRunning < totalCPUsAvail) && (len(processQueue) > 0)) {
+				fmt.Printf("[func(main) %s] The total number of associations running is %v.\n", time.Now(), allAssocationsRunning)
+				changeQueueSize.Lock() // lock queue to prevent collision
+				vcfFile := processQueue[0]
+				tmp := strings.Split(vcfFile, "_") // extract chromosome name
+				subName := strings.TrimSuffix(vcfFile, parserMap.ImputeSuffix)
+				// if condition is true, that means the data is not chunked and need to be read from the imputeDir not outDir
+				if ((tmp[0]+parserMap.ImputeSuffix == vcfFile) || (parserMap.SkipChunking == true)) {
+					wgAssociation.Add(1)
+					go associationAnalysis(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,filepath.Join(parserMap.ImputeDir,vcfFile),parserMap.VcfField,parserMap.OutDir,
+					tmp[0],subName,parserMap.SampleIDFile,parserMap.IsDropMissingDosages,parserMap.OutPrefix,parserMap.Loco)
+					processQueue = processQueue[1:]
+					time.Sleep(1* time.Second) // prevent queue overload
+				}else{
+					wgAssociation.Add(1)
+					go associationAnalysis(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,filepath.Join(parserMap.BindPointTemp,"tmp_saige",vcfFile),parserMap.VcfField,
+					parserMap.OutDir,tmp[0],subName,parserMap.SampleIDFile,parserMap.IsDropMissingDosages,parserMap.OutPrefix,parserMap.Loco)
+					processQueue = processQueue[1:]
+					time.Sleep(1* time.Second) // prevent queue overload
+				}
+				changeQueueSize.Unlock() // unlock queue safely
 			}else{
-				wgAssociation.Add(1)
-				go associationAnalysis(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,filepath.Join(parserMap.BindPointTemp,"tmp_saige",vcfFile),parserMap.VcfField,
-				parserMap.OutDir,tmp[0],subName,parserMap.SampleIDFile,parserMap.IsDropMissingDosages,parserMap.OutPrefix,parserMap.Loco)
-				processQueue = processQueue[1:]
-				time.Sleep(1* time.Second) // prevent queue overload
+				time.Sleep(5* time.Minute)
 			}
-			changeQueueSize.Unlock() // unlock queue safely
-		}else{
-			time.Sleep(5* time.Minute)
 		}
+
+		// wait for all association anlayses to finish before proceeding
+	    wgAssociation.Wait()
+
+	    // STEP2a: Concatenate all results into one file
+	    concatTime := time.Now()
+		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
+	    fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
+	    concat := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/opt/concatenate.sh", filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix))
+	    concat.Stdout = os.Stdout
+	    concat.Stderr = os.Stderr
+	    concat.Run()
+	    
+	    fmt.Printf("[func(main) -- concatenate %s] Finished all association results. Time Elapsed: %.2f minutes\n", time.Now(),time.Since(concatTime).Minutes())
 	}
-
-	// wait for all association anlayses to finish before proceeding
-    wgAssociation.Wait()
-
-    // STEP2a: Concatenate all results into one file
-    concatTime := time.Now()
-	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
-    fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
-    concat := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/opt/concatenate.sh", filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix))
-    concat.Stdout = os.Stdout
-    concat.Stderr = os.Stderr
-    concat.Run()
     
-    fmt.Printf("[func(main) -- concatenate %s] Finished all association results. Time Elapsed: %.2f minutes\n", time.Now(),time.Since(concatTime).Minutes())
-
     // STEP3: Clean, Visualize, and Summarize results
-    graph := time.Now()
-	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
-    fmt.Printf("[func(main) -- clean and graph results %s] Start data clean up, visualization, and summarization...\n", time.Now())
-    cleanAndGraph := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/usr/lib/R/bin/Rscript", "/opt/step3_GWASsummary.R",
-			"--assocFile="+filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix) + "_allChromosomeResultsMerged.txt",
-			"--infoFile="+parserMap.InfoFile,
-			"--dataOutputPrefix="+filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix),
-			"--pheno="+parserMap.Pheno,
-			"--covars="+parserMap.Covars,
-			"--macFilter="+parserMap.MAC,
-			"--mafFilter="+parserMap.MAF,
-			"--traitType="+parserMap.Trait,
-			"--nThreads="+parserMap.NThreads)
-	cleanAndGraph.Stdout = os.Stdout
-    cleanAndGraph.Stderr = os.Stderr
-    cleanAndGraph.Run()
+    if parserMap.GenerateResults == true {
+    	if parserMap.GenerateAssociations == false {
+			if _,err := os.Stat(parserMap.AssociationFile); err != nil {
+				if os.IsNotExist(err) {
+					fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
+					os.Exit(42)
+				}else {
+					fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] CONFIRMED! The path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
+				}
+			}
+    	}else{
+    		parserMap.AssociationFile = filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix) + "_allChromosomeResultsMerged.txt"
+    	}
+	    graph := time.Now()
+		//formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
+	    fmt.Printf("[func(main) -- clean and graph results %s] Start data clean up, visualization, and summarization...\n", time.Now())
+	    cleanAndGraph := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/usr/lib/R/bin/Rscript", "/opt/step3_GWASsummary.R",
+				"--assocFile="+parserMap.AssociationFile,
+				"--infoFile="+parserMap.InfoFile,
+				"--dataOutputPrefix="+filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix),
+				"--pheno="+parserMap.Pheno,
+				"--covars="+parserMap.Covars,
+				"--macFilter="+parserMap.MAC,
+				"--mafFilter="+parserMap.MAF,
+				"--traitType="+parserMap.Trait,
+				"--nThreads="+parserMap.NThreads)
+		cleanAndGraph.Stdout = os.Stdout
+	    cleanAndGraph.Stderr = os.Stderr
+	    cleanAndGraph.Run()
 
 
-    fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
+	    fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
+	}
 
     //TODO: clean up temp files
     saveResults(parserMap.BindPointTemp,parserMap.OutPrefix,parserMap.OutDir,parserMap.SaveChunks,parserMap.SaveAsTar)
@@ -473,13 +493,6 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		return
 	}
 
-	/*
-	errorHandling.Lock()
-    subset.Stdout = os.Stdout
-    subset.Stderr = os.Stderr
-    errorHandling.Unlock()
-    */
-
 	index := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/tabix",
 		"-p",
 		"vcf",
@@ -489,13 +502,6 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		fmt.Printf("[func(processing) %s] Indexing of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, indexErr)
 		return
 	}
-
-	/*
-	errorHandling.Lock()
-   	index.Stdout = os.Stdout
-    index.Stderr = os.Stderr
-    errorHandling.Unlock()
-    */
 
 	totalVariants,_ := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/opt/bcftools",
 		"index",
@@ -558,11 +564,8 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 			"--LOCO="+loco,
 			"--isCovariateTransform="+covTransform)
 
-			
-		//errorHandling.Lock()
 		cmd.Stdout = os.Stdout
     	cmd.Stderr = os.Stderr
-    	//errorHandling.Unlock()
 		cmd.Run() // run automatically wait for null to finish before processing next lines within function
 		parserMap.NullModelFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".rda"
 		parserMap.VarianceRatioFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".varianceRatio.txt"
@@ -644,24 +647,7 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 	
 	cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
-	//assocErr := cmd.Run()
 	cmd.Run()
-
-	
-	/*
-	if assocErr != nil {
-		fmt.Printf("[func(associationAnalysis) %s] Association analysis of %s finished with error: %v\n", time.Now(), vcfFile, assocErr)
-		queueCheck.Lock() // lock shared variable to prevent collision
-		allAssocationsRunning--
-		queueCheck.Unlock() // unlock access to shared variable
-		return
-	}
-
-	errorHandling.Lock()
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    errorHandling.Unlock()
-    */
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
@@ -1039,6 +1025,8 @@ func parser (configFile string) {
 			parserMap.NullModelFile = strings.TrimSpace(tmpParse[1])
 		case strings.TrimSpace(tmpParse[0]) == "VarianceRatioFile":
 			parserMap.VarianceRatioFile = strings.TrimSpace(tmpParse[1])
+		case strings.TrimSpace(tmpParse[0]) == "AssociationFile":
+			parserMap.AssociationFile = strings.TrimSpace(tmpParse[1])
 		}
 		if err == io.EOF {
 			fmt.Println("[func(parser)] Finished parsing config file!\n")
@@ -1046,11 +1034,3 @@ func parser (configFile string) {
 		}
 	}
 }
-
-/*
-	GenerateNull bool //defaults as true -- need to implement
-	GenerateAssociations bool //defaults as true -- need to implement
-	GenerateResults bool //defaults as true -- need to implement
-	NullModelFile string
-	VarianceRatioFile string
-*/
