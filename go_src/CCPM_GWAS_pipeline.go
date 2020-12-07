@@ -182,24 +182,24 @@ func main() {
 		parserMap.SampleIDFile = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt")
 		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM sampleID path located at: %s\n", time.Now(),parserMap.SampleIDFile)
 	} else {
-		if _,err := os.Stat(parserMap.SparseGRM); err != nil {
-			if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
-				os.Exit(42)
-			}else {
-				fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
-			}
+		if _,err := os.Stat(parserMap.SparseGRM); err == nil {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n")
+		} else if os.IsNotExist(err) {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+			os.Exit(42)
+		} else {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] File may exist from variable SparseGRM but the following error occurred: %v The path and file are reachable for config variable SparseGRM.\n", err)
 		}
-		if _,err := os.Stat(parserMap.SampleIDFile); err != nil {
-			if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
-				os.Exit(42)
-			}
-		}else {
-				fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
-
-		}		
-	}
+		}
+		
+		if _,err := os.Stat(parserMap.SampleIDFile); err == nil {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n")
+		} else if os.IsNotExist(err) {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+			os.Exit(42)
+		} else {
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] File may exist from variable SampleIDFile but the following error occurred: %v The path and file are reachable for config variable SampleIDFile.\n", err)
+		}	
 
  	
  	// STEP1: Run Null Model Queue
@@ -228,23 +228,23 @@ func main() {
 			time.Sleep(1* time.Minute) 
 
 		}
-	}else if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true)) {
-		if _,err := os.Stat(parserMap.NullModelFile); err != nil {
-			if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+	}else if (parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true) {
+		if _,err := os.Stat(parserMap.NullModelFile); err == nil {
+			fmt.Printf("[func(main) -- skip null model file; use supplied check] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n")
+			}else if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.VarianceRatioFile)
 				os.Exit(42)
 			}else {
-				fmt.Printf("[func(main) -- skip null model file; use supplied check] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] File may exist from variable NullModelFile but the following error occurred: %v \n", err)
 			}
-		}
-		if _,err := os.Stat(parserMap.VarianceRatioFile); err != nil {
-			if os.IsNotExist(err) {
+		if _,err := os.Stat(parserMap.VarianceRatioFile); err == nil {
+			fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n")
+			} else if os.IsNotExist(err) {
 				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
 				os.Exit(42)
 			}else {
-				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] File may exist from variable VariableRatioFile but the following error occurred: %v \n", err)
 			}
-		}
 	}else {
 		fmt.Printf("[func(main)] null model not needed since no association analyses will be calculated.\n")
 	}
@@ -320,17 +320,17 @@ func main() {
     // STEP3: Clean, Visualize, and Summarize results
     if parserMap.GenerateResults == true {
     	if parserMap.GenerateAssociations == false {
-			if _,err := os.Stat(parserMap.AssociationFile); err != nil {
-				if os.IsNotExist(err) {
-					fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
-					os.Exit(42)
-				}else {
-					fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] CONFIRMED! The path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
-				}
+			if _,err := os.Stat(parserMap.AssociationFile); err == nil {
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] CONFIRMED! The path and file are reachable for config variable AssociationFile.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] File may exist from variable AssociationFile but the following error occurred: %v \n", err)
 			}
-    	}else{
+		} else{
     		parserMap.AssociationFile = filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix) + "_allChromosomeResultsMerged.txt"
-    	}
+    	}	
 	    graph := time.Now()
 		//formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", graph.Year(), graph.Month(), graph.Day(), graph.Hour(), graph.Minute(), graph.Second())
 	    fmt.Printf("[func(main) -- clean and graph results %s] Start data clean up, visualization, and summarization...\n", time.Now())
@@ -347,7 +347,6 @@ func main() {
 		cleanAndGraph.Stdout = os.Stdout
 	    cleanAndGraph.Stderr = os.Stderr
 	    cleanAndGraph.Run()
-
 
 	    fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
 	}
