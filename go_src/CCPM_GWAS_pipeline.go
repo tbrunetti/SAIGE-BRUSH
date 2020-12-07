@@ -93,7 +93,7 @@ func main() {
 	if parserMap.NThreads == "" {
 		parserMap.NThreads = strconv.Itoa(totalCPUsAvail)
 		runtime.GOMAXPROCS(totalCPUsAvail)
-	} else {
+	}else {
 		maxThreads,err := strconv.Atoi(parserMap.NThreads)
 		if err != nil{
 			fmt.Printf("[func(main) Thread Allocation %s] There was a problem allocating your threads.  You entered: %v\n, %v", time.Now(),parserMap.NThreads, err)
@@ -228,7 +228,7 @@ func main() {
 			time.Sleep(1* time.Minute) 
 
 		}
-	} else if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true)) {
+	}else if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true)) {
 		if _,err := os.Stat(parserMap.NullModelFile); err != nil {
 			if os.IsNotExist(err) {
 				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
@@ -245,7 +245,7 @@ func main() {
 				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
 			}
 		}
-	} else {
+	}else {
 		fmt.Printf("[func(main)] null model not needed since no association analyses will be calculated.\n")
 	}
  	
