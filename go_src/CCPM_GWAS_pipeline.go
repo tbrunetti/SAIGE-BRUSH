@@ -261,7 +261,7 @@ func main() {
  	}else if ((parserMap.SkipChunking ==  true) && (parserMap.GenerateAssociations == true)) {
  		fmt.Printf("[func(main) Queue status] Reusing previously chunked and index files for queue for association analyses\n")
  		wgAllChunks.Add(1)
- 		go usePrevChunks(parserMap.ImputeDir, parserMap.ImputationFileList)
+ 		go usePrevChunks(start, end, parserMap.Build, parserMap.ImputeDir, parserMap.ImputationFileList)
  	}else {
  		fmt.Printf("[func(main) Queue status] Skipping queue since no associations are required\n")
  	}
@@ -660,6 +660,8 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 
 func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	var lineNumber int
+	var sampleIDloc int
+	checkIDs := make(map[string]bool)
 	// check MAC
 	checkMAC,err := strconv.ParseFloat(MAF, 64)
 	if err != nil {
@@ -703,11 +705,33 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 			for _,value := range allCovsSplit {
 				findElement(headerLineSplit, value)
 			}
+			for idx,value :=range headerLineSplit{
+				if value == parserMap.SampleID{
+					sampleIDloc = idx
+					break
+				}
+			}
 		} else {
 			break
 		}
 	}
+
+	checkUniq := bufio.NewScanner(checkPhenoFile)
+	for checkUniq.Scan(){
+		line := checkUniq.Text()
+		tmpParse := strings.Split(line, "\t")
+		if checkIDs[tmpParse[sampleIDloc]] {
+			fmt.Printf("[func(checkInput)] Duplicate sample ID detected: %v. Duplicate IDs are not allowed.\n", tmpParse[sampleIDloc])
+			os.Exit(42)
+		} else {
+			checkIDs[tmpParse[sampleIDloc]] = true
+		}
+	}
+	fmt.Printf("[func(checkInput)] There are total of %d unique sample IDs.\n", len(checkIDs))
+		
+
 }
+
 
 
 func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bool) {
@@ -835,8 +859,26 @@ func saveQueue (queueFile string, f *os.File) {
 }
 
 
-func usePrevChunks (imputeDir,imputationFileList string) {
+func usePrevChunks (start,end,build,imputeDir,imputationFileList string) {
 	defer wgAllChunks.Done()
+
+	var chromsToProcess = make([]string, 0)
+
+	startInt,_ :=  strconv.Atoi(start)
+	endInt,_ := strconv.Atoi(end)
+
+	for i:=startInt; i < endInt+1; i++ {
+		intervals := strconv.Itoa(i)
+		if build == "hg38" {
+			chromsToProcess = append(chromsToProcess, "chr"+ intervals+"_")
+		} else if build == "hg19" {
+			chromsToProcess = append(chromsToProcess, intervals+"_")
+		} else {
+			fmt.Printf("[func(usePrevChunks)] There was an error with the human genome build specifed.  You entered %v.  Please select either hg38 or hg19.\n", build)
+			os.Exit(42)
+		}
+	}
+
 	fileQueue, err := os.Open(imputationFileList)
 	if err != nil {
 		fmt.Printf("[func(usePrevChunks) %s] There was an error opening the imputation chunk file list. The error is as follows: %v\n", time.Now(),err)
@@ -847,10 +889,17 @@ func usePrevChunks (imputeDir,imputationFileList string) {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		changeQueueSize.Lock()
-		processQueue = append(processQueue, scanner.Text())
-		changeQueueSize.Unlock()
-		fmt.Printf("[func(usePrevChunks) %s] %s, has been added to the processing queue.\n", time.Now(), scanner.Text())
+		for _,chromList := range chromsToProcess {
+			if strings.HasPrefix(scanner.Text(), chromList) {
+				changeQueueSize.Lock()
+				processQueue = append(processQueue, scanner.Text())
+				changeQueueSize.Unlock()
+				fmt.Printf("[func(usePrevChunks) %s] %s, has been added to the processing queue.\n", time.Now(), scanner.Text())
+				break
+			} else {
+				continue
+			}
+		}
 	}
 
 	allChunksFinished--
@@ -1033,3 +1082,7 @@ func parser (configFile string) {
 		}
 	}
 }
+
+//func pathCheck () {
+//	continue
+//}
