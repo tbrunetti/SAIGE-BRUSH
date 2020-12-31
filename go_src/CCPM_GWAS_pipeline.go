@@ -723,7 +723,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	}
 
 	// check SparseKin is a string boolean
-	if ((strings.ToLower(parserMap.SparseKin) == "TRUE") || (parserMap.SparseKin == "FALSE")) {
+	if ((parserMap.SparseKin == "TRUE") || (parserMap.SparseKin == "FALSE")) {
 		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable sparseKin is set to %s.\n", parserMap.SparseKin)
 	} else {
 		fmt.Printf("func(checkInput)] Error: Please select SparseKin as either True or False.  You entered: %s.\n", parserMap.SparseKin)
@@ -738,7 +738,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	}
 
 	// check loco is a string boolean
-	if ((strings.ToLower(parserMap.Loco) == "TRUE") || (parserMap.Loco == "FALSE")) {
+	if ((parserMap.Loco == "TRUE") || (parserMap.Loco == "FALSE")) {
 		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable Loco is set to %s.\n", parserMap.Loco)
 	} else {
 		fmt.Printf("func(checkInput)] Error: Please set Loco as either True or False.  You entered: %s.\n", parserMap.Loco)
@@ -786,18 +786,21 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 		}
 	}
 
+	// have pointer move to beginning of file -- faster than closing and opening the file
+	checkPhenoFile.Seek(0, io.SeekStart)
 	checkUniq := bufio.NewScanner(checkPhenoFile)
 	for checkUniq.Scan(){
 		line := checkUniq.Text()
 		tmpParse := strings.Split(line, "\t")
-		if checkIDs[tmpParse[sampleIDloc]] {
-			fmt.Printf("[func(checkInput)] Duplicate sample ID detected: %v. Duplicate IDs are not allowed.\n", tmpParse[sampleIDloc])
+		if checkIDs[tmpParse[sampleIDloc]] == true {
+			fmt.Printf("[func(checkInput)] Error: Duplicate sample ID detected: %v. Duplicate IDs are not allowed.\n", tmpParse[sampleIDloc])
 			os.Exit(42)
 		} else {
 			checkIDs[tmpParse[sampleIDloc]] = true
 		}
 	}
-	fmt.Printf("[func(checkInput)] There are total of %d unique sample IDs.\n", len(checkIDs))
+	fmt.Printf("[func(checkInput)] There are a total of %d unique sample IDs.\n", len(checkIDs))
+
 
 	// if using GenerateGRM or GenerateNull must have plink file and check if it exists
 	if ((parserMap.GenerateGRM == true) || (parserMap.GenerateNull == true)) {
