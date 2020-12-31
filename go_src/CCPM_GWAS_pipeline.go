@@ -570,7 +570,6 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 		parserMap.VarianceRatioFile = filepath.Join(bindPointTemp, "tmp_saige", outPrefix)+".varianceRatio.txt"
   
 
-
 	case strings.ToLower(strings.TrimSpace(trait)) == "quantitative":
 		// singularity command to run step1: null model for quantitative traits
 		cmd := exec.Command("singularity", "run", "-B", bindPoint+","+bindPointTemp, container, "/usr/lib/R/bin/Rscript", "/opt/step1_fitNULLGLMM.R",
@@ -600,16 +599,11 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
     	//errorHandling.Unlock()
 
 		cmd.Run() // run automatically wait for null to finish before processing next lines within function
-		
-
-	default:
-		fmt.Printf("func(nullModel) %s] Please select trait type as either binary or quantitative.  You entered: %s.\n", time.Now(), trait)
-		os.Exit(42)
-	}
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
 	fmt.Printf("[func(nullModel) %s] Finished Null Model. Time Elapsed: %.2f minutes\n", formatted, time.Since(t0).Minutes())
+	}
 }
 
 
@@ -662,7 +656,8 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	var lineNumber int
 	var sampleIDloc int
 	checkIDs := make(map[string]bool)
-	// check MAC
+	
+	// check MAC if float and is between 0.0-0.50
 	checkMAC,err := strconv.ParseFloat(MAF, 64)
 	if err != nil {
 		fmt.Printf("[func(checkInput)] There was an error converting MAC to float 64. See following : %v\n", err)
@@ -672,7 +667,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 		os.Exit(42)
 	}
 
-	// check MAF
+	// check MAF is float and is between 0.0-0.50
 	checkMAF,err := strconv.ParseFloat(MAF, 64)
 	if err != nil {
 		fmt.Printf("[func(checkInput)] There was an error converting MAF to float 64. See following : %v\n", err)
@@ -685,6 +680,80 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 		os.Exit(42)
 	}
 
+	// check GrmMAF is float and is between 0.0-0.50
+	checkGrmMAF,err := strconv.ParseFloat(parserMap.GrmMAF, 64)
+	if err != nil {
+		fmt.Printf("[func(checkInput)] There was an error converting GrmMaf to float 64. See following : %v\n", err)
+		os.Exit(42)
+	} else if checkGrmMAF > 0.50 {
+		fmt.Printf("[func(checkInput)] Error: minor allele frequency cannot be larger than 0.50 (50%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
+		os.Exit(42)
+	} else if checkGrmMAF < 0.0 {
+		fmt.Printf("[func(checkInput)] Error: minor allele frequency cannot be smaller (negative) than 0 (0%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
+		os.Exit(42)
+	}
+
+	// check that rel is float convertable and between 0.0 -1.0
+	checkRel,err := strconv.ParseFloat(parserMap.Rel, 64)
+	if err != nil {
+		fmt.Printf("[func(checkInput)] There was an error converting Rel to float 64. See following : %v\n", err)
+		os.Exit(42)
+	} else if checkRel > 1.0 {
+		fmt.Printf("[func(checkInput)] Error: Kinship relatedness threshold cannot be larger than 1.0 (100%) for Rel variable. Please select a value between 0.0-1.0.\n")
+		os.Exit(42)
+	} else if checkRel < 0.0 {
+		fmt.Printf("[func(checkInput)] Error: Kinship relatedness threshold cannot be smaller (negative) than 0 (0%) for Rel variable. Please select a value between 0.0-1.0.\n")
+		os.Exit(42)
+	}
+
+	// check trait is either binary or quantitative
+	if ((strings.ToLower(parserMap.Trait) == "binary") || (strings.ToLower(parserMap.Trait) == "quantitative")) {
+		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable Trait is set to %s.\n", parserMap.Trait)
+	} else {
+		fmt.Printf("func(checkInput)] Error: Please select trait type as either binary or quantitative.  You entered: %s.\n", parserMap.Trait)
+		os.Exit(42)		
+	}
+
+	// check invNorm is a string boolean
+	if ((strings.ToLower(parserMap.InvNorm) == "TRUE") || (parserMap.InvNorm == "FALSE")) {
+		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable InvNorm is set to %s.\n", parserMap.InvNorm)
+	} else {
+		fmt.Printf("func(checkInput)] Error: Please select InvNorm as either True or False.  You entered: %s.\n", parserMap.InvNorm)
+		os.Exit(42)		
+	}
+
+	// check SparseKin is a string boolean
+	if ((strings.ToLower(parserMap.SparseKin) == "TRUE") || (parserMap.SparseKin == "FALSE")) {
+		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable sparseKin is set to %s.\n", parserMap.SparseKin)
+	} else {
+		fmt.Printf("func(checkInput)] Error: Please select SparseKin as either True or False.  You entered: %s.\n", parserMap.SparseKin)
+		os.Exit(42)		
+	}
+
+	// check markers is an integer-based string
+	_,err =  strconv.Atoi(parserMap.Markers)
+	if err != nil {
+		fmt.Printf("func(checkInput)] Error: There was an error converting the Markers variable to an integer. Please ensure this is an integer value. You entered: %s.\n", parserMap.Markers)
+		os.Exit(42)		
+	}
+
+	// check loco is a string boolean
+	if ((strings.ToLower(parserMap.Loco) == "TRUE") || (parserMap.Loco == "FALSE")) {
+		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable Loco is set to %s.\n", parserMap.Loco)
+	} else {
+		fmt.Printf("func(checkInput)] Error: Please set Loco as either True or False.  You entered: %s.\n", parserMap.Loco)
+		os.Exit(42)		
+	}
+
+	// check CovTransform is a string boolean
+	if ((parserMap.CovTransform == "TRUE") || (parserMap.CovTransform == "FALSE")) {
+		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable CovTransform is set to %s.\n", parserMap.CovTransform)
+	} else {
+		fmt.Printf("func(checkInput)] Error: Please set CovTransform as either True or False.  You entered: %s.\n", parserMap.CovTransform)
+		os.Exit(42)		
+	}
+
+
 
 	// check phenoFile for covars, sampleID, and trait
 	allCovsSplit := strings.Split(covars, ",")
@@ -696,6 +765,7 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	}
 	defer checkPhenoFile.Close()
 
+	// check for duplicate sample IDs
 	readFile := bufio.NewScanner(checkPhenoFile)
 	for readFile.Scan(){
 		if lineNumber == 0 {
@@ -728,7 +798,64 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 		}
 	}
 	fmt.Printf("[func(checkInput)] There are total of %d unique sample IDs.\n", len(checkIDs))
-		
+
+	// if using GenerateGRM or GenerateNull must have plink file and check if it exists
+	if ((parserMap.GenerateGRM == true) || (parserMap.GenerateNull == true)) {
+		// check plink path
+		if _,err := os.Stat(parserMap.Plink + ".bed"); err == nil {
+				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable Plink.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable Plink.\n", parserMap.Plink)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(checkInput)] File may exist from variable Plink but the following error occurred: %v \n", err)
+			}
+	}
+
+	// if using GenerateNull is set to true but reusing an existing GRM, then check these files exist
+	if ((parserMap.GenerateGRM == false) && (parserMap.GenerateNull == true)) {
+		// check sparse GRM file exists
+		if _,err := os.Stat(parserMap.SparseGRM); err == nil {
+				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(checkInput)] File may exist from variable SparseGRM but the following error occurred: %v \n", err)
+			}
+		// check sampleID file exists
+		if _,err := os.Stat(parserMap.SampleIDFile); err == nil {
+				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(checkInput)] File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
+			}
+	}
+
+
+	// if using GenerateAssociations is set to true but reusing an existing Null model, then check these files exist
+	if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations == true)) {
+		// check NullModelFile exists
+		if _,err := os.Stat(parserMap.NullModelFile); err == nil {
+				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(checkInput)] File may exist from variable NullModelFile but the following error occurred: %v \n", err)
+			}
+		// check VarianceRatioFile exists
+		if _,err := os.Stat(parserMap.VarianceRatioFile); err == nil {
+				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n")
+			} else if os.IsNotExist(err) {
+				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+				os.Exit(42)
+			} else {
+				fmt.Printf("[func(checkInput)] File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
+			}
+	}
 
 }
 
