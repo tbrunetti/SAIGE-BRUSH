@@ -1,0 +1,42 @@
+Parameter,Type,Default,Description,Usage
+ChromosomeLengthFile,"string
+(as file path)",,This is a tab-delimited text file that contains the same names as the chromosomes in your dataset followed by the chromosome length.  This file can generally be pulled down from the NCBI website under the build you are using (hg19 or hg38).  This is used for chunking the imputed data., if skipChunking:false
+Build,"option: 
+Hg19 or hg38",hg38,This determines whether the software needs to be searching for a “chr” before the chomosome name or not,
+Chromosomes,"string 
+(as integer range)",1-22,"This lets the software know which chromosomes you want to use for association analysis.  It must be a range.  If you want to only run analysis on a single chromsome, the start and end will be the same value.  For example:  running chromome 2 only will look like 2-2.",if GenerateAssociations:true
+ImputeSuffix,string,,"The full suffix for the software to determine which files in the directory are impuation files. Important, it is assuming the prefix is either a chromosome number (hg19) or the string chr followed by the chromosome number (hg38)",if GenerateAssociations:true and skipChunking:false
+ImputeDir,"string
+(as directory path)",,Full path to directory where imputed results are located,if GenerateAssociations:true and skipChunking:false
+OutDir,"string
+(as directory apth)",,Full path to directory where final results should be transferred,all
+OutPrefix,string,,string (no whitespace or special characters) to prefix to the output files generated,all
+PhenoFile,"string
+(as file path)",,"Full path to tab-delimted phenotype file containing sample IDs, phenotypes, and covariates, with whatever string of  headers you choose",if GenerateNull:true
+Plink,,,,
+Trait,,,,
+Pheno,,,,
+InvNorm,,,,
+Covars,,,,
+SampleID,,,,
+Nthreads,,,,
+SparseKin,,,,
+Markers,,,,
+Rel,,,,
+Loco,,,,
+CovTransform,,,,
+VcfField,,,,
+MAF,,,,
+MAC,,,,
+IsDropMissingDosages,,,,
+InfoFile,,,,
+SaveChunks,,,,
+GrmMAF,,,,
+ChunkVariants,,,,
+SaveAsTar,,,,
+ImputationFileList,,,,
+SparseGRM,,,,
+SampleIDFile,,,,
+NullModelFile,,,,
+VarianceRatioFile,,,,
+AssociationFile,,,,

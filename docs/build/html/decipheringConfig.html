@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deciphering the config file &#8212; CCPM Biobank GWAS Pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Parameters" href="parameters.html" />
+    <link rel="prev" title="Welcome to the CCPM Biobank GWAS Pipeline documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="parameters.html" title="Parameters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to the CCPM Biobank GWAS Pipeline documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Deciphering the config file</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="deciphering-the-config-file">
+<h1>Deciphering the config file<a class="headerlink" href="#deciphering-the-config-file" title="Permalink to this headline">¶</a></h1>
+<p>The config file is a text file that contains key-value mappings to all input parameters and pipeline logic. The file can be broken down into three main parts: the pipeline logic, enviroment setup, and the user data input options.</p>
+<div class="section" id="pipeline-logic">
+<h2>Pipeline Logic<a class="headerlink" href="#pipeline-logic" title="Permalink to this headline">¶</a></h2>
+<p>There are five keywords that control the logic of the pipeline and all four accept only boolean arguments (true/false):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="environment-setup">
+<h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Permalink to this headline">¶</a></h2>
+<p>There are three keywords that control the environment setup of the pipeline. It is a requirement to use the container provided as an LSF object on github. This ensures all versioning of softaware if properly versioned and it reduces the complexity of the pipeline by using predefining software paths as well as reducing installation issues that arise with some many softawre dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
+<span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
+<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">SAIGE_v0</span><span class="o">.</span><span class="mi">39</span><span class="n">_CCPM_biobank_singularity_recipe_file_11162020</span><span class="o">.</span><span class="n">simg</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="user-data-input">
+<h2>User Data Input<a class="headerlink" href="#user-data-input" title="Permalink to this headline">¶</a></h2>
+<p>The remainder of the keywords are parameters offered to the user and the user can specify paths and options for all or some of these keywords:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ChromosomeLengthFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">chromosomeLengths</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">Build</span><span class="p">:</span><span class="n">hg38</span>
+<span class="n">Chromosomes</span><span class="p">:</span><span class="mi">1</span><span class="o">-</span><span class="mi">22</span>
+<span class="n">ImputeSuffix</span><span class="p">:</span><span class="n">_rsq70_merged_renamed</span><span class="o">.</span><span class="n">vcf</span><span class="o">.</span><span class="n">gz</span>
+<span class="n">ImputeDir</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">imputed</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">directory</span><span class="o">/</span>
+<span class="n">OutDir</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">output</span><span class="o">/</span><span class="n">final</span><span class="o">/</span><span class="n">results</span>
+<span class="n">OutPrefix</span><span class="p">:</span><span class="n">myGWAS</span>
+<span class="n">PhenoFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">phenotype</span><span class="o">/</span><span class="n">covariate</span><span class="o">/</span><span class="n">file</span>
+<span class="n">Plink</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">LDpruned</span><span class="o">/</span><span class="n">plink</span><span class="o">/</span><span class="n">file</span><span class="o">/</span><span class="n">prefix</span>
+<span class="n">Trait</span><span class="p">:</span><span class="n">binary</span>
+<span class="n">Pheno</span><span class="p">:</span><span class="n">myPhenotype</span>
+<span class="n">InvNorm</span><span class="p">:</span><span class="n">FALSE</span>
+<span class="n">Covars</span><span class="p">:</span><span class="n">PC1</span><span class="p">,</span><span class="n">PC2</span><span class="p">,</span><span class="n">PC3</span><span class="p">,</span><span class="n">PC4</span><span class="p">,</span><span class="n">PC5</span><span class="p">,</span><span class="n">age</span><span class="p">,</span><span class="n">sex</span>
+<span class="n">SampleID</span><span class="p">:</span><span class="n">SampleIDcol</span>
+<span class="n">NThreads</span><span class="p">:</span>
+<span class="n">SparseKin</span><span class="p">:</span><span class="kc">True</span>
+<span class="n">Markers</span><span class="p">:</span><span class="mi">30</span>
+<span class="n">Rel</span><span class="p">:</span><span class="mf">0.0625</span>
+<span class="n">Loco</span><span class="p">:</span><span class="n">TRUE</span>
+<span class="n">CovTransform</span><span class="p">:</span><span class="kc">True</span>
+<span class="n">VcfField</span><span class="p">:</span><span class="n">DS</span>
+<span class="n">MAF</span><span class="p">:</span><span class="mf">0.05</span>
+<span class="n">MAC</span><span class="p">:</span><span class="mi">10</span>
+<span class="n">IsDropMissingDosages</span><span class="p">:</span><span class="n">FALSE</span>
+<span class="n">InfoFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">info</span><span class="o">/</span><span class="n">file</span>
+<span class="n">SaveChunks</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GrmMAF</span><span class="p">:</span><span class="mf">0.01</span>
+<span class="n">ChunkVariants</span><span class="p">:</span><span class="mi">1000000</span>
+<span class="n">SaveAsTar</span><span class="p">:</span><span class="n">false</span>
+<span class="n">ImputationFileList</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="nb">list</span><span class="o">/</span><span class="n">of</span><span class="o">/</span><span class="n">chunked</span><span class="o">/</span><span class="n">chromosomes</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">SparseGRM</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">grm</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">mtx</span>
+<span class="n">SampleIDFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">grm</span><span class="o">/</span><span class="n">sample</span><span class="o">/</span><span class="nb">id</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">mtx</span><span class="o">.</span><span class="n">SampleID</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">NullModelFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">null</span><span class="o">/</span><span class="n">model</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">rda</span>
+<span class="n">VarianceRatioFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">variance</span><span class="o">/</span><span class="n">ratio</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">AssociationFile</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">concatenated</span><span class="o">/</span><span class="n">association</span><span class="o">/</span><span class="n">results</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Deciphering the config file</a><ul>
+<li><a class="reference internal" href="#pipeline-logic">Pipeline Logic</a></li>
+<li><a class="reference internal" href="#environment-setup">Environment Setup</a></li>
+<li><a class="reference internal" href="#user-data-input">User Data Input</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to the CCPM Biobank GWAS Pipeline documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parameters.html"
+                        title="next chapter">Parameters</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/decipheringConfig.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="parameters.html" title="Parameters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to the CCPM Biobank GWAS Pipeline documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Deciphering the config file</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

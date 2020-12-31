@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parameters &#8212; CCPM Biobank GWAS Pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Minimum Requirements to Run Genetic Relatedness Matrix" href="grmParameters.html" />
+    <link rel="prev" title="Deciphering the config file" href="decipheringConfig.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="grmParameters.html" title="Minimum Requirements to Run Genetic Relatedness Matrix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="decipheringConfig.html" title="Deciphering the config file"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Parameters</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="parameters">
+<h1>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h1>
+<p>This explains in more detail how and when to use each keyword in the config file.  For readability, the minimum required parameters are listed for each step.  If more than one step will be run (&gt;1 out of 5 possible pipeline logic keywords is set to true), the minimum parameters required is the sum of the minimum required parameters for all true keywords.</p>
+<div class="section" id="minimum-required-parameters-for-each-step">
+<h2>Minimum Required Parameters for Each Step<a class="headerlink" href="#minimum-required-parameters-for-each-step" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="grmParameters.html">Minimum Requirements to Run Genetic Relatedness Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nullModelParameters.html">Minimum Requirements to Run Null Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="assocAnalysisParameters.html">Minimum Requirements to Run Association Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resultsParameters.html">Minimum Requirements to Run Results</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="full-list-of-user-input-data-parameters">
+<h2>Full List of User Input Data Parameters<a class="headerlink" href="#full-list-of-user-input-data-parameters" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-center" id="id1">
+<caption><span class="caption-text">Definitions and Use</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 10%" />
+<col style="width: 40%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ChromosomeLengthFile</p></td>
+<td><p>string
+(as file path)</p></td>
+<td></td>
+<td><p>This is a tab-delimited text file that contains the same names as the chromosomes in your dataset followed by the chromosome length.  This file can generally be pulled down from the NCBI website under the build you are using (hg19 or hg38).  This is used for chunking the imputed data.</p></td>
+<td><p>if skipChunking:false</p></td>
+</tr>
+<tr class="row-odd"><td><p>Build</p></td>
+<td><p>option: 
+Hg19 or hg38</p></td>
+<td><p>hg38</p></td>
+<td><p>This determines whether the software needs to be searching for a “chr” before the chomosome name or not</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Chromosomes</p></td>
+<td><p>string 
+(as integer range)</p></td>
+<td><p>1-22</p></td>
+<td><p>This lets the software know which chromosomes you want to use for association analysis.  It must be a range.  If you want to only run analysis on a single chromsome, the start and end will be the same value.  For example:  running chromome 2 only will look like 2-2.</p></td>
+<td><p>if GenerateAssociations:true</p></td>
+</tr>
+<tr class="row-odd"><td><p>ImputeSuffix</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The full suffix for the software to determine which files in the directory are impuation files. Important, it is assuming the prefix is either a chromosome number (hg19) or the string chr followed by the chromosome number (hg38)</p></td>
+<td><p>if GenerateAssociations:true and skipChunking:false</p></td>
+</tr>
+<tr class="row-even"><td><p>ImputeDir</p></td>
+<td><p>string
+(as directory path)</p></td>
+<td></td>
+<td><p>Full path to directory where imputed results are located</p></td>
+<td><p>if GenerateAssociations:true and skipChunking:false</p></td>
+</tr>
+<tr class="row-odd"><td><p>OutDir</p></td>
+<td><p>string
+(as directory apth)</p></td>
+<td></td>
+<td><p>Full path to directory where final results should be transferred</p></td>
+<td><p>all</p></td>
+</tr>
+<tr class="row-even"><td><p>OutPrefix</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>string (no whitespace or special characters) to prefix to the output files generated</p></td>
+<td><p>all</p></td>
+</tr>
+<tr class="row-odd"><td><p>PhenoFile</p></td>
+<td><p>string
+(as file path)</p></td>
+<td></td>
+<td><p>Full path to tab-delimted phenotype file containing sample IDs, phenotypes, and covariates, with whatever string of  headers you choose</p></td>
+<td><p>if GenerateNull:true</p></td>
+</tr>
+<tr class="row-even"><td><p>Plink</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Trait</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Pheno</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>InvNorm</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Covars</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SampleID</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Nthreads</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SparseKin</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Markers</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Rel</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Loco</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>CovTransform</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>VcfField</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>MAF</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>MAC</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>IsDropMissingDosages</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>InfoFile</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SaveChunks</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GrmMAF</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ChunkVariants</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SaveAsTar</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ImputationFileList</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SparseGRM</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SampleIDFile</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>NullModelFile</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>VarianceRatioFile</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>AssociationFile</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Parameters</a><ul>
+<li><a class="reference internal" href="#minimum-required-parameters-for-each-step">Minimum Required Parameters for Each Step</a></li>
+<li><a class="reference internal" href="#full-list-of-user-input-data-parameters">Full List of User Input Data Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="decipheringConfig.html"
+                        title="previous chapter">Deciphering the config file</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="grmParameters.html"
+                        title="next chapter">Minimum Requirements to Run Genetic Relatedness Matrix</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/parameters.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="grmParameters.html" title="Minimum Requirements to Run Genetic Relatedness Matrix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="decipheringConfig.html" title="Deciphering the config file"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Parameters</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>
