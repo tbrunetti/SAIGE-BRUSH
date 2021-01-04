@@ -89,20 +89,20 @@ func main() {
 	parser(configFilename)
 
 	totalCPUsAvail := runtime.NumCPU()
-	fmt.Printf("[func(main) Thread Allocation %s] %v total CPUs available.\n", time.Now(),totalCPUsAvail)
+	fmt.Printf("[func(main) Thread Allocation %s] -- UPDATE! -- %v total CPUs available.\n", time.Now(),totalCPUsAvail)
 	if parserMap.NThreads == "" {
 		parserMap.NThreads = strconv.Itoa(totalCPUsAvail)
 		runtime.GOMAXPROCS(totalCPUsAvail)
 	}else {
 		maxThreads,err := strconv.Atoi(parserMap.NThreads)
 		if err != nil{
-			fmt.Printf("[func(main) Thread Allocation %s] There was a problem allocating your threads.  You entered: %v\n, %v", time.Now(),parserMap.NThreads, err)
+			fmt.Printf("[func(main) Thread Allocation %s] -- ERROR! -- There was a problem allocating your threads.  You entered: %v\n, %v", time.Now(),parserMap.NThreads, err)
 			os.Exit(42)
 		}
 		runtime.GOMAXPROCS(maxThreads)
 	}
 
-	fmt.Printf("[func(main) Thread Allocation %s] %v total CPUs will be used.\n", time.Now(), parserMap.NThreads)
+	fmt.Printf("[func(main) Thread Allocation %s] -- UPDATE! -- %v total CPUs will be used.\n", time.Now(), parserMap.NThreads)
 	
 	
 	
@@ -114,10 +114,10 @@ func main() {
 	 // create tmp folder to be deleted at end of run
  	err:=os.Mkdir(filepath.Join(parserMap.BindPointTemp, "tmp_saige"), 0755)
  	if err != nil {
- 		fmt.Printf("[func(main) %s] There was an error creating the tmp directory. \t%v\n", time.Now(), err)
+ 		fmt.Printf("[func(main) %s] -- ERROR! -- There was an error creating the tmp directory. \t%v\n", time.Now(), err)
  		os.Exit(42)
  	}else {
- 		fmt.Printf("[func(main) %s] Created tmp directory called tmp_saige in %s\n", time.Now(), parserMap.BindPointTemp)
+ 		fmt.Printf("[func(main) %s] -- UPDATE! -- Created tmp directory called tmp_saige in %s\n", time.Now(), parserMap.BindPointTemp)
  	}
  	defer os.RemoveAll(filepath.Join(parserMap.BindPointTemp, "tmp_saige")) // remove tmp_saige dir after main finishes
 
@@ -161,7 +161,7 @@ func main() {
 		totalSNPs:=strings.Fields(string(totalSNPsTmp)) // convert byte stream to string and then split based on whitespace to get int string
 
 
-		fmt.Printf("[func(main) generate GRM %s] There are a total of %v snps that meet the maf requirements for GRM calculation.\n", time.Now(),totalSNPs[0])
+		fmt.Printf("[func(main) generate GRM %s] -- UPDATE! -- There are a total of %v snps that meet the maf requirements for GRM calculation.\n", time.Now(),totalSNPs[0])
 
 
 		createGRM := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/usr/lib/R/bin/Rscript", "/opt/createSparseGRM.R",
@@ -178,27 +178,27 @@ func main() {
 		createGRM.Run()
 
 		parserMap.SparseGRM = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx")
-		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM path located at: %s\n", time.Now(),parserMap.SparseGRM)
+		fmt.Printf("[func(main) -- generate GRM %s] -- UPDATE! -- Sparse GRM path located at: %s\n", time.Now(),parserMap.SparseGRM)
 		parserMap.SampleIDFile = filepath.Join(parserMap.BindPointTemp, "tmp_saige", parserMap.OutPrefix+"_relatednessCutoff_"+parserMap.Rel+"_"+string(totalSNPs[0])+"_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt")
-		fmt.Printf("[func(main) -- generate GRM %s] Sparse GRM sampleID path located at: %s\n", time.Now(),parserMap.SampleIDFile)
+		fmt.Printf("[func(main) -- generate GRM %s] -- UPDATE! -- Sparse GRM sampleID path located at: %s\n", time.Now(),parserMap.SampleIDFile)
 	} else {
 		if _,err := os.Stat(parserMap.SparseGRM); err == nil {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n")
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- CONFIRMED! -- The path and file are reachable for config variable SparseGRM.\n")
 		} else if os.IsNotExist(err) {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
 			os.Exit(42)
 		} else {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] File may exist from variable SparseGRM but the following error occurred: %v The path and file are reachable for config variable SparseGRM.\n", err)
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- WARNING! -- File may exist from variable SparseGRM but the following error occurred: %v The path and file are reachable for config variable SparseGRM.\n", err)
 		}
 		}
 		
 		if _,err := os.Stat(parserMap.SampleIDFile); err == nil {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n")
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- CONFIRMED! -- The path and file are reachable for config variable SampleIDFile.\n")
 		} else if os.IsNotExist(err) {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
 			os.Exit(42)
 		} else {
-			fmt.Printf("[func(main) -- skip GRM; use supplied check] File may exist from variable SampleIDFile but the following error occurred: %v The path and file are reachable for config variable SampleIDFile.\n", err)
+			fmt.Printf("[func(main) -- skip GRM; use supplied check] -- WARNING! -- File may exist from variable SampleIDFile but the following error occurred: %v The path and file are reachable for config variable SampleIDFile.\n", err)
 		}	
 
  	
@@ -213,14 +213,14 @@ func main() {
 		} else {
 			threadsNull,err := strconv.Atoi(parserMap.NThreads)
 			if err != nil {
-				fmt.Printf("[func(main) null thread allocation %s] There was an error converting threads: %v\n", time.Now(),err)
+				fmt.Printf("[func(main) null thread allocation %s] -- ERROR! -- There was an error converting threads: %v\n", time.Now(),err)
 				os.Exit(42)
 			}
 			toNull := math.Ceil(float64(threadsNull) * 0.75)
 			toChunk := math.Ceil(float64(threadsNull) - toNull)
 			toNullString := fmt.Sprintf("%f", toNull)
 			
-			fmt.Printf("func(main) null thread allocation %s] There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", time.Now(), threadsNull, toNull, toChunk)
+			fmt.Printf("func(main) null thread allocation %s] -- UPDATE! -- There are %v threads requested.  %v are reserverd for the null model generation. %v are reserved for chunking.\n", time.Now(), threadsNull, toNull, toChunk)
 			
 			go nullModel(parserMap.BindPoint,parserMap.BindPointTemp,parserMap.Container,parserMap.SparseGRM,parserMap.SampleIDFile,parserMap.PhenoFile,parserMap.Plink,
 				parserMap.Trait,parserMap.Pheno,parserMap.InvNorm,parserMap.Covars,parserMap.SampleID,toNullString,parserMap.SparseKin,parserMap.Markers,parserMap.OutDir,
@@ -230,23 +230,23 @@ func main() {
 		}
 	}else if (parserMap.GenerateNull == false) && (parserMap.GenerateAssociations==true) {
 		if _,err := os.Stat(parserMap.NullModelFile); err == nil {
-			fmt.Printf("[func(main) -- skip null model file; use supplied check] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n")
+			fmt.Printf("[func(main) -- skip null model file; use supplied check] -- CONFIRMED! -- The path and file are reachable for config variable NullModelFile.\n")
 			}else if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip null model file; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.VarianceRatioFile)
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.VarianceRatioFile)
 				os.Exit(42)
 			}else {
-				fmt.Printf("[func(main) -- skip null model file; use supplied check] File may exist from variable NullModelFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(main) -- skip null model file; use supplied check] -- WARNING! -- File may exist from variable NullModelFile but the following error occurred: %v \n", err)
 			}
 		if _,err := os.Stat(parserMap.VarianceRatioFile); err == nil {
-			fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n")
+			fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] -- CONFIRMED! -- The path and file are reachable for config variable VarianceRatioFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
 				os.Exit(42)
 			}else {
-				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] File may exist from variable VariableRatioFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(main) -- skip variance ratio calculation; use supplied check] -- WARNING! -- File may exist from variable VariableRatioFile but the following error occurred: %v \n", err)
 			}
 	}else {
-		fmt.Printf("[func(main)] null model not needed since no association analyses will be calculated.\n")
+		fmt.Printf("[func(main)] -- UPDATE! -- null model not needed since no association analyses will be calculated.\n")
 	}
  	
  	
@@ -254,16 +254,16 @@ func main() {
  	chunk can run the same time as the null model; and the association analysis needs to wait for the 
  	null to finish and chunk to finish*/
  	if ((parserMap.SkipChunking ==  false) && (parserMap.GenerateAssociations == true)) {
- 		fmt.Printf("[func(main) Queue status] Chunking files for queue for association analyses\n")
+ 		fmt.Printf("[func(main) Queue status] -- UPDATE! -- Chunking files for queue for association analyses\n")
  		wgAllChunks.Add(1)
     	go chunk(start,end,parserMap.Build,parserMap.OutDir,parserMap.ChromosomeLengthFile,parserMap.ImputeDir,parserMap.ImputeSuffix,parserMap.BindPoint,
     		parserMap.BindPointTemp,parserMap.Container,parserMap.ChunkVariants,f)
  	}else if ((parserMap.SkipChunking ==  true) && (parserMap.GenerateAssociations == true)) {
- 		fmt.Printf("[func(main) Queue status] Reusing previously chunked and index files for queue for association analyses\n")
+ 		fmt.Printf("[func(main) Queue status] -- UPDATE! -- Reusing previously chunked and index files for queue for association analyses\n")
  		wgAllChunks.Add(1)
  		go usePrevChunks(start, end, parserMap.Build, parserMap.ImputeDir, parserMap.ImputationFileList)
  	}else {
- 		fmt.Printf("[func(main) Queue status] Skipping queue since no associations are required\n")
+ 		fmt.Printf("[func(main) Queue status] -- UPDATE! -- Skipping queue since no associations are required\n")
  	}
   
     
@@ -277,7 +277,7 @@ func main() {
 	if parserMap.GenerateAssociations == true {
 		for allChunksFinished == 1 || len(processQueue) != 0 {
 			if ((allAssocationsRunning < totalCPUsAvail) && (len(processQueue) > 0)) {
-				fmt.Printf("[func(main) %s] The total number of associations running is %v.\n", time.Now(), allAssocationsRunning)
+				fmt.Printf("[func(main) %s] -- UPDATE! -- The total number of associations running is %v.\n", time.Now(), allAssocationsRunning)
 				changeQueueSize.Lock() // lock queue to prevent collision
 				vcfFile := processQueue[0]
 				tmp := strings.Split(vcfFile, "_") // extract chromosome name
@@ -308,25 +308,25 @@ func main() {
 	    // STEP2a: Concatenate all results into one file
 	    concatTime := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", concatTime.Year(), concatTime.Month(), concatTime.Day(), concatTime.Hour(), concatTime.Minute(), concatTime.Second())
-	    fmt.Printf("[func(main) %s] Concatenating all association results...\n", formatted)
+	    fmt.Printf("[func(main) %s] -- UPDATE! -- Concatenating all association results...\n", formatted)
 	    concat := exec.Command("singularity", "run", "-B", parserMap.BindPoint+","+parserMap.BindPointTemp, parserMap.Container, "/opt/concatenate.sh", filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix))
 	    concat.Stdout = os.Stdout
 	    concat.Stderr = os.Stderr
 	    concat.Run()
 	    
-	    fmt.Printf("[func(main) -- concatenate %s] Finished all association results. Time Elapsed: %.2f minutes\n", time.Now(),time.Since(concatTime).Minutes())
+	    fmt.Printf("[func(main) -- concatenate %s] -- UPDATE! -- Finished all association results. Time Elapsed: %.2f minutes\n", time.Now(),time.Since(concatTime).Minutes())
 	}
     
     // STEP3: Clean, Visualize, and Summarize results
     if parserMap.GenerateResults == true {
     	if parserMap.GenerateAssociations == false {
 			if _,err := os.Stat(parserMap.AssociationFile); err == nil {
-				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] CONFIRMED! The path and file are reachable for config variable AssociationFile.\n")
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] -- CONFIRMED! -- The path and file are reachable for config variable AssociationFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
 				os.Exit(42)
 			} else {
-				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] File may exist from variable AssociationFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(main) -- skip associationAnalysis; use supplied check] -- WARNING! -- File may exist from variable AssociationFile but the following error occurred: %v \n", err)
 			}
 		} else{
     		parserMap.AssociationFile = filepath.Join(parserMap.BindPointTemp,"tmp_saige",parserMap.OutPrefix) + "_allChromosomeResultsMerged.txt"
@@ -348,14 +348,14 @@ func main() {
 	    cleanAndGraph.Stderr = os.Stderr
 	    cleanAndGraph.Run()
 
-	    fmt.Printf("[func(main) -- clean and graph results %s] Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
+	    fmt.Printf("[func(main) -- clean and graph results %s] -- UPDATE! -- Finished all data clean up, visualizations, and summarization. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(graph).Minutes())
 	}
 
     //TODO: clean up temp files
     saveResults(parserMap.BindPointTemp,parserMap.OutPrefix,parserMap.OutDir,parserMap.SaveChunks,parserMap.SaveAsTar)
 
     // Pipeline Finish
-    fmt.Printf("[func(main) %s] All threads are finished and pipeline is complete!\n", time.Now())
+    fmt.Printf("[func(main) %s] -- UPDATE! -- All threads are finished and pipeline is complete!\n", time.Now())
 }
 
 
@@ -364,8 +364,8 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 
 	fileBytes, err := os.Open(chromosomeLengthFile)
 	if err != nil {
-		fmt.Printf("func(chunk) %s] There was a problems reading in the chromosome length file.", time.Now())
-		os.Exit(42)
+		fmt.Printf("[func(chunk) %s] -- ERROR! -- There was a problems reading in the chromosome length file.", time.Now())
+		os.Exit(10)
 	}
 
 
@@ -376,12 +376,12 @@ func chunk(start,end,build,outDir,chromosomeLengthFile,imputeDir,imputeSuffix,bi
 	for {
 		line, err := scanBytes.ReadString('\n')
 		if err != nil && err != io.EOF {
-			fmt.Println("An error occurred when reading in the chromosome length file.")
-			os.Exit(42)
+			fmt.Println("[func(chunk)] -- ERROR! -- An error occurred when reading in the chromosome length file.")
+			os.Exit(10)
 		}
 
 		if err == io.EOF {
-			fmt.Println("Finished reading chromosome file length")
+			fmt.Println("[func(chunk)] -- UPDATE! -- Finished reading chromosome file length")
 			break
 		}
 		
@@ -428,11 +428,11 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 	if err != nil {
 		tErr := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
-		fmt.Printf("[func(smallerChunk) %s] %s overall: Error in total variants call:\n%v", formatted,chrom, err)
+		fmt.Printf("[func(smallerChunk) %s] -- WARNING! -- %s overall: Error in total variants call:\n%v", formatted,chrom, err)
 	} else {
 		tErr := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", tErr.Year(), tErr.Month(), tErr.Day(),tErr.Hour(), tErr.Minute(), tErr.Second())
-		fmt.Printf("[func(smallerChunk) %s] A total of %s variants are in the vcf file for %s\n", formatted,strings.TrimSpace(string(totalVariants)),chrom)
+		fmt.Printf("[func(smallerChunk) %s] -- UPDATE! -- A total of %s variants are in the vcf file for %s\n", formatted,strings.TrimSpace(string(totalVariants)),chrom)
 	}
 
 	// convert byte slice to string, trim any trailing whitespace of either end and then convert to integer
@@ -453,7 +453,7 @@ func smallerChunk(chrom,build,outDir,imputeDir,imputeSuffix,bindPoint,bindPointT
 		saveQueue(chrom+imputeSuffix,f)
 		t0 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
-		fmt.Printf("[func(smallerChunk) %s] %s is in the queue and %d is variant value\n", formatted,chrom+imputeSuffix,varVal)
+		fmt.Printf("[func(smallerChunk) %s] -- UPDATE! -- %s is in the queue and %d is variant value\n", formatted,chrom+imputeSuffix,varVal)
 	}else {
 		for loopId := 1; loopId < maxLoops + 1; loopId++ {
 			wgSmallChunk.Add(1)
@@ -469,7 +469,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 	defer wgSmallChunk.Done()
 	t0 := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
-	fmt.Printf("[func(processing) %s] Processing %s, chunk %d\n", formatted, chrom, loopId)
+	fmt.Printf("[func(processing) %s] -- UPDATE! -- Processing %s, chunk %d\n", formatted, chrom, loopId)
 	
 	loopNum := strconv.Itoa(loopId)
 	upperVal := loopId*chunkVariants
@@ -486,7 +486,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		filepath.Join(imputeDir, chrom+imputeSuffix))
 	bcfToolsErr := subset.Run()
 	if bcfToolsErr != nil {
-		fmt.Printf("[func(processing) %s] BcfTools subsetting of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, bcfToolsErr)
+		fmt.Printf("[func(processing) %s] -- WARNING! -- BcfTools subsetting of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, bcfToolsErr)
 		return
 	}
 
@@ -496,7 +496,7 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		filepath.Join(bindPointTemp,"tmp_saige",chrom+"_")+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix)
 	indexErr:=index.Run()
 	if indexErr != nil {
-		fmt.Printf("[func(processing) %s] Indexing of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, indexErr)
+		fmt.Printf("[func(processing) %s] -- WARNING! -- Indexing of %s finished with error: %v\n", time.Now(), chrom+":"+lowerValStr+"-"+upperValStr, indexErr)
 		return
 	}
 
@@ -522,11 +522,11 @@ func processing (loopId,chunkVariants int, bindPoint,bindPointTemp,container,chr
 		saveQueue(chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix,f)
 		t1 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
-		fmt.Printf("[func(processing) %s] %s, chunk %s has successfully completed and has been added to the processing queue. Time Elapsed: %.2f minutes\n", formatted,chrom,loopNum, time.Since(t0).Minutes())
+		fmt.Printf("[func(processing) %s] -- UPDATE! -- %s, chunk %s has successfully completed and has been added to the processing queue. Time Elapsed: %.2f minutes\n", formatted,chrom,loopNum, time.Since(t0).Minutes())
 	}else{
 		t1 := time.Now()
 		formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
-		fmt.Printf("[func(processing) %s] %s is empty with value %d and will not be added to queue.\n", formatted, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix, varVal)
+		fmt.Printf("[func(processing) %s] -- WARNING! -- %s is empty with value %d and will not be added to queue.\n", formatted, chrom+"_"+loopNum+"_"+lowerValStr+"_"+upperValStr+"_"+imputeSuffix, varVal)
 	}
 }
 	
@@ -534,7 +534,7 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 	defer wgNull.Done() // decrement wgNull sync object
 	t0 := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
-	fmt.Printf("[func(nullModel) %s] Starting Null Model...\n", formatted)
+	fmt.Printf("[func(nullModel) %s] -- UPDATE! -- Starting Null Model...\n", formatted)
 
 	switch{
 	case strings.ToLower(strings.TrimSpace(trait)) == "binary":
@@ -599,7 +599,7 @@ func nullModel (bindPoint,bindPointTemp,container,sparseGRM,sampleIDFile,phenoFi
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
-	fmt.Printf("[func(nullModel) %s] Finished Null Model. Time Elapsed: %.2f minutes\n", formatted, time.Since(t0).Minutes())
+	fmt.Printf("[func(nullModel) %s] -- UPDATE! -- Finished Null Model. Time Elapsed: %.2f minutes\n", formatted, time.Since(t0).Minutes())
 	}
 }
 
@@ -611,7 +611,7 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 
 	t0 := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t0.Year(), t0.Month(), t0.Day(),t0.Hour(), t0.Minute(), t0.Second())
-	fmt.Printf("[func(associationAnalysis) %s] Starting Association of %s...\n", formatted, vcfFile)
+	fmt.Printf("[func(associationAnalysis) %s] -- UPDATE! -- Association of %s...\n", formatted, vcfFile)
 
 
 	// run step2: association analyses command in SAIGE via Singularity		
@@ -640,7 +640,7 @@ func associationAnalysis(bindpoint,bindPointTemp,container,vcfFile,vcfField,outD
 
 	t1 := time.Now()
 	formatted = fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t1.Year(), t1.Month(), t1.Day(),t1.Hour(), t1.Minute(), t1.Second())
-	fmt.Printf("[func(associationAnalysis) %s] %s has successfully completed. Time Elapsed: %.2f minutes\n", formatted,vcfFile,time.Since(t0).Minutes())
+	fmt.Printf("[func(associationAnalysis) %s] -- UPDATE! -- %s has completed. Time Elapsed: %.2f minutes\n", formatted,vcfFile,time.Since(t0).Minutes())
 
 	queueCheck.Lock() // lock shared variable to prevent collision
 	allAssocationsRunning--
@@ -651,101 +651,132 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	var lineNumber int
 	var sampleIDloc int
 	checkIDs := make(map[string]bool)
+
+	// check container path exists
+	if _,err := os.Stat(parserMap.Container); err == nil {
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable Container.\n")
+	} else if os.IsNotExist(err) {
+		fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable Container.\n", parserMap.Container)
+		os.Exit(5)
+	} else {
+		fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable Container but the following error occurred: %v \n", err)
+	}
+
+	// check bindpoint exists
+	if _,err := os.Stat(parserMap.BindPoint); err == nil {
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable BindPoint.\n")
+	} else if os.IsNotExist(err) {
+		fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable BindPoint.\n", parserMap.BindPoint)
+		os.Exit(5)
+	} else {
+		fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable BindPoint but the following error occurred: %v \n", err)
+	}
+
+	// check tmp bindpoint exists
+	if _,err := os.Stat(parserMap.BindPointTemp); err == nil {
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable BindPointTemp.\n")
+	} else if os.IsNotExist(err) {
+		fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable BindPointTemp.\n", parserMap.BindPointTemp)
+		os.Exit(5)
+	} else {
+		fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable BindPointTemp but the following error occurred: %v \n", err)
+	}
+
 	
 	// check MAC if float and is between 0.0-0.50
 	checkMAC,err := strconv.ParseFloat(MAF, 64)
 	if err != nil {
-		fmt.Printf("[func(checkInput)] ERROR! There was an error converting MAC to float 64. See following : %v\n", err)
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- There was an error converting MAC to float 64. See following : %v\n", err)
+		os.Exit(5)
 	} else if checkMAC < 0.0 {
-		fmt.Printf("[func(checkInput)] ERROR! minor allele count cannot be smaller (negative) than 0 (0%). Please select a positive value.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- minor allele count cannot be smaller (negative) than 0 (0%). Please select a positive value.\n")
+		os.Exit(5)
 	}
 
 	// check MAF is float and is between 0.0-0.50
 	checkMAF,err := strconv.ParseFloat(MAF, 64)
 	if err != nil {
-		fmt.Printf("[func(checkInput)] ERROR! There was an error converting MAF to float 64. See following : %v\n", err)
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- There was an error converting MAF to float 64. See following : %v\n", err)
+		os.Exit(5)
 	} else if checkMAF > 0.50 {
-		fmt.Printf("[func(checkInput)] ERROR! minor allele frequency cannot be larger than 0.50 (50%). Please select a value between 0.0-0.50.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- minor allele frequency cannot be larger than 0.50 (50%). Please select a value between 0.0-0.50.\n")
+		os.Exit(5)
 	} else if checkMAF < 0.0 {
-		fmt.Printf("[func(checkInput)] ERROR! minor allele frequency cannot be smaller (negative) than 0 (0%). Please select a value between 0.0-0.50.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- minor allele frequency cannot be smaller (negative) than 0 (0%). Please select a value between 0.0-0.50.\n")
+		os.Exit(5)
 	}
 
 	// check GrmMAF is float and is between 0.0-0.50
 	checkGrmMAF,err := strconv.ParseFloat(parserMap.GrmMAF, 64)
 	if err != nil {
-		fmt.Printf("[func(checkInput)] ERROR! There was an error converting GrmMaf to float 64. See following : %v\n", err)
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- There was an error converting GrmMaf to float 64. See following : %v\n", err)
+		os.Exit(5)
 	} else if checkGrmMAF > 0.50 {
-		fmt.Printf("[func(checkInput)] ERROR! minor allele frequency cannot be larger than 0.50 (50%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- minor allele frequency cannot be larger than 0.50 (50%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
+		os.Exit(5)
 	} else if checkGrmMAF < 0.0 {
-		fmt.Printf("[func(checkInput)] ERROR! minor allele frequency cannot be smaller (negative) than 0 (0%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- minor allele frequency cannot be smaller (negative) than 0 (0%) for GrmMaf variable. Please select a value between 0.0-0.50.\n")
+		os.Exit(5)
 	}
 
 	// check that rel is float convertable and between 0.0 -1.0
 	checkRel,err := strconv.ParseFloat(parserMap.Rel, 64)
 	if err != nil {
-		fmt.Printf("[func(checkInput)] ERROR! There was an error converting Rel to float 64. See following : %v\n", err)
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- There was an error converting Rel to float 64. See following : %v\n", err)
+		os.Exit(5)
 	} else if checkRel > 1.0 {
-		fmt.Printf("[func(checkInput)] ERROR! Kinship relatedness threshold cannot be larger than 1.0 (100%) for Rel variable. Please select a value between 0.0-1.0.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- Kinship relatedness threshold cannot be larger than 1.0 (100%) for Rel variable. Please select a value between 0.0-1.0.\n")
+		os.Exit(5)
 	} else if checkRel < 0.0 {
-		fmt.Printf("[func(checkInput)] ERROR! Kinship relatedness threshold cannot be smaller (negative) than 0 (0%) for Rel variable. Please select a value between 0.0-1.0.\n")
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- Kinship relatedness threshold cannot be smaller (negative) than 0 (0%) for Rel variable. Please select a value between 0.0-1.0.\n")
+		os.Exit(5)
 	}
 
 	// check trait is either binary or quantitative
 	if ((strings.ToLower(parserMap.Trait) == "binary") || (strings.ToLower(parserMap.Trait) == "quantitative")) {
-		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable Trait is set to %s.\n", parserMap.Trait)
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable Trait is set to %s.\n", parserMap.Trait)
 	} else {
-		fmt.Printf("func(checkInput)] ERROR! Please select trait type as either binary or quantitative.  You entered: %s.\n", parserMap.Trait)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- Please select trait type as either binary or quantitative.  You entered: %s.\n", parserMap.Trait)
+		os.Exit(5)		
 	}
 
 	// check invNorm is a string boolean
 	if ((strings.ToLower(parserMap.InvNorm) == "TRUE") || (parserMap.InvNorm == "FALSE")) {
-		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable InvNorm is set to %s.\n", parserMap.InvNorm)
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable InvNorm is set to %s.\n", parserMap.InvNorm)
 	} else {
-		fmt.Printf("func(checkInput)] ERROR! Please select InvNorm as either True or False.  You entered: %s.\n", parserMap.InvNorm)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- Please select InvNorm as either True or False.  You entered: %s.\n", parserMap.InvNorm)
+		os.Exit(5)		
 	}
 
 	// check SparseKin is a string boolean
 	if ((parserMap.SparseKin == "TRUE") || (parserMap.SparseKin == "FALSE")) {
-		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable sparseKin is set to %s.\n", parserMap.SparseKin)
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable sparseKin is set to %s.\n", parserMap.SparseKin)
 	} else {
-		fmt.Printf("func(checkInput)] ERROR! Please select SparseKin as either True or False.  You entered: %s.\n", parserMap.SparseKin)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- Please select SparseKin as either True or False.  You entered: %s.\n", parserMap.SparseKin)
+		os.Exit(5)		
 	}
 
 	// check markers is an integer-based string
 	_,err =  strconv.Atoi(parserMap.Markers)
 	if err != nil {
-		fmt.Printf("func(checkInput)] ERROR! There was an error converting the Markers variable to an integer. Please ensure this is an integer value. You entered: %s.\n", parserMap.Markers)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- There was an error converting the Markers variable to an integer. Please ensure this is an integer value. You entered: %s.\n", parserMap.Markers)
+		os.Exit(5)		
 	}
 
 	// check loco is a string boolean
 	if ((parserMap.Loco == "TRUE") || (parserMap.Loco == "FALSE")) {
-		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable Loco is set to %s.\n", parserMap.Loco)
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable Loco is set to %s.\n", parserMap.Loco)
 	} else {
-		fmt.Printf("func(checkInput)] ERROR! Please set Loco as either True or False.  You entered: %s.\n", parserMap.Loco)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- Please set Loco as either True or False.  You entered: %s.\n", parserMap.Loco)
+		os.Exit(5)		
 	}
 
 	// check CovTransform is a string boolean
 	if ((parserMap.CovTransform == "TRUE") || (parserMap.CovTransform == "FALSE")) {
-		fmt.Printf("[func(checkInput)] CONFIRMED! Config variable CovTransform is set to %s.\n", parserMap.CovTransform)
+		fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable CovTransform is set to %s.\n", parserMap.CovTransform)
 	} else {
-		fmt.Printf("func(checkInput)] ERROR! Please set CovTransform as either True or False.  You entered: %s.\n", parserMap.CovTransform)
-		os.Exit(42)		
+		fmt.Printf("func(checkInput)] -- ERROR! -- Please set CovTransform as either True or False.  You entered: %s.\n", parserMap.CovTransform)
+		os.Exit(5)		
 	}
 
 
@@ -755,8 +786,8 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	allCovsSplit = append(allCovsSplit, sampleID)
 	checkPhenoFile,err := os.Open(phenoFile)
 	if err != nil {
-		fmt.Printf("[func(checkInput)] ERROR! There was an error opening your phenotype file: \n\t%v", err)
-		os.Exit(42)
+		fmt.Printf("[func(checkInput)] -- ERROR! -- There was an error opening your phenotype file: \n\t%v", err)
+		os.Exit(5)
 	}
 	defer checkPhenoFile.Close()
 
@@ -788,25 +819,25 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 		line := checkUniq.Text()
 		tmpParse := strings.Split(line, "\t")
 		if checkIDs[tmpParse[sampleIDloc]] == true {
-			fmt.Printf("[func(checkInput)] ERROR! Duplicate sample ID detected: %v. Duplicate IDs are not allowed.\n", tmpParse[sampleIDloc])
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Duplicate sample ID detected: %v. Duplicate IDs are not allowed.\n", tmpParse[sampleIDloc])
+			os.Exit(5)
 		} else {
 			checkIDs[tmpParse[sampleIDloc]] = true
 		}
 	}
-	fmt.Printf("[func(checkInput)] There are a total of %d unique sample IDs.\n", len(checkIDs))
+	fmt.Printf("[func(checkInput)] -- UPDATE! -- There are a total of %d unique sample IDs.\n", len(checkIDs))
 
 
 	// if using GenerateGRM or GenerateNull must have plink file and check if it exists
 	if ((parserMap.GenerateGRM == true) || (parserMap.GenerateNull == true)) {
 		// check plink path
 		if _,err := os.Stat(parserMap.Plink + ".bed"); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable Plink.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable Plink.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable Plink.\n", parserMap.Plink)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable Plink.\n", parserMap.Plink)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! File may exist from variable Plink but the following error occurred: %v \n", err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable Plink but the following error occurred: %v \n", err)
 			}
 	}
 
@@ -814,21 +845,21 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	if ((parserMap.GenerateGRM == false) && (parserMap.GenerateNull == true)) {
 		// check sparse GRM file exists
 		if _,err := os.Stat(parserMap.SparseGRM); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable SparseGRM.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable SparseGRM.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SparseGRM.\n", parserMap.SparseGRM)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! File may exist from variable SparseGRM but the following error occurred: %v \n", err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable SparseGRM but the following error occurred: %v \n", err)
 			}
 		// check sampleID file exists
 		if _,err := os.Stat(parserMap.SampleIDFile); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable SampleIDFile.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable SampleIDFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable SampleIDFile.\n", parserMap.SampleIDFile)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
 			}
 	}
 
@@ -837,21 +868,21 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	if ((parserMap.GenerateNull == false) && (parserMap.GenerateAssociations == true)) {
 		// check NullModelFile exists
 		if _,err := os.Stat(parserMap.NullModelFile); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable NullModelFile.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable NullModelFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable NullModelFile.\n", parserMap.NullModelFile)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! File may exist from variable NullModelFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable NullModelFile but the following error occurred: %v \n", err)
 			}
 		// check VarianceRatioFile exists
 		if _,err := os.Stat(parserMap.VarianceRatioFile); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! The path and file are reachable for config variable VarianceRatioFile.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path and file are reachable for config variable VarianceRatioFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable VarianceRatioFile.\n", parserMap.VarianceRatioFile)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable SampleIDFile but the following error occurred: %v \n", err)
 			}
 	}
 
@@ -859,12 +890,12 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 	if parserMap.GenerateAssociations == true {
 		// check Impute directory exists
 		if _,err := os.Stat(parserMap.ImputeDir); err == nil {
-			fmt.Printf("[func(checkInput)] CONFIRMED! The path is reachable for config variable ImputeDir.\n")
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- The path is reachable for config variable ImputeDir.\n")
 		} else if os.IsNotExist(err) {
-			fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputeDir.\n", parserMap.ImputeDir)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputeDir.\n", parserMap.ImputeDir)
+			os.Exit(5)
 		} else {
-			fmt.Printf("[func(checkInput)] WARNING! File may exist from variable ImputeDir but the following error occurred: %v \n", err)
+			fmt.Printf("[func(checkInput)] -- WARNING! -- File may exist from variable ImputeDir but the following error occurred: %v \n", err)
 		}
 
 		// check chromosome ranges are integers and separted by dash
@@ -874,39 +905,39 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 
 		checkStart,err:=  strconv.Atoi(start)
 		if err != nil {
-			fmt.Printf("[func(checkInput)] ERROR! There was a problem converting your starting chromosome.  Please be sure this in an integer between 1-22. You entered: %s.\n", start)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- There was a problem converting your starting chromosome.  Please be sure this in an integer between 1-22. You entered: %s.\n", start)
+			os.Exit(5)
 		}
 		checkEnd,err := strconv.Atoi(end)
 		if err != nil {
-			fmt.Printf("[func(checkInput)] ERROR! There was a problem converting your ending chromosome.  Please be sure this in an integer between 1-22. You entered: %s.\n", end)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- There was a problem converting your ending chromosome.  Please be sure this in an integer between 1-22. You entered: %s.\n", end)
+			os.Exit(5)
 		}
 
 		// check to make sure start-end is in ascending or equal order
 		if checkStart <= checkEnd {
-			fmt.Printf("[func(checkInput)] CONFIRMED! Chromosome ranges are in proper order.\n")
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Chromosome ranges are in proper order.\n")
 		} else {
-			fmt.Printf("[func(checkInput)] ERROR! The chromosome range must be in equal or ascending order.  Please rearrange.  You entered: %s.", parserMap.Chromosomes)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- The chromosome range must be in equal or ascending order.  Please rearrange.  You entered: %s.", parserMap.Chromosomes)
+			os.Exit(5)
 		}
 
 		// check start chromosome is 1-22
 		if ((checkStart < 1) || (checkStart > 22)) {
-			fmt.Printf("[func(checkInput)] ERROR! The starting chromosome must be between 1-22. You entered: %d.\n", checkStart)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- The starting chromosome must be between 1-22. You entered: %d.\n", checkStart)
+			os.Exit(5)
 		}
 
 		// check end chromosome is 1-22
 		if ((checkEnd < 1) || (checkEnd > 22)) {
-			fmt.Printf("[func(checkInput)] ERROR! The ending chromosome must be between 1-22. You entered: %d.\n", checkEnd)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- The ending chromosome must be between 1-22. You entered: %d.\n", checkEnd)
+			os.Exit(5)
 		}
 		
 		// confirm this is string range
 		if len(chroms) != 2 {
-			fmt.Printf("[func(checkInput)] ERROR! Chromosomes must be an integer range.  Ex: 1-22, 1-1, 3-10, etc....  You entered: %s.\n", parserMap.Chromosomes)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Chromosomes must be an integer range.  Ex: 1-22, 1-1, 3-10, etc....  You entered: %s.\n", parserMap.Chromosomes)
+			os.Exit(5)
 		}
 
 		// check imputation files and index files exist
@@ -927,73 +958,73 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 
 			for _,val := range checkFileExists {
 				if _,err := os.Stat(val); err == nil {
-					fmt.Printf("[func(checkInput)] CONFIRMED! imputation file is reachable for config variable ImputeDir and ImputeSuffix.\n")
+					fmt.Printf("[func(checkInput)] -- CONFIRMED! -- imputation file is reachable for config variable ImputeDir and ImputeSuffix.\n")
 				} else if os.IsNotExist(err) {
-					fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputeDir and ImputeSuffix\n", val)
-					os.Exit(42)
+					fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputeDir and ImputeSuffix\n", val)
+					os.Exit(5)
 				} else {
-					fmt.Printf("[func(checkInput)] WARNING! The file %s may exist from variable ImputeDir and ImputeSuffix but the following error occurred: %v \n", val, err)
+					fmt.Printf("[func(checkInput)] -- WARNING! -- The file %s may exist from variable ImputeDir and ImputeSuffix but the following error occurred: %v \n", val, err)
 				}					
 			}
 
 		} else if parserMap.SkipChunking == true {
 			if _,err := os.Stat(parserMap.ChromosomeLengthFile); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! chromosome length file is reachable for config variable ChromosomeLengthFile.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- chromosome length file is reachable for config variable ChromosomeLengthFile.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ChromosomeLengthFile.\n", parserMap.ChromosomeLengthFile)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ChromosomeLengthFile.\n", parserMap.ChromosomeLengthFile)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! The file %s may exist from variable ChromosomeLengthFile but the following error occurred: %v \n", parserMap.ChromosomeLengthFile, err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- The file %s may exist from variable ChromosomeLengthFile but the following error occurred: %v \n", parserMap.ChromosomeLengthFile, err)
 			}
 
 			// check if ImputationFileList exists that contains file chunk names
 			if _,err := os.Stat(parserMap.ImputationFileList); err == nil {
-				fmt.Printf("[func(checkInput)] CONFIRMED! Imputation File List is reachable for config variable ImputationFileList.\n")
+				fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Imputation File List is reachable for config variable ImputationFileList.\n")
 			} else if os.IsNotExist(err) {
-				fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputationFileList.\n", parserMap.ImputationFileList)
-				os.Exit(42)
+				fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable ImputationFileList.\n", parserMap.ImputationFileList)
+				os.Exit(5)
 			} else {
-				fmt.Printf("[func(checkInput)] WARNING! The file %s may exist from variable ChromosomeLengthFile but the following error occurred: %v \n", parserMap.ImputationFileList, err)
+				fmt.Printf("[func(checkInput)] -- WARNING! -- The file %s may exist from variable ChromosomeLengthFile but the following error occurred: %v \n", parserMap.ImputationFileList, err)
 			}
 		}
 
 		// check this field is either DS or GT (parserMap.VcfField)
 		if ((parserMap.VcfField == "DS") || (parserMap.VcfField == "GT")) {
-			fmt.Printf("[func(checkInput)] CONFIRMED! Config variable VcfField is set to %s.\n", parserMap.VcfField)
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable VcfField is set to %s.\n", parserMap.VcfField)
 		} else {
-			fmt.Printf("[func(checkInput)] ERROR! Please set VcfField as either True or False.  You entered: %s.\n", parserMap.VcfField)
-			os.Exit(42)		
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Please set VcfField as either True or False.  You entered: %s.\n", parserMap.VcfField)
+			os.Exit(5)		
 		}
 
 
 		// check parserMap.IsDropMissingDosages is string-based true/false
 		if ((parserMap.IsDropMissingDosages == "TRUE") || (parserMap.IsDropMissingDosages == "FALSE")) {
-			fmt.Printf("[func(checkInput)] CONFIRMED! Config variable IsDropMissingDosages is set to %s.\n", parserMap.IsDropMissingDosages)
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Config variable IsDropMissingDosages is set to %s.\n", parserMap.IsDropMissingDosages)
 		} else {
-			fmt.Printf("[func(checkInput)] ERROR! Please set IsDropMissingDosages as either True or False.  You entered: %s.\n", parserMap.IsDropMissingDosages)
-			os.Exit(42)		
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Please set IsDropMissingDosages as either True or False.  You entered: %s.\n", parserMap.IsDropMissingDosages)
+			os.Exit(5)		
 		}
 	}
 
 	if parserMap.GenerateResults == true {
 		// check if Association results file exists
 		if _,err := os.Stat(parserMap.AssociationFile); err == nil {
-			fmt.Printf("[func(checkInput)] CONFIRMED! Association anaysis file is reachable for config variable AssociationFile.\n")
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Association anaysis file is reachable for config variable AssociationFile.\n")
 		} else if os.IsNotExist(err) {
-			fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable AssociationFile.\n", parserMap.AssociationFile)
+			os.Exit(5)
 		} else {
-			fmt.Printf("[func(checkInput)] WARNING! The file %s may exist from variable AssociationFile but the following error occurred: %v \n", parserMap.AssociationFile, err)
+			fmt.Printf("[func(checkInput)] -- WARNING! -- The file %s may exist from variable AssociationFile but the following error occurred: %v \n", parserMap.AssociationFile, err)
 		}
 
 		// check if info file exists
 		if _,err := os.Stat(parserMap.InfoFile); err == nil {
-			fmt.Printf("[func(checkInput)] CONFIRMED! Info file is reachable for config variable InfoFile.\n")
+			fmt.Printf("[func(checkInput)] -- CONFIRMED! -- Info file is reachable for config variable InfoFile.\n")
 		} else if os.IsNotExist(err) {
-			fmt.Printf("[func(checkInput)] ERROR! Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable InfoFile.\n", parserMap.InfoFile)
-			os.Exit(42)
+			fmt.Printf("[func(checkInput)] -- ERROR! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable for config variable InfoFile.\n", parserMap.InfoFile)
+			os.Exit(5)
 		} else {
-			fmt.Printf("[func(checkInput)] WARNING! The file %s may exist from variable AssociationFile but the following error occurred: %v \n", parserMap.InfoFile, err)
+			fmt.Printf("[func(checkInput)] -- WARNING! -- The file %s may exist from variable AssociationFile but the following error occurred: %v \n", parserMap.InfoFile, err)
 		}
 
 		// 	
@@ -1002,13 +1033,13 @@ func checkInput(MAC,MAF,phenoFile,pheno,covars,sampleID string) {
 
 func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bool) {
 	save := time.Now()
-	fmt.Printf("[func(saveResults) -- begin transferring final results %s]\n", time.Now())
+	fmt.Printf("[func(saveResults)] -- UPDATE! -- begin transferring final results %s.\n", time.Now())
 	err:=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"), 0755)
 	if err != nil {
- 		fmt.Printf("[func(saveResults) %s] There was an error creating the final results directory. \t%v\n", time.Now(), err)
- 		os.Exit(42)
+ 		fmt.Printf("[func(saveResults) %s] -- ERROR! -- There was an error creating the final results directory. \t%v\n", time.Now(), err)
+ 		os.Exit(99)
  	}else {
- 		fmt.Printf("[func(saveResults) %s]Created final results directory called %s\n", time.Now(), outputPrefix+"_finalResults")
+ 		fmt.Printf("[func(saveResults) %s] -- UPDATE! -- Created final results directory called %s\n", time.Now(), outputPrefix+"_finalResults")
  	}
 
  	_=os.Mkdir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults/grm_files"), 0755)
@@ -1038,27 +1069,27 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bo
     	case (strings.HasSuffix(fileName[len(fileName)-1], ".mtx.sampleIDs.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".sparseGRM.mtx") || strings.HasSuffix(fileName[len(fileName)-1], ".sparseSigma.mtx")):
     		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/grm_files",fileName[len(fileName)-1]))
     		if err != nil {
-    			fmt.Printf("[func(saveResults) -- transferring final results into grm_files %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    			fmt.Printf("[func(saveResults) -- transferring final results into grm_files %s] -- WARNING! -- Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     		}
     	case (strings.HasSuffix(fileName[len(fileName)-1], ".varianceRatio.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".rda")):
     		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/null_model_files",fileName[len(fileName)-1]))
     		if err != nil {
-    			fmt.Printf("[func(saveResults) -- transferring final results into null_model_files %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    			fmt.Printf("[func(saveResults) -- transferring final results into null_model_files %s] -- WARNING! -- Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     		}
     	case (strings.HasSuffix(fileName[len(fileName)-1], ".png") || strings.HasSuffix(fileName[len(fileName)-1], ".pdf") || strings.HasSuffix(fileName[len(fileName)-1], "_allChromosomeResultsMerged.txt") || strings.HasSuffix(fileName[len(fileName)-1], ".txt.gz")):
     		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/association_analysis_results",fileName[len(fileName)-1]))
     		if err != nil {
-    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] -- WARNING! -- Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     		}
     	case (strings.HasSuffix(fileName[len(fileName)-1], ".vcf.gz") || strings.HasSuffix(fileName[len(fileName)-1], ".vcf.gz.tbi") || strings.HasSuffix(fileName[len(fileName)-1], "_chunkedImputationQueue.txt")):
     		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/chunked_imputation_files",fileName[len(fileName)-1]))
     		if err != nil {
-    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    			fmt.Printf("[func(saveResults) -- transferring final results into association_analysis_results %s] -- WARNING! -- Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     		}
     	case (strings.HasSuffix(fileName[len(fileName)-1], ".log") || strings.HasSuffix(fileName[len(fileName)-1], ".err")):
     		err := os.Rename(fileTransfer, filepath.Join(bindPointTemp,outputPrefix+"_finalResults/other",fileName[len(fileName)-1]))
     		if err != nil {
-    			fmt.Printf("[func(saveResults) -- transferring final results into other %s] Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
+    			fmt.Printf("[func(saveResults) -- transferring final results into other %s] -- WARNING! -- Problem transferring file %s to %s.\n\tThe following error was encountered: %v\n", time.Now(),filepath.Join(bindPointTemp,fileTransfer),filepath.Join(outDir,fileTransfer),err)
     		}
     	}
     }
@@ -1069,7 +1100,7 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bo
    		filesToTar, _ := ioutil.ReadDir(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
     	tarFileName, tarErr := os.Create(filepath.Join(bindPointTemp,outputPrefix+"_finalResults.tar"))
     	if tarErr != nil {
-    		fmt.Printf("[func(saveResults) %s] Error encountered when creating compressed tar file \t%v\n", time.Now(),tarErr)
+    		fmt.Printf("[func(saveResults) %s] -- WARNING! -- Error encountered when creating compressed tar file \t%v\n", time.Now(),tarErr)
    		}
     	defer tarFileName.Close()
     	var writeTar io.WriteCloser = tarFileName
@@ -1088,12 +1119,12 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bo
 
      		err = tarFileWriter.WriteHeader(header)
       		if err != nil {
-      			fmt.Printf("[func(saveResults) -- transferring final results %s] Problem writing file to tar.  The following error was encountered: %v\n",time.Now(),err)
+      			fmt.Printf("[func(saveResults) -- transferring final results %s] -- WARNING! -- Problem writing file to tar.  The following error was encountered: %v\n",time.Now(),err)
       		}
  
 	      	_, err = io.Copy(tarFileWriter, file)
    	   		if err != nil {
-      			fmt.Printf("[func(saveResults) -- transferring final results %s] Problem copying file to tar.  The following error was encountered: %v\n",time.Now(),err)
+      			fmt.Printf("[func(saveResults) -- transferring final results %s] -- WARNING! -- Problem copying file to tar.  The following error was encountered: %v\n",time.Now(),err)
       		} 
     	}
 	
@@ -1106,18 +1137,18 @@ func saveResults(bindPointTemp,outputPrefix,outDir string, saveChunks,saveTar bo
     	}
     	os.RemoveAll(filepath.Join(bindPointTemp,outputPrefix+"_finalResults"))
     }
-    fmt.Printf("[func(saveResults) -- finished transferring final results %s] Time Elapsed: %.2f minutes\n", time.Now(), time.Since(save).Minutes())
+    fmt.Printf("[func(saveResults)] -- UPDATE! -- finished transferring final results %s. Time Elapsed: %.2f minutes\n", time.Now(), time.Since(save).Minutes())
 }
 
 func saveQueue (queueFile string, f *os.File) {
 	queueFileSave.Lock()
 	_, err := f.WriteString(queueFile+"\n")
 	if err != nil {
-		fmt.Printf("[func(saveQueue) %s] There was an error when writing %s queue to file:\t%v\n", time.Now(),queueFile, err)
+		fmt.Printf("[func(saveQueue) %s] -- WARNING! -- There was an error when writing %s queue to file:\t%v\n", time.Now(),queueFile, err)
 		queueFileSave.Unlock()
 
 	}else{
-		fmt.Printf("[func(saveQueue) %s] Saved chunked file to queue list: %s\n", time.Now(),queueFile)
+		fmt.Printf("[func(saveQueue) %s] -- UPDATE! -- Saved chunked file to queue list: %s\n", time.Now(),queueFile)
 		f.Sync()
 		queueFileSave.Unlock()
 	}
@@ -1138,15 +1169,15 @@ func usePrevChunks (start,end,build,imputeDir,imputationFileList string) {
 		} else if build == "hg19" {
 			chromsToProcess = append(chromsToProcess, intervals+"_")
 		} else {
-			fmt.Printf("[func(usePrevChunks)] There was an error with the human genome build specifed.  You entered %v.  Please select either hg38 or hg19.\n", build)
-			os.Exit(42)
+			fmt.Printf("[func(usePrevChunks)] -- ERROR! -- There was an error with the human genome build specifed.  You entered %v.  Please select either hg38 or hg19.\n", build)
+			os.Exit(17)
 		}
 	}
 
 	fileQueue, err := os.Open(imputationFileList)
 	if err != nil {
-		fmt.Printf("[func(usePrevChunks) %s] There was an error opening the imputation chunk file list. The error is as follows: %v\n", time.Now(),err)
-		os.Exit(42)
+		fmt.Printf("[func(usePrevChunks) %s] -- ERROR! -- There was an error opening the imputation chunk file list. The error is as follows: %v\n", time.Now(),err)
+		os.Exit(17)
 	}
 
 	scanner := bufio.NewScanner(fileQueue)
@@ -1159,11 +1190,11 @@ func usePrevChunks (start,end,build,imputeDir,imputationFileList string) {
 					changeQueueSize.Lock()
 					processQueue = append(processQueue, scanner.Text())
 					changeQueueSize.Unlock()
-					fmt.Printf("[func(usePrevChunks) %s] %s, has been added to the processing queue.\n", time.Now(), scanner.Text())
+					fmt.Printf("[func(usePrevChunks) %s] -- UPDATE! -- %s, has been added to the processing queue.\n", time.Now(), scanner.Text())
 				} else if os.IsNotExist(err) {
-					fmt.Printf("[func(usePrevChunks) %s] %s, WARNING! Ooops, the path %s does not exist!  Please confirm this path and file are reachable.  Skipping this file...\n", time.Now(), filepath.Join(parserMap.ImputeDir,scanner.Text()))
+					fmt.Printf("[func(usePrevChunks) %s] %s, -- WARNING! -- Ooops, the path %s does not exist!  Please confirm this path and file are reachable.  Skipping this file...\n", time.Now(), filepath.Join(parserMap.ImputeDir,scanner.Text()))
 				} else {
-					fmt.Printf("[func(usePrevChunks) %s] %s, WARNING! The file %s may exist from variable ImputeDir and ImputeSuffix but the following error occurred: %v.  Skipping this file...\n", time.Now(), filepath.Join(parserMap.ImputeDir, scanner.Text()), err)
+					fmt.Printf("[func(usePrevChunks) %s] %s, -- WARNING! -- The file %s may exist from variable ImputeDir and ImputeSuffix but the following error occurred: %v.  Skipping this file...\n", time.Now(), filepath.Join(parserMap.ImputeDir, scanner.Text()), err)
 				}
 				break
 			} else {
@@ -1178,19 +1209,19 @@ func usePrevChunks (start,end,build,imputeDir,imputationFileList string) {
 func findElement (headerSlice []string, element string) {
 	for _,headerVal := range headerSlice {
 		if headerVal == element {
-			fmt.Printf("[func(findElement)] Confirmed %v in phenoFile\n", element)
+			fmt.Printf("[func(findElement)] -- CONFIRMED! -- %v in phenoFile\n", element)
 			return
 		}
 	}
-	fmt.Printf("[func(findElement)] FAIL -- %v is not listed in phenofile.  Please update phenofile.\n", element)
-	os.Exit(42)
+	fmt.Printf("[func(findElement)] -- ERROR! -- %v is not listed in phenofile.  Please update phenofile.\n", element)
+	os.Exit(20)
 }
 
 func parser (configFile string) {
 	fileBytes, err := os.Open(configFile)
 	if err != nil {
-		fmt.Printf("[func(parser)] There was a problems reading config file.\n")
-		os.Exit(42)
+		fmt.Printf("[func(parser)] -- ERROR! -- There was a problems reading config file.\n")
+		os.Exit(3)
 	}
 
 	defer fileBytes.Close() // once funciton finished close file
@@ -1205,8 +1236,8 @@ func parser (configFile string) {
 		case strings.TrimSpace(tmpParse[0]) == "ChunkVariants":
 			chunkSize,err := strconv.Atoi(strings.TrimSpace(tmpParse[1]))
 			if err != nil {
-				fmt.Printf("[func(parser)] There was an error converting ChunkVariants to integer: %v\n", err)
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- There was an error converting ChunkVariants to integer: %v\n", err)
+				os.Exit(3)
 			}
 			parserMap.ChunkVariants = chunkSize
 		case strings.TrimSpace(tmpParse[0]) == "SaveChunks":
@@ -1215,8 +1246,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.SaveChunks = true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for SaveChunks.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for SaveChunks.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "SkipChunking":
 			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
@@ -1224,8 +1255,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.SkipChunking = true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for SkipChunking.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for SkipChunking.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "GenerateGRM":
 			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
@@ -1233,8 +1264,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.GenerateGRM = true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for GenerateGRM.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for GenerateGRM.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "Runtype":
 			parserMap.Runtype = strings.ToUpper(strings.TrimSpace(tmpParse[1]))
@@ -1308,8 +1339,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.SaveAsTar= true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for SaveAsTar.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for SaveAsTar.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "GenerateNull":
 			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
@@ -1317,8 +1348,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.GenerateNull= true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for GenerateNull.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for GenerateNull.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "GenerateAssociations":
 			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
@@ -1326,8 +1357,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.GenerateAssociations= true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "GenerateResults":
 			if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "FALSE" {
@@ -1335,8 +1366,8 @@ func parser (configFile string) {
 			} else if strings.ToUpper(strings.TrimSpace(tmpParse[1])) == "TRUE" {
 				parserMap.GenerateResults= true
 			} else {
-				fmt.Printf("[func(parser)] %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
-				os.Exit(42)
+				fmt.Printf("[func(parser)] -- ERROR! -- %v is not a valid option for GenerateAssociations.\n", strings.TrimSpace(tmpParse[1]))
+				os.Exit(3)
 			}
 		case strings.TrimSpace(tmpParse[0]) == "NullModelFile":
 			parserMap.NullModelFile = strings.TrimSpace(tmpParse[1])
@@ -1346,7 +1377,7 @@ func parser (configFile string) {
 			parserMap.AssociationFile = strings.TrimSpace(tmpParse[1])
 		}
 		if err == io.EOF {
-			fmt.Println("[func(parser)] Finished parsing config file!\n")
+			fmt.Println("[func(parser)] -- UPDATE! -- Finished parsing config file!\n")
 			break
 		}
 	}
