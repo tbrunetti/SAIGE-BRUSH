@@ -43,6 +43,95 @@
   <div class="section" id="formatting-the-required-files">
 <h1>Formatting the Required Files<a class="headerlink" href="#formatting-the-required-files" title="Permalink to this headline">¶</a></h1>
 <p>The pipeline does require some formatting for file names and contents within files to be present.  This section explains the file format expectations, as well as file name expectations.</p>
+<div class="section" id="parameter-chromosomelengthfile">
+<h2>Parameter: ChromosomeLengthFile<a class="headerlink" href="#parameter-chromosomelengthfile" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">ChromsomeLengthFile</span></code> parameter is a file that can be downloaded and modified from sources such as <a class="reference external" href="https://www.ncbi.nlm.nih.gov/grc/human/data/">NCBI</a> and <a class="reference external" href="http://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes">UCSC</a>.  It should be a tab-delimted file with chromosomes 1-22 listed in the first column and the length of the chromosome in the second column. This file contains <strong>no header</strong>.  The build you select should be based upon the build used for your imputation file.  If only using genotyping file, base this file on the genotype build.</p>
+<a class="reference internal image-reference" href="_images/chromosomeLengthFile.png"><img alt="_images/chromosomeLengthFile.png" src="_images/chromosomeLengthFile.png" style="width: 400px;" /></a>
+<div class="sidebar">
+<p class="sidebar-title"><strong>Example snippet for hg38</strong></p>
+<ul class="simple">
+<li><p>1st column is chromosome</p></li>
+<li><p>2nd column is length</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>hg19 vs hg38 formatting</strong>  Depending on the build you choose you must format your file accordingly.</p>
+<ul class="simple">
+<li><p><em>hg19:</em> omit &quot;chr&quot; and should strictly be integer values between 1-22 for the first column.</p></li>
+<li><p><em>hg38:</em> include the preceding &quot;chr&quot; string (no spaces) for integer values between 1-22 for the first column.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="parameter-imputesuffix">
+<h2>Parameter: ImputeSuffix<a class="headerlink" href="#parameter-imputesuffix" title="Permalink to this headline">¶</a></h2>
+<p>This string is the suffix of your imputation file.  The imputation files require to be named and split in a particular way.</p>
+<dl class="simple">
+<dt>First, all imputation files follow these rules:</dt><dd><ul class="simple">
+<li><p>split by chromosome</p></li>
+<li><p>sample names are the samples names used in <code class="code docutils literal notranslate"><span class="pre">GenerateGRM</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> (order doesn't need to be maintained)</p></li>
+<li><p>gzipped vcf files, and</p></li>
+<li><p>have the matching tabix index ending in the imputation file name followed by the .tbi string</p></li>
+</ul>
+</dd>
+</dl>
+<p>This is how each imputation file needs to be named:</p>
+<p><strong>for hg38</strong></p>
+<a class="reference internal image-reference" href="_images/imputationSuffix_hg38.png"><img alt="_images/imputationSuffix_hg38.png" src="_images/imputationSuffix_hg38.png" style="width: 800px;" /></a>
+<p><strong>for hg19</strong></p>
+<a class="reference internal image-reference" href="_images/imputationSuffix_hg19.png"><img alt="_images/imputationSuffix_hg19.png" src="_images/imputationSuffix_hg19.png" style="width: 800px;" /></a>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>hg19 vs hg38 formatting</strong>  Depending on the build you choose you must format your file name accordingly.</p>
+<ul class="simple">
+<li><p><em>hg19:</em> omit &quot;chr&quot; and strictly be integer values between 1-22 as the prefix, followed by a required underscore, following by remaining string.</p></li>
+<li><p><em>hg38:</em> include the preceding &quot;chr&quot; string (no spaces) for integer values between 1-22 as the prefix, followed by a required underscore, following by remaining string.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="parameter-phenofile">
+<h2>Parameter: PhenoFile<a class="headerlink" href="#parameter-phenofile" title="Permalink to this headline">¶</a></h2>
+<p>This is tab-delimited txt file that contains all the sample IDs (must be the same IDs used in the plink file, imputation file, GRM, and null model -- order agnostic).  In addition to the sample IDs, it also contains any phenotype(s) you may want to run and any covariates you may want to use, although the user is not required to use everything listed in the header/file.</p>
+<p>Below is an example of a tab-delimited <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code>.  Again, none of these header names are required, however, there needs to be a header variable at minimum that denotes the sample ID and a phenotype to analyze.</p>
+<a class="reference internal image-reference" href="_images/phenoFile.png"><img alt="_images/phenoFile.png" src="_images/phenoFile.png" style="width: 800px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is worthwhile to generate a single PhenoFile that contains many phenotypes and covariates you may want to analyze for the sample set.  Within the config file, the user can specify which single phenotype to run and which covariates to run.  That way, the user can run several jobs in parallel using the same PhenoFile but just changing the trait, phenotype, covariates, and invNorm parameters without having to change anything else.</p>
+</div>
+</div>
+<div class="section" id="parameter-plink">
+<h2>Parameter: Plink<a class="headerlink" href="#parameter-plink" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-pheno">
+<h2>Parameter: Pheno<a class="headerlink" href="#parameter-pheno" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-covars">
+<h2>Parameter: Covars<a class="headerlink" href="#parameter-covars" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-sampleid">
+<h2>Parameter: SampleID<a class="headerlink" href="#parameter-sampleid" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-infofile">
+<h2>Parameter: InfoFile<a class="headerlink" href="#parameter-infofile" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-imputationfilelist">
+<h2>Parameter: ImputationFileList<a class="headerlink" href="#parameter-imputationfilelist" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-sparsegrm">
+<h2>Parameter: SparseGRM<a class="headerlink" href="#parameter-sparsegrm" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-sampleidfile">
+<h2>Parameter: SampleIDFile<a class="headerlink" href="#parameter-sampleidfile" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-nullmodelfile">
+<h2>Parameter: NullModelFile<a class="headerlink" href="#parameter-nullmodelfile" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-varianceratiofile">
+<h2>Parameter: VarianceRatioFile<a class="headerlink" href="#parameter-varianceratiofile" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="parameter-associationfile">
+<h2>Parameter: AssociationFile<a class="headerlink" href="#parameter-associationfile" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -52,6 +141,27 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Formatting the Required Files</a><ul>
+<li><a class="reference internal" href="#parameter-chromosomelengthfile">Parameter: ChromosomeLengthFile</a></li>
+<li><a class="reference internal" href="#parameter-imputesuffix">Parameter: ImputeSuffix</a></li>
+<li><a class="reference internal" href="#parameter-phenofile">Parameter: PhenoFile</a></li>
+<li><a class="reference internal" href="#parameter-plink">Parameter: Plink</a></li>
+<li><a class="reference internal" href="#parameter-pheno">Parameter: Pheno</a></li>
+<li><a class="reference internal" href="#parameter-covars">Parameter: Covars</a></li>
+<li><a class="reference internal" href="#parameter-sampleid">Parameter: SampleID</a></li>
+<li><a class="reference internal" href="#parameter-infofile">Parameter: InfoFile</a></li>
+<li><a class="reference internal" href="#parameter-imputationfilelist">Parameter: ImputationFileList</a></li>
+<li><a class="reference internal" href="#parameter-sparsegrm">Parameter: SparseGRM</a></li>
+<li><a class="reference internal" href="#parameter-sampleidfile">Parameter: SampleIDFile</a></li>
+<li><a class="reference internal" href="#parameter-nullmodelfile">Parameter: NullModelFile</a></li>
+<li><a class="reference internal" href="#parameter-varianceratiofile">Parameter: VarianceRatioFile</a></li>
+<li><a class="reference internal" href="#parameter-associationfile">Parameter: AssociationFile</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="resultsParameters.html"
                         title="previous chapter">Minimum Requirements to Run Results</a></p>

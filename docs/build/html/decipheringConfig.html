@@ -42,10 +42,10 @@
             
   <div class="section" id="deciphering-the-config-file">
 <h1>Deciphering the config file<a class="headerlink" href="#deciphering-the-config-file" title="Permalink to this headline">¶</a></h1>
-<p>The config file is a text file that contains key-value mappings to all input parameters and pipeline logic. The file can be broken down into three main parts: the pipeline logic, enviroment setup, and the user data input options.</p>
+<p>The config file is a text file that contains key-value mappings to all input parameters and pipeline logic. The file can be broken down into three main parts: the pipeline logic, environment setup, and the user data input options.</p>
 <div class="section" id="pipeline-logic">
 <h2>Pipeline Logic<a class="headerlink" href="#pipeline-logic" title="Permalink to this headline">¶</a></h2>
-<p>There are five keywords that control the logic of the pipeline and all four accept only boolean arguments (true/false):</p>
+<p>There are five keywords that control the logic of the pipeline and all five accept only boolean arguments (true/false):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
 <span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
 <span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
@@ -56,11 +56,20 @@
 </div>
 <div class="section" id="environment-setup">
 <h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Permalink to this headline">¶</a></h2>
-<p>There are three keywords that control the environment setup of the pipeline. It is a requirement to use the container provided as an LSF object on github. This ensures all versioning of softaware if properly versioned and it reduces the complexity of the pipeline by using predefining software paths as well as reducing installation issues that arise with some many softawre dependencies:</p>
+<p>There are three keywords that control the environment setup of the pipeline. It is a requirement to use the container provided as an LSF object on github. This ensures all software is properly versioned and it reduces the complexity of the pipeline by using predefining software paths as well as reducing installation issues that arise with many softawre dependencies.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
 <span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
 <span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">SAIGE_v0</span><span class="o">.</span><span class="mi">39</span><span class="n">_CCPM_biobank_singularity_recipe_file_11162020</span><span class="o">.</span><span class="n">simg</span>
 </pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> and <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> are directories to where you want the container to be mounted.  <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> allows you to give the container a secondary binding point where all temp files and calculations will be performed, and once finished will move the final files to the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.  The files generated in <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> will be deleted after the run completes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you do not want to use or do not have a temp directory, please set this parameter to be the same as <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>IMPORTANT PLEASE READ!</strong> The container follows the same rules of inheritance as Singularity specifies.  This means the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> and <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> become the highest point in your directory tree.  Thus, you can only access paths, directories, and files if you are able to traverse below the tree from these starting points but not above these entry points from your host system.  Therefore, be sure all the paths, directories, and files specified in the config file are contained within the scope of at least one of these two entry points.</p>
 </div>
 </div>
 <div class="section" id="user-data-input">

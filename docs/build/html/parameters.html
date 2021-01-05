@@ -70,47 +70,43 @@
 <th class="head"><p>Type</p></th>
 <th class="head"><p>Default</p></th>
 <th class="head"><p>Description</p></th>
-<th class="head"><p>Usage</p></th>
+<th class="head"><p>Relevance</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>ChromosomeLengthFile</p></td>
-<td><p>string
-(as file path)</p></td>
+<td><p>string</p></td>
 <td></td>
 <td><p>This is a tab-delimited text file that contains the same names as the chromosomes in your dataset followed by the chromosome length.  This file can generally be pulled down from the NCBI website under the build you are using (hg19 or hg38).  This is used for chunking the imputed data.</p></td>
-<td><p>if skipChunking:false</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">skipChunking:false</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Build</p></td>
 <td><p>option: 
-Hg19 or hg38</p></td>
+hg19 or hg38</p></td>
 <td><p>hg38</p></td>
 <td><p>This determines whether the software needs to be searching for a “chr” before the chomosome name or not</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>Chromosomes</p></td>
-<td><p>string 
-(as integer range)</p></td>
+<td><p>string</p></td>
 <td><p>1-22</p></td>
 <td><p>This lets the software know which chromosomes you want to use for association analysis.  It must be a range.  If you want to only run analysis on a single chromsome, the start and end will be the same value.  For example:  running chromome 2 only will look like 2-2.</p></td>
-<td><p>if GenerateAssociations:true</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>ImputeSuffix</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>The full suffix for the software to determine which files in the directory are impuation files. Important, it is assuming the prefix is either a chromosome number (hg19) or the string chr followed by the chromosome number (hg38)</p></td>
-<td><p>if GenerateAssociations:true and skipChunking:false</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code> and <code class="code docutils literal notranslate"><span class="pre">skipChunking:false</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>ImputeDir</p></td>
-<td><p>string
-(as directory path)</p></td>
+<td><p>string</p></td>
 <td></td>
 <td><p>Full path to directory where imputed results are located</p></td>
-<td><p>if GenerateAssociations:true and skipChunking:false</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>OutDir</p></td>
-<td><p>string
-(as directory apth)</p></td>
+<td><p>string</p></td>
 <td></td>
 <td><p>Full path to directory where final results should be transferred</p></td>
 <td><p>all</p></td>
@@ -122,173 +118,172 @@ Hg19 or hg38</p></td>
 <td><p>all</p></td>
 </tr>
 <tr class="row-odd"><td><p>PhenoFile</p></td>
-<td><p>string
-(as file path)</p></td>
+<td><p>string</p></td>
 <td></td>
-<td><p>Full path to tab-delimted phenotype file containing sample IDs, phenotypes, and covariates, with whatever string of  headers you choose</p></td>
-<td><p>if GenerateNull:true</p></td>
+<td><p>Full path to tab-delimted phenotype file containing sample IDs, phenotypes, and covariates, with whatever string of  headers you choose. NO WHITESPACES in header names.</p></td>
+<td><p>If :<code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Plink</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Full path to the directory and plink file prefix (dropping the suffix .bed,.bim,.fam) to an LD-pruned set of data to be used to generate GRM relatedness and to select random markers from for the variance ratio value</p></td>
+<td><p>If <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code> or <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Trait</p></td>
+<td><p>option: binary or quantitative</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Based upon your association phenotype.  If binary, all values will be 0/1/NA, if quantitivate all phenotype traits to be analyzed will be continuous or have numeric quantitative meaning</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> or <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Pheno</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>The exact name (case-sensitive) of the phenotype to be analyzed in your PhenoFile.  Must be present in PhenoFile.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> or <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>InvNorm</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>boolean</p></td>
+<td><p>FALSE</p></td>
+<td><p>This applies to the phenotype of interest to be analzyed and whether to perform an inverse normalization.  For binary traits, this should be set to FALSE and for quantitative traits, set this to TRUE.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Covars</p></td>
+<td><p>comma-separated list</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>A comma-separated list (no whitespaces) of all the covariate names to regress out in the model.  These variables need to be in your PhenoFile.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> or <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>SampleID</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>A string (no whitespaces) that is contained in the header of your PhenoFile.  This is the sampleID names and they must be the same names as listed in the PhenoFile, Imputation Files, and Plink Files.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Nthreads</p></td>
+<td><p>int</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Strongly Recommned to leave this blank!  If left blank, it will auto-decect available resources and scale steps automatically on the back-end.  By specifiying the threads it tells the program to use max Nthreads for parallelization and concurrency.</p></td>
+<td><p>all</p></td>
 </tr>
 <tr class="row-odd"><td><p>SparseKin</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>boolean</p></td>
+<td><p>TRUE</p></td>
+<td><p>If set to true, takes advantage of the sparsity of the GRM, otherwise will not use the sparsity to make assessments</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Markers</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>int</p></td>
+<td><p>30</p></td>
+<td><p>The number of random markers selected from the LD-pruned plink file to estimate the variance ratio component in the null model. Warning!  This number increases time linearly</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Rel</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>float</p></td>
+<td><p>0.0625</p></td>
+<td><p>A float between 0.0-1.0.  This is the threshold in kinship estimate to consider someone related.  Anything below this value will be treated as an unrelated individual in the pairwise comparison and calculation for the sparse GRM.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Loco</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>boolean</p></td>
+<td><p>TRUE</p></td>
+<td><p>Leave-One-Chromosome-Out method.  Warning – Setting this to true, increases the time complexity of the algorithm.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true`and</span> <span class="pre">:code:`GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>CovTransform</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>boolean</p></td>
+<td><p>TRUE</p></td>
+<td><p>Recommended to set to true.  It is a QR decomposition that aids in the covergence of the null model.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>VcfField</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>option: DS or GT</p></td>
+<td><p>DS</p></td>
+<td><p>This determines what metric to base association upon.  DS = dosages and GT = genotypes.  If you have genotypes only, i.e. chip data withouth dosage calculations, DS cannot be used!</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>MAF</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>float</p></td>
+<td><p>0.05</p></td>
+<td><p>Float between 0.0-0.50 that specifies the cutoff to be considered a common snp or a rare snp.  For example, keeping this to the default of 0.05 will assume common snps are defined as those with a minor allele frequency &gt;5% and that rare snps are defined as those with a minor allele frequency ≤ 5%.  THIS IS NOT A FILTER!</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>MAC</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>int</p></td>
+<td><p>10</p></td>
+<td><p>A filter applied to the cleaned association results to remove snps that have low minor allele counts.  Default recommendation is to set this to 10.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>IsDropMissingDosages</p></td>
+<td><p>boolean</p></td>
+<td><p>FALSE</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>InfoFile</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Path to the info file.  This file contains snps information pertaining to chromosome, positions, genotype/imputation status, R2, ER2 values. For formatting of this file please refer to &lt;-----------------→</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>SaveChunks</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>boolean</p></td>
+<td><p>TRUE</p></td>
+<td><p>Specifies whether to save the chunked files and the queue list for future use.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code> and <code class="code docutils literal notranslate"><span class="pre">skipChunking:false</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>GrmMAF</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>float</p></td>
+<td><p>0.01</p></td>
+<td><p>The minor allele frequency threshold for a snp to be included in the GRM calculation based on the LD-pruned plink file.  For example, if set to 0.01 this means any snp with a MAF &gt; 0.01 wil be used to calculate relatedness in the GRM.</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>ChunkVariants</p></td>
+<td><p>int</p></td>
+<td><p>1000000</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> and <code class="code docutils literal notranslate"><span class="pre">SkipChunking:false</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>SaveAsTar</p></td>
+<td><p>boolean</p></td>
+<td><p>FALSE</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>all</p></td>
 </tr>
 <tr class="row-odd"><td><p>ImputationFileList</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in _chunkedImputationQueue.txt</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code> and <code class="code docutils literal notranslate"><span class="pre">skipChunking:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>SparseGRM</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in .sparseGRM.mtx</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:false</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>SampleIDFile</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in sparseGRM.mtx.sampleIDs.txt</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:false</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>NullModelFile</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in .rda</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:false</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>VarianceRatioFile</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in .varianceRatio.txt</p></td>
+<td><p>if <code class="code docutils literal notranslate"><span class="pre">GenerateNull:false</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>AssociationFile</p></td>
+<td><p>string</p></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><p>Ends in _SNPassociationAnalysis.txt</p></td>
+<td><p>If <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:false</span></code> and <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code></p></td>
 </tr>
 </tbody>
 </table>

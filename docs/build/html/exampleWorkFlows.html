@@ -15,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Output Generated" href="output.html" /> 
+    <link rel="prev" title="Parsing Through StdErr and StdOut" href="parsingStdErrOut.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -24,7 +24,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="output.html" title="Output Generated"
+          <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Example Work Flows</a></li> 
@@ -38,20 +38,68 @@
             
   <div class="section" id="example-work-flows">
 <h1>Example Work Flows<a class="headerlink" href="#example-work-flows" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="quick-start-command">
+<h2>Quick Start Command<a class="headerlink" href="#quick-start-command" title="Permalink to this headline">¶</a></h2>
+<p>In order to run the pipeline, open a shell or bash prompt (or batch script for a job-scheduler) and type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./CCPM_GWAS_pipeline myConfigFile.txt
+</pre></div>
+</div>
+</div>
 <div class="section" id="full-pipeline">
 <h2>Full Pipeline<a class="headerlink" href="#full-pipeline" title="Permalink to this headline">¶</a></h2>
+<p><strong>Full pipline</strong> means you want to run every component of the pipeline from beginning to end in one go, without re-using any previously calculated data from the pipeline.  This is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="grm-only">
 <h2>GRM only<a class="headerlink" href="#grm-only" title="Permalink to this headline">¶</a></h2>
+<p><strong>GRM only</strong> means you want to run the GRM step.  This is analagous to setting the pipeline logic kewords to the following:</p>
+<p><em>Note,</em> <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> <em>can be set to either</em> <code class="code docutils literal notranslate"><span class="pre">true</span></code> <em>or</em> <code class="code docutils literal notranslate"><span class="pre">false</span></code> <em>because it is only used if</em> <code class="code docutils literal notranslate"><span class="pre">GenerateAssociation</span></code> <em>is set to</em> <code class="code docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="null-model-only">
 <h2>Null Model only<a class="headerlink" href="#null-model-only" title="Permalink to this headline">¶</a></h2>
+<p><strong>Null Model only</strong> means you want to run the Null Model only.  It makes an assumption that you already have the GRM pre-calculated and want to re-use it in this step by setting the keywords <code class="code docutils literal notranslate"><span class="pre">SparseGRM</span></code> and <code class="code docutils literal notranslate"><span class="pre">SampleIDFile</span></code> located in the config file.  These two files are the result of running <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code>.</p>
+<p>Choosing to run just the null model generation step is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> <em>can be set to either</em> <code class="code docutils literal notranslate"><span class="pre">true</span></code> <em>or</em> <code class="code docutils literal notranslate"><span class="pre">false</span></code> <em>because it is only used if</em> <code class="code docutils literal notranslate"><span class="pre">GenerateAssociation</span></code> <em>is set to</em> <code class="code docutils literal notranslate"><span class="pre">true</span></code>.</p>
 </div>
 <div class="section" id="association-analyses-only">
 <h2>Association Analyses Only<a class="headerlink" href="#association-analyses-only" title="Permalink to this headline">¶</a></h2>
+<p><strong>Association Analyses only</strong> means you only want to run the association anlysis.  It makes an assumption that you already have the null model file (.rda) pre-calculated and have a pre-calculate variance ratio file (.varianceRatio.txt) and want to re-use/use it in this step by setting the keywords <code class="code docutils literal notranslate"><span class="pre">NullModelFile</span></code> and <code class="code docutils literal notranslate"><span class="pre">VarianceRatioFile</span></code> located in the config file.  These two files are the result of running <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code>.</p>
+<p>Choosing to run just the association analysis step is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p>When <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code>, the <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> logic comes into play.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This step produces the raw associaions results concatenated into a file.  It does not clean up the data, perform the proper flips, or generate graphs/figures.  If you want the raw data in addition to the previously mentioned actions, be sure to also set <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code>.</p>
+</div>
 </div>
 <div class="section" id="results-and-graphs-only">
 <h2>Results and Graphs Only<a class="headerlink" href="#results-and-graphs-only" title="Permalink to this headline">¶</a></h2>
+<p><strong>Results and Graphs Only</strong> cleans up raw data that was previously generated from an association analysis and generates cleaned data in addition to some figures/graphs.  You can use any association analysis here as long as it meets the file formatting specifications for supplying results in <code class="code docutils literal notranslate"><span class="pre">AssociationFile</span></code>.</p>
 </div>
 <div class="section" id="reuse-previously-indexed-and-chunked-files">
 <h2>Reuse Previously Indexed and Chunked Files<a class="headerlink" href="#reuse-previously-indexed-and-chunked-files" title="Permalink to this headline">¶</a></h2>
@@ -71,6 +119,7 @@
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Example Work Flows</a><ul>
+<li><a class="reference internal" href="#quick-start-command">Quick Start Command</a></li>
 <li><a class="reference internal" href="#full-pipeline">Full Pipeline</a></li>
 <li><a class="reference internal" href="#grm-only">GRM only</a></li>
 <li><a class="reference internal" href="#null-model-only">Null Model only</a></li>
@@ -83,8 +132,8 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="output.html"
-                        title="previous chapter">Output Generated</a></p>
+  <p class="topless"><a href="parsingStdErrOut.html"
+                        title="previous chapter">Parsing Through StdErr and StdOut</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -113,7 +162,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="output.html" title="Output Generated"
+          <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Example Work Flows</a></li> 
