@@ -85,6 +85,19 @@ Parameter: SampleID
 
 Parameter: InfoFile
 ^^^^^^^^^^^^^^^^^^^^
+This is a tab-delimited file that contains information about all snps present in the genotyping chip and imputation files.  This file is really only necessary if :code:`GenerateResults:` is set to :code:`true`.
+
+The following headers must be present:
+	* CHR
+	* POS
+	* Allele1
+	* Allele2
+	* R2
+	* ER2
+	* GENOTYPE_STATUS
+
+.. image:: images/infoFile.png
+   :width: 800
 
 
 Parameter: ImputationFileList

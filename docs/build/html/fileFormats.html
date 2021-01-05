@@ -113,6 +113,20 @@
 </div>
 <div class="section" id="parameter-infofile">
 <h2>Parameter: InfoFile<a class="headerlink" href="#parameter-infofile" title="Permalink to this headline">¶</a></h2>
+<p>This is a tab-delimited file that contains information about all snps present in the genotyping chip and imputation files.  This file is really only necessary if <code class="code docutils literal notranslate"><span class="pre">GenerateResults:</span></code> is set to <code class="code docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<dl class="simple">
+<dt>The following headers must be present:</dt><dd><ul class="simple">
+<li><p>CHR</p></li>
+<li><p>POS</p></li>
+<li><p>Allele1</p></li>
+<li><p>Allele2</p></li>
+<li><p>R2</p></li>
+<li><p>ER2</p></li>
+<li><p>GENOTYPE_STATUS</p></li>
+</ul>
+</dd>
+</dl>
+<a class="reference internal image-reference" href="_images/infoFile.png"><img alt="_images/infoFile.png" src="_images/infoFile.png" style="width: 800px;" /></a>
 </div>
 <div class="section" id="parameter-imputationfilelist">
 <h2>Parameter: ImputationFileList<a class="headerlink" href="#parameter-imputationfilelist" title="Permalink to this headline">¶</a></h2>

@@ -11,10 +11,6 @@ In order to run the pipeline, open a shell or bash prompt (or batch script for a
 	$ ./CCPM_GWAS_pipeline myConfigFile.txt 
 
 
-
-
-
-
 Full Pipeline
 ^^^^^^^^^^^^^
 **Full pipline** means you want to run every component of the pipeline from beginning to end in one go, without re-using any previously calculated data from the pipeline.  This is analagous to setting the pipeline logic kewords to the following: :: 	
