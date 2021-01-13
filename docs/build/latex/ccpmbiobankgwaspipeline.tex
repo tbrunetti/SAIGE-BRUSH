@@ -746,6 +746,36 @@ It is worthwhile to generate a single PhenoFile that contains many phenotypes an
 
 \subsection{Parameter: InfoFile}
 \label{\detokenize{fileFormats:parameter-infofile}}
+This is a tab\sphinxhyphen{}delimited file that contains information about all snps present in the genotyping chip and imputation files.  This file is really only necessary if \sphinxcode{\sphinxupquote{GenerateResults:}} is set to \sphinxcode{\sphinxupquote{true}}.
+\begin{description}
+\item[{The following headers must be present:}] \leavevmode\begin{itemize}
+\item {} 
+CHR
+
+\item {} 
+POS
+
+\item {} 
+Allele1
+
+\item {} 
+Allele2
+
+\item {} 
+R2
+
+\item {} 
+ER2
+
+\item {} 
+GENOTYPE\_STATUS
+
+\end{itemize}
+
+\end{description}
+
+\noindent\sphinxincludegraphics[width=800\sphinxpxdimen]{{infoFile}.png}
+
 
 \subsection{Parameter: ImputationFileList}
 \label{\detokenize{fileFormats:parameter-imputationfilelist}}

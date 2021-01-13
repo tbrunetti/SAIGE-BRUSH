@@ -3,6 +3,7 @@ Formatting the Required Files
 
 The pipeline does require some formatting for file names and contents within files to be present.  This section explains the file format expectations, as well as file name expectations.
 
+.. _Chromosome-Length-File-Format: 
 
 Parameter: ChromosomeLengthFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -23,6 +24,9 @@ The :code:`ChromsomeLengthFile` parameter is a file that can be downloaded and m
 
 	- *hg19:* omit "chr" and should strictly be integer values between 1-22 for the first column.
 	- *hg38:* include the preceding "chr" string (no spaces) for integer values between 1-22 for the first column.
+
+
+.. _Imputation-Name-Format: 
 
 Parameter: ImputeSuffix
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,6 +58,8 @@ This is how each imputation file needs to be named:
 	- *hg38:* include the preceding "chr" string (no spaces) for integer values between 1-22 as the prefix, followed by a required underscore, following by remaining string.
 
 
+.. _Phenotype-File-Format:
+
 Parameter: PhenoFile
 ^^^^^^^^^^^^^^^^^^^^^
 This is tab-delimited txt file that contains all the sample IDs (must be the same IDs used in the plink file, imputation file, GRM, and null model -- order agnostic).  In addition to the sample IDs, it also contains any phenotype(s) you may want to run and any covariates you may want to use, although the user is not required to use everything listed in the header/file.
@@ -67,6 +73,7 @@ Below is an example of a tab-delimited :code:`PhenoFile`.  Again, none of these 
 .. note:: It is worthwhile to generate a single PhenoFile that contains many phenotypes and covariates you may want to analyze for the sample set.  Within the config file, the user can specify which single phenotype to run and which covariates to run.  That way, the user can run several jobs in parallel using the same PhenoFile but just changing the trait, phenotype, covariates, and invNorm parameters without having to change anything else.  
 
 
+.. _Plink-File-Format:
 
 Parameter: Plink
 ^^^^^^^^^^^^^^^^
@@ -82,6 +89,8 @@ Parameter: Covars
 
 Parameter: SampleID
 ^^^^^^^^^^^^^^^^^^^
+
+.. _Info-File-Format:
 
 Parameter: InfoFile
 ^^^^^^^^^^^^^^^^^^^^

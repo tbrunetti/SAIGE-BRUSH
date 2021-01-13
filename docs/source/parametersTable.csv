@@ -27,7 +27,7 @@ IsDropMissingDosages,boolean,FALSE,,if :code:`GenerateAssociations:true`
 InfoFile,string,,"Path to the info file.  This file contains snps information pertaining to chromosome, positions, genotype/imputation status, R2, ER2 values. For formatting of this file please refer to <-----------------→",if :code:`GenerateResults:true`
 SaveChunks,boolean,TRUE,Specifies whether to save the chunked files and the queue list for future use.,if :code:`GenerateAssociations:true` and :code:`skipChunking:false`
 GrmMAF,float,0.01,"The minor allele frequency threshold for a snp to be included in the GRM calculation based on the LD-pruned plink file.  For example, if set to 0.01 this means any snp with a MAF > 0.01 wil be used to calculate relatedness in the GRM.",if :code:`GenerateGRM:true`
-ChunkVariants,int,1000000,,if :code:`GenerateNull:true` and :code:`SkipChunking:false`
+ChunkVariants,int,1000000,The window of base pairs to chunk imputation files.  It is recommended to keep this at the default of 1000000.,if :code:`GenerateNull:true` and :code:`SkipChunking:false`
 SaveAsTar,boolean,FALSE,,all
 ImputationFileList,string,,Ends in _chunkedImputationQueue.txt,if :code:`GenerateAssociations:true` and :code:`skipChunking:true`
 SparseGRM,string,,Ends in .sparseGRM.mtx,if :code:`GenerateGRM:false` and :code:`GenerateNull:true`

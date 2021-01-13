@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.25)  5 JAN 2021 10:25
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.25)  5 JAN 2021 12:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1684,12 +1684,18 @@ File: phenoFile.png Graphic file (type png)
 Package pdftex.def Info: phenoFile.png  used on input line 728.
 (pdftex.def)             Requested size: 469.74641pt x 149.18994pt.
  [11 <./phenoFile.png>]
-<messageFormat.png, id=174, 796.47563pt x 231.11343pt>
+<infoFile.png, id=179, 796.47563pt x 303.38344pt>
+File: infoFile.png Graphic file (type png)
+<use infoFile.png>
+Package pdftex.def Info: infoFile.png  used on input line 777.
+(pdftex.def)             Requested size: 469.74641pt x 178.93912pt.
+<messageFormat.png, id=180, 796.47563pt x 231.11343pt>
 File: messageFormat.png Graphic file (type png)
 <use messageFormat.png>
-Package pdftex.def Info: messageFormat.png  used on input line 777.
+Package pdftex.def Info: messageFormat.png  used on input line 807.
 (pdftex.def)             Requested size: 469.74641pt x 136.31342pt.
- [12 <./messageFormat.png>] [13] [14
+ [12 <./infoFile.png>]
+[13 <./messageFormat.png>] [14
 
 ]
 Chapter 3.
@@ -1706,23 +1712,27 @@ Chapter 5.
 ]
 Chapter 6.
 (./ccpmbiobankgwaspipeline.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1016.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1046.
  [23]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1016.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1046.
  (./ccpmbiobankgwaspipeline.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1016.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1016.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1046.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1046.
 
 Package rerunfilecheck Info: File `ccpmbiobankgwaspipeline.out' has not changed
 .
 (rerunfilecheck)             Checksum: 18760E3B4202BA1EB9356631CE08F7B4;1752.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1016.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1046.
  ) 
 Here is how much of TeX's memory you used:
- 13815 strings out of 494847
- 192726 string characters out of 6179080
+ 13820 strings out of 494847
+ 192805 string characters out of 6179080
  315269 words of memory out of 5000000
- 16738 multiletter control sequences out of 15000+600000
+ 16742 multiletter control sequences out of 15000+600000
  53898 words of font info for 73 fonts, out of 8000000 for 9000
  60 hyphenation exceptions out of 8191
  37i,11n,48p,786b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1735,10 +1745,10 @@ a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts
 /type1/urw/times/utmri8a.pfb>
-Output written on ccpmbiobankgwaspipeline.pdf (27 pages, 431162 bytes).
+Output written on ccpmbiobankgwaspipeline.pdf (27 pages, 524345 bytes).
 PDF statistics:
- 299 PDF objects out of 1000 (max. 8388607)
+ 301 PDF objects out of 1000 (max. 8388607)
  243 compressed objects within 3 object streams
  80 named destinations out of 1000 (max. 500000)
- 142 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 147 words of extra memory for PDF output out of 10000 (max. 10000000)
 

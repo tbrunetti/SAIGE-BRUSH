@@ -76,3 +76,18 @@ The remainder of the keywords are parameters offered to the user and the user ca
 	VarianceRatioFile:/path/to/variance/ratio/file.txt
 	AssociationFile:/path/to/concatenated/association/results/file.txt
 
+User Data Input: Parameters that are paths to files
+----------------------------------------------------
+.. seealso::
+
+	:doc:`parameters <parameters>` under the section: Full List of User Input Data Parameters.  This will prodvide keyword descriptions and types.  For file and name formatting of keyword values see :doc:`fileFormats <fileFormats>`.
+
+
+
+
+
+
+
+
+
+

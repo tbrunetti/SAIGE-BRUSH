@@ -14,6 +14,13 @@ If not, you can `install Singularity`_ and `install Golang`_ using the links on 
 .. _install Golang: https://golang.org/doc/install
 
 
+Full Pipeline Overview
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: images/fullPipeline.png
+   :width: 800
+
+
 
 Getting Started
 ^^^^^^^^^^^^^^^

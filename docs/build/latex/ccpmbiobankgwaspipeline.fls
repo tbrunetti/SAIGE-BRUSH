@@ -314,6 +314,11 @@ INPUT ./phenoFile.png
 INPUT ./phenoFile.png
 INPUT phenoFile.png
 INPUT ./phenoFile.png
+INPUT infoFile.png
+INPUT ./infoFile.png
+INPUT ./infoFile.png
+INPUT infoFile.png
+INPUT ./infoFile.png
 INPUT messageFormat.png
 INPUT ./messageFormat.png
 INPUT ./messageFormat.png

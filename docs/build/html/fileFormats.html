@@ -44,7 +44,7 @@
 <h1>Formatting the Required Files<a class="headerlink" href="#formatting-the-required-files" title="Permalink to this headline">¶</a></h1>
 <p>The pipeline does require some formatting for file names and contents within files to be present.  This section explains the file format expectations, as well as file name expectations.</p>
 <div class="section" id="parameter-chromosomelengthfile">
-<h2>Parameter: ChromosomeLengthFile<a class="headerlink" href="#parameter-chromosomelengthfile" title="Permalink to this headline">¶</a></h2>
+<span id="chromosome-length-file-format"></span><h2>Parameter: ChromosomeLengthFile<a class="headerlink" href="#parameter-chromosomelengthfile" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="code docutils literal notranslate"><span class="pre">ChromsomeLengthFile</span></code> parameter is a file that can be downloaded and modified from sources such as <a class="reference external" href="https://www.ncbi.nlm.nih.gov/grc/human/data/">NCBI</a> and <a class="reference external" href="http://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes">UCSC</a>.  It should be a tab-delimted file with chromosomes 1-22 listed in the first column and the length of the chromosome in the second column. This file contains <strong>no header</strong>.  The build you select should be based upon the build used for your imputation file.  If only using genotyping file, base this file on the genotype build.</p>
 <a class="reference internal image-reference" href="_images/chromosomeLengthFile.png"><img alt="_images/chromosomeLengthFile.png" src="_images/chromosomeLengthFile.png" style="width: 400px;" /></a>
 <div class="sidebar">
@@ -64,7 +64,7 @@
 </div>
 </div>
 <div class="section" id="parameter-imputesuffix">
-<h2>Parameter: ImputeSuffix<a class="headerlink" href="#parameter-imputesuffix" title="Permalink to this headline">¶</a></h2>
+<span id="imputation-name-format"></span><h2>Parameter: ImputeSuffix<a class="headerlink" href="#parameter-imputesuffix" title="Permalink to this headline">¶</a></h2>
 <p>This string is the suffix of your imputation file.  The imputation files require to be named and split in a particular way.</p>
 <dl class="simple">
 <dt>First, all imputation files follow these rules:</dt><dd><ul class="simple">
@@ -90,7 +90,7 @@
 </div>
 </div>
 <div class="section" id="parameter-phenofile">
-<h2>Parameter: PhenoFile<a class="headerlink" href="#parameter-phenofile" title="Permalink to this headline">¶</a></h2>
+<span id="phenotype-file-format"></span><h2>Parameter: PhenoFile<a class="headerlink" href="#parameter-phenofile" title="Permalink to this headline">¶</a></h2>
 <p>This is tab-delimited txt file that contains all the sample IDs (must be the same IDs used in the plink file, imputation file, GRM, and null model -- order agnostic).  In addition to the sample IDs, it also contains any phenotype(s) you may want to run and any covariates you may want to use, although the user is not required to use everything listed in the header/file.</p>
 <p>Below is an example of a tab-delimited <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code>.  Again, none of these header names are required, however, there needs to be a header variable at minimum that denotes the sample ID and a phenotype to analyze.</p>
 <a class="reference internal image-reference" href="_images/phenoFile.png"><img alt="_images/phenoFile.png" src="_images/phenoFile.png" style="width: 800px;" /></a>
@@ -100,7 +100,7 @@
 </div>
 </div>
 <div class="section" id="parameter-plink">
-<h2>Parameter: Plink<a class="headerlink" href="#parameter-plink" title="Permalink to this headline">¶</a></h2>
+<span id="plink-file-format"></span><h2>Parameter: Plink<a class="headerlink" href="#parameter-plink" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="parameter-pheno">
 <h2>Parameter: Pheno<a class="headerlink" href="#parameter-pheno" title="Permalink to this headline">¶</a></h2>
@@ -112,7 +112,7 @@
 <h2>Parameter: SampleID<a class="headerlink" href="#parameter-sampleid" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="parameter-infofile">
-<h2>Parameter: InfoFile<a class="headerlink" href="#parameter-infofile" title="Permalink to this headline">¶</a></h2>
+<span id="info-file-format"></span><h2>Parameter: InfoFile<a class="headerlink" href="#parameter-infofile" title="Permalink to this headline">¶</a></h2>
 <p>This is a tab-delimited file that contains information about all snps present in the genotyping chip and imputation files.  This file is really only necessary if <code class="code docutils literal notranslate"><span class="pre">GenerateResults:</span></code> is set to <code class="code docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <dl class="simple">
 <dt>The following headers must be present:</dt><dd><ul class="simple">
