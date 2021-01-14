@@ -124,7 +124,7 @@
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Snp information file</strong></dt><dd><ul class="simple">
+<dt><strong>SNP information file</strong></dt><dd><ul class="simple">
 <li><p>use for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateResults</span></code> is set to true</p></li>
 <li><p>fulfills parameter :code: <cite>InfoFile</cite></p></li>
 <li><p>see <a class="reference internal" href="fileFormats.html#info-file-format"><span class="std std-ref">Parameter: InfoFile</span></a> for formatting</p></li>
@@ -141,6 +141,33 @@
 <div class="section" id="step-4-set-the-path-to-all-the-required-input-parameters">
 <h4>STEP 4: Set the path to all the required input parameters<a class="headerlink" href="#step-4-set-the-path-to-all-the-required-input-parameters" title="Permalink to this headline">¶</a></h4>
 <p>Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:</p>
+<ol class="arabic">
+<li><p>This <code class="code docutils literal notranslate"><span class="pre">RUNTYPE</span></code> parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUNTYPE</span><span class="p">:</span><span class="n">FULL</span>
+</pre></div>
+</div>
+</li>
+<li><p>The next set of parameters are the keywords that relate to file inputs:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_fileparamters.png"><img alt="_images/fullPipeline_fileparamters.png" class="align-center" src="_images/fullPipeline_fileparamters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>Here are some required general keyword parameters that need to be set:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_generalParameter.png"><img alt="_images/fullPipeline_generalParameter.png" class="align-center" src="_images/fullPipeline_generalParameter.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following two sets of keyword parameters affect the GRM step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code> :</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_grmParametres.png"><img alt="_images/fullPipeline_grmParametres.png" class="align-center" src="_images/fullPipeline_grmParametres.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following sets of keyword parameters affect the null model step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> :</p></li>
+<li><p>The following sets of keyword parameters affect the association analysis step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code> :</p></li>
+<li><p>The following sets of keyword parameters affect the results step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code> :</p></li>
+<li><p>These parameters I recommend you keep as is, unless you are familiar with the pipeline and have a reason to change them:</p></li>
+<li><p>For running the full pipeline, these are the <strong>parameters you can ignore</strong>.  You can leave the keywords empty or fill them in, but just know no matter what is listed for these keywords, <strong>the pipeline will ignore them</strong>.</p></li>
+</ol>
 </div>
 <div class="section" id="step-5-running-the-pipeline">
 <h4>STEP 5: Running the pipeline<a class="headerlink" href="#step-5-running-the-pipeline" title="Permalink to this headline">¶</a></h4>

@@ -84,7 +84,7 @@ For running the full pipeline, including chunking the imputation files, you will
 	* see :ref:`Imputation-Name-Format` for formatting
 
 
-#. **Snp information file**
+#. **SNP information file**
 	* use for when logic parameter :code:`GenerateResults` is set to true
 	* fulfills parameter :code: `InfoFile`
 	* see :ref:`Info-File-Format` for formatting
@@ -95,9 +95,48 @@ For running the full pipeline, including chunking the imputation files, you will
 	For a complete list of files and name formatting of keyword values listed in the config file see :doc:`Formatting the Required Files <fileFormats>`.
 
 
-STEP 4: Set the path to all the required input parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+STEP 4: Set the path and values to all the required input parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:  
+
+#. This :code:`RUNTYPE` parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists. :: 
+
+	RUNTYPE:FULL
+
+#. The next set of parameters are the keywords that relate to file inputs: 
+
+	.. image:: images/fullPipeline_fileparamters.png
+		:width: 700
+		:align: center
+
+#. Here are some required general keyword parameters that need to be set:
+
+	.. image:: images/fullPipeline_generalParameter.png
+		:width: 700
+		:align: center
+
+#. The following two sets of keyword parameters affect the GRM step, i.e. :code:`GenerateGRM:true` :
+	
+	.. image:: images/fullPipeline_grmParametres.png
+		:width: 700
+		:align: center
+
+#. The following sets of keyword parameters affect the null model step, i.e. :code:`GenerateNull:true` :
+
+#. The following sets of keyword parameters affect the association analysis step, i.e. :code:`GenerateAssociations:true` :
+
+#. The following sets of keyword parameters affect the results step, i.e. :code:`GenerateResults:true` :
+
+#. These parameters I recommend you keep as is, unless you are familiar with the pipeline and have a reason to change them:
+
+#. For running the full pipeline, these are the **parameters you can ignore**.  You can leave the keywords empty or fill them in, but just know no matter what is listed for these keywords, **the pipeline will ignore them**.
+
+
+
+
+
+
+
 
 
 
