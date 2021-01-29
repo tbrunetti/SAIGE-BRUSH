@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial: Full Pipeline with Binary Trait &#8212; CCPM Biobank GWAS Pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial: Generate GRM Only" href="generateGRMonlyTutorial.html" />
+    <link rel="prev" title="Tutorials and Examples" href="exampleWorkFlows.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="generateGRMonlyTutorial.html" title="Tutorial: Generate GRM Only"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="exampleWorkFlows.html" title="Tutorials and Examples"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" accesskey="U">Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Full Pipeline with Binary Trait</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial-full-pipeline-with-binary-trait">
+<h1>Tutorial: Full Pipeline with Binary Trait<a class="headerlink" href="#tutorial-full-pipeline-with-binary-trait" title="Permalink to this headline">¶</a></h1>
+<p>This example will walk you through how to run the full pipeline when the phenotype for association analysis if for a binary trait.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.</p>
+<div class="section" id="section-logic-and-overview">
+<h2>Section: Logic and Overview<a class="headerlink" href="#section-logic-and-overview" title="Permalink to this headline">¶</a></h2>
+<p><strong>Full pipline</strong> means you want to run every component of the pipeline from beginning to end in one go, without re-using any previously calculated data from the pipeline.  This is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p>If the pipeline is set to the above logic, the following workflow will be executed:</p>
+<a class="reference internal image-reference" href="_images/fullPipeline_example.png"><img alt="_images/fullPipeline_example.png" class="align-center" src="_images/fullPipeline_example.png" style="width: 400px;" /></a>
+</div>
+<div class="section" id="section-step-by-step-tutorial">
+<h2>Section: Step-by-Step Tutorial<a class="headerlink" href="#section-step-by-step-tutorial" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-1-set-the-logic">
+<h3>STEP 1: Set the logic<a class="headerlink" href="#step-1-set-the-logic" title="Permalink to this headline">¶</a></h3>
+<p>As stated about above, open your config file (.txt) and make sure the logic is set to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-2-set-the-environment">
+<h3>STEP 2: Set the environment<a class="headerlink" href="#step-2-set-the-environment" title="Permalink to this headline">¶</a></h3>
+<p>Open your config file (.txt) and make sure you set the path to where the bind point, temp bind point, and  container image are located.  I suggest you set the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> keyword to the same path as where the container is located to avoid any confusion.  If you have a tmp directory you want to use as scratch space, set that path as well.  If this doesn't exist or you choose not to use it, set the keyword <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> to be the same as the path listed in the keyword <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
+<span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
+<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">SAIGE_v0</span><span class="o">.</span><span class="mi">39</span><span class="n">_CCPM_biobank_singularity_recipe_file_11162020</span><span class="o">.</span><span class="n">simg</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-3-ensure-you-have-all-the-files-required">
+<h3>STEP 3: Ensure you have all the files required<a class="headerlink" href="#step-3-ensure-you-have-all-the-files-required" title="Permalink to this headline">¶</a></h3>
+<p>For running the full pipeline, including chunking the imputation files, you will need access to the following files:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt><strong>LD-pruned plink file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameters <code class="code docutils literal notranslate"><span class="pre">GenerateGRM</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">Plink</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#plink-file-format"><span class="std std-ref">Parameter: Plink</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phenotype and covariates file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#phenotype-file-format"><span class="std std-ref">Parameter: PhenoFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>chromosome lengths file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter, <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">ChromosomeLengthFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#chromosome-length-file-format"><span class="std std-ref">Parameter: ChromosomeLengthFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>imputation files properly named and formatted or genotype files formatted in same way as imputation files</strong></dt><dd><ul class="simple">
+<li><p>used for when logic paramters <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">ImputeSuffix</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#imputation-name-format"><span class="std std-ref">Parameter: ImputeSuffix</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>SNP information file</strong></dt><dd><ul class="simple">
+<li><p>use for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateResults</span></code> is set to true</p></li>
+<li><p>fulfills parameter :code: <cite>InfoFile</cite></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#info-file-format"><span class="std std-ref">Parameter: InfoFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For a complete list of files and name formatting of keyword values listed in the config file see <a class="reference internal" href="fileFormats.html"><span class="doc">Formatting the Required Files</span></a>.</p>
+</div>
+</div>
+<div class="section" id="step-4-set-the-path-and-values-to-all-the-required-input-parameters">
+<h3>STEP 4: Set the path and values to all the required input parameters<a class="headerlink" href="#step-4-set-the-path-and-values-to-all-the-required-input-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:</p>
+<ol class="arabic">
+<li><p>This <code class="code docutils literal notranslate"><span class="pre">RUNTYPE</span></code> parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUNTYPE</span><span class="p">:</span><span class="n">FULL</span>
+</pre></div>
+</div>
+</li>
+<li><p>The next set of parameters are the keywords that relate to file inputs:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_fileparamters.png"><img alt="_images/fullPipeline_fileparamters.png" class="align-center" src="_images/fullPipeline_fileparamters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>Here are some required general keyword parameters that need to be set:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_generalParameter.png"><img alt="_images/fullPipeline_generalParameter.png" class="align-center" src="_images/fullPipeline_generalParameter.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following two sets of keyword parameters affect the GRM step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code> :</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_grmParametres.png"><img alt="_images/fullPipeline_grmParametres.png" class="align-center" src="_images/fullPipeline_grmParametres.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following sets of keyword parameters affect the null model step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code> :</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_nullParameters.png"><img alt="_images/fullPipeline_nullParameters.png" class="align-center" src="_images/fullPipeline_nullParameters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following sets of keyword parameters affect the association analysis step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code> :</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_AssociationParameters.png"><img alt="_images/fullPipeline_AssociationParameters.png" class="align-center" src="_images/fullPipeline_AssociationParameters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The following sets of keyword parameters affect the results step, i.e. <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code> :</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_resultsParameters.png"><img alt="_images/fullPipeline_resultsParameters.png" class="align-center" src="_images/fullPipeline_resultsParameters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+<li><p>These parameters I recommend to keep as is, unless you are familiar with the pipeline and have a reason to change them:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_otherParameters.png"><img alt="_images/fullPipeline_otherParameters.png" class="align-center" src="_images/fullPipeline_otherParameters.png" style="width: 700px;" /></a>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="step-5-running-the-pipeline">
+<h3>STEP 5: Running the pipeline<a class="headerlink" href="#step-5-running-the-pipeline" title="Permalink to this headline">¶</a></h3>
+<p>To run the pipeline make sure the files are all accessible to the container relative to the bindpoint.</p>
+<p>Once all the files are accessible and the config is ready, the following command will run the pipeline:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./CCPM_GWAS_pipeline myConfigFile.txt
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="section-generated-output">
+<h2>Section: Generated Output<a class="headerlink" href="#section-generated-output" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/fullPipeline_output.png"><img alt="_images/fullPipeline_output.png" class="align-center" src="_images/fullPipeline_output.png" style="width: 1000px;" /></a>
+</div></blockquote>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For a interpreting and searching the log files for potential pipeline errors, see <a class="reference internal" href="parsingStdErrOut.html"><span class="doc">Parsing Through StdErr and StdOut</span></a>.</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial: Full Pipeline with Binary Trait</a><ul>
+<li><a class="reference internal" href="#section-logic-and-overview">Section: Logic and Overview</a></li>
+<li><a class="reference internal" href="#section-step-by-step-tutorial">Section: Step-by-Step Tutorial</a><ul>
+<li><a class="reference internal" href="#step-1-set-the-logic">STEP 1: Set the logic</a></li>
+<li><a class="reference internal" href="#step-2-set-the-environment">STEP 2: Set the environment</a></li>
+<li><a class="reference internal" href="#step-3-ensure-you-have-all-the-files-required">STEP 3: Ensure you have all the files required</a></li>
+<li><a class="reference internal" href="#step-4-set-the-path-and-values-to-all-the-required-input-parameters">STEP 4: Set the path and values to all the required input parameters</a></li>
+<li><a class="reference internal" href="#step-5-running-the-pipeline">STEP 5: Running the pipeline</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#section-generated-output">Section: Generated Output</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="exampleWorkFlows.html"
+                        title="previous chapter">Tutorials and Examples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="generateGRMonlyTutorial.html"
+                        title="next chapter">Tutorial: Generate GRM Only</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/fullPipelineBinaryTutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="generateGRMonlyTutorial.html" title="Tutorial: Generate GRM Only"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="exampleWorkFlows.html" title="Tutorials and Examples"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" >Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Full Pipeline with Binary Trait</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

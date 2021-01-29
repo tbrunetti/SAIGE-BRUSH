@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial: Generate Association Analysis Only &#8212; CCPM Biobank GWAS Pipeline 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorial: Generate Null Model only" href="generateNullonlyTutorial.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="generateNullonlyTutorial.html" title="Tutorial: Generate Null Model only"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" accesskey="U">Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Generate Association Analysis Only</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial-generate-association-analysis-only">
+<h1>Tutorial: Generate Association Analysis Only<a class="headerlink" href="#tutorial-generate-association-analysis-only" title="Permalink to this headline">¶</a></h1>
+<p>This example will show you how to generate the association analysis step only.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.</p>
+<div class="section" id="section-logic-and-overview">
+<h2>Section: Logic and Overview<a class="headerlink" href="#section-logic-and-overview" title="Permalink to this headline">¶</a></h2>
+<p><strong>Association Analysis only</strong> means you only want to run the association anlysis.  It makes an assumption that you already have the null model file (.rda) pre-calculated and have a pre-calculate variance ratio file (.varianceRatio.txt) and want to re-use/use it in this step by setting the keywords <code class="code docutils literal notranslate"><span class="pre">NullModelFile</span></code> and <code class="code docutils literal notranslate"><span class="pre">VarianceRatioFile</span></code> located in the config file.  These two files are the result of running <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code>.</p>
+<p>Choosing to run just the association analysis step is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p>When <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code>, the <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> logic comes into play.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This step produces the raw associaions results concatenated into a file.  It does not clean up the data, perform the proper flips, or generate graphs/figures.  If you want the raw data in addition to the previously mentioned actions, be sure to also set <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code>.</p>
+</div>
+</div>
+<div class="section" id="section-step-by-step-tutorial">
+<h2>Section: Step-by-Step Tutorial<a class="headerlink" href="#section-step-by-step-tutorial" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="section-generated-output">
+<h2>Section: Generated Output<a class="headerlink" href="#section-generated-output" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For a interpreting and searching the log files for potential pipeline errors, see <a class="reference internal" href="parsingStdErrOut.html"><span class="doc">Parsing Through StdErr and StdOut</span></a>.</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial: Generate Association Analysis Only</a><ul>
+<li><a class="reference internal" href="#section-logic-and-overview">Section: Logic and Overview</a></li>
+<li><a class="reference internal" href="#section-step-by-step-tutorial">Section: Step-by-Step Tutorial</a></li>
+<li><a class="reference internal" href="#section-generated-output">Section: Generated Output</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="generateNullonlyTutorial.html"
+                        title="previous chapter">Tutorial: Generate Null Model only</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/generateAssociationOnlyTutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="generateNullonlyTutorial.html" title="Tutorial: Generate Null Model only"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CCPM Biobank GWAS Pipeline 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" >Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Generate Association Analysis Only</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>
