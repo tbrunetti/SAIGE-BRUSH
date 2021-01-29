@@ -50,6 +50,18 @@ FAQs
 Acknowledgements
 ================
 
+The most important acknowledgment is for the group of developers, investigaters, scientists, and researchers of SAIGE .  This pipline is honestly just an automated wrapper to most of their work.  They have an excellent github page here at https://github.com/weizhouUMICH/SAIGE -- The entire team is very responsive to github questions.  They are tirelessy working on newer and more complex versions of SAIGE, and for that I must thank them.  It is an amazing piece of software!  Please read their publication:
+
+*Zhou, W., Nielsen, J. B., Fritsche, L. G., Dey, R., Gabrielsen, M. E., Wolford, B. N., LeFaive, J., VandeHaar, P., Gagliano, S. A., Gifford, A., Bastarache, L. A., Wei, W. Q., Denny, J. C., Lin, M., Hveem, K., Kang, H. M., Abecasis, G. R., Willer, C. J., & Lee, S. (2018). Efficiently controlling for case-control imbalance and sample relatedness in large-scale genetic association studies. Nature genetics, 50(9), 1335–1341. https://doi.org/10.1038/s41588-018-0184-y*
+
+
+
+All of this work could not be done without the full support of the Colorado Center for Personalized Medicine (CCPM) under the guidance of their Biobank, and the Translation Informatics Services (TIS) sector, among several input from exerpienced scientists and professor within CCPM whose expertise is in GWAS.
+
+	.. image:: images/tis_logo.png
+		:width: 200
+		:align: center
+
 
 Indices and tables
 ==================
