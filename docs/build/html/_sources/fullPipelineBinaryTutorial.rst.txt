@@ -150,12 +150,65 @@ Once all the files are accessible and the config is ready, the following command
 Section: Generated Output
 --------------------------
 
+The following graphic shows how all the data generated from running the logic of this pipeline will be organized and which files are present.  One thing to notice is the list of files generated in each directory based on whether the pipeline logic is set to :code:`true` or :code:`false`.  Many of these outputs and be re-used under certain circumstances to save time and bypass running certain steps of the pipeline in the next run.
+
 	.. image:: images/fullPipeline_output.png
 		:width: 1000
 		:align: center
+
+
+.. warning::
+	**IMPORTANT PLEASE READ!** Although the pipeline tries its best to not generate output as critical errors occur, this is not always the case.  It is particularly important to parse through the standard error output, as well as the log file produced in the :code:`other` directory of your output directory.  The log file can be quite large, therefore, it is recommended to use :code:`grep` to seach for keywords.  I would recommend the following: :code:`grep -i "err" other/*.log`, :code:`grep -i "warn" other/*.log`, and :code:`grep -i "exit" other/.*log`.  Also, please see the note below, for additional ways to parse the log file.
 
 
 .. seealso::
 
 	For a interpreting and searching the log files for potential pipeline errors, see :doc:`Parsing Through StdErr and StdOut <parsingStdErrOut>`.
 
+
+Once it is confirmed that the error and log files ran successfully without major errors, the results and files are ready for viewing.  The directory of highest interest will be the :code:`association_analysis_results` directory.
+
+	.. image:: images/fullPipeline_output_results.png
+		:width: 1000
+		:align: center
+
+When :code:`GenerateAssociations:true`, the pipeline generates raw association analysis data of all SNPs.  This set of data does have the allele flips in place, it is uncleaned and unfiltered, unannotated, lacking additional calculations and will not generate any visuals.  The file is the :code:`*allChromosomeResultsMerged.txt` files.
+
+
+Now, when :code:`GenerateResults:true`, it takes that file, :code:`*allChromosomeResultsMerged.txt` and applies allele flips to ensure allele2 is always the minor allele, cleans the data using the :code:`MAC` filter, annotates the data with ER2, R2, and whether the SNP/Indel is imputed/genotyed/both.  This will also split your data in to common vs rare variants as defined by :code:`MAF` and generate qqplots and Manhattan plots for each.  The plots are put in a pdf report, :code:`*finalGWASresults.pdf`.  Each plot is also reported as individual pngs so they can easily be embedded into presentations and documents.  Here is an example of one of the pdf reports:
+
+	.. image:: images/fullPipeline_pdf_example.png
+		:width: 400
+		:align: center
+
+If you open any of the :code:`.txt.gz` files in located in the :code:`association_analysis_results` directory produced by :code:`GenerateResults:true`, the following headers are listed for all the SNPs/indels, in a tab-delimited file:
+
+=============== =======================================================================
+Header 			Definintion
+=============== =======================================================================
+CHR             chromosome name/ID
+POS             position in chromosome, build is based on input imputation file build
+majorAllele     major allele based on the allele frequency of your project
+minorAllele     minor allele based on the allele frequency of your project
+SNPID           snpID/name
+BETA            beta value
+SE              standard error of the beta
+OR              odds ratio
+LogOR           log(odds ratio)
+Lower95OR       the lower 95% confidence interval of the odds ratio
+Upper95OR	    the upper 95% confidence interval of the odds ratio
+MAF             minor allele frequency
+MAC             minor allele count
+p.value         pvalue significance of association (note, for GWAS sig p<5e-08)
+N               total samples used in this snp analysis
+N.Cases         total number of case samples
+N.Controls      total number of control samples
+casesHomMinor   total number of cases that have homozygous minor alleles
+casesHet        total number of cases that are heterozygous
+controlHomMinor total number of controls that have homozygous minor alleles
+controlHet      total number of controls that are heterozygous
+negLog10pvalue  -log10(p.value)
+R2              imputation R2 quality
+ER2             empirical R2 quality  -- only for genotyped variants
+GENTOYPE_STATUS whether a SNP is genotyped/imputed/both
+=============== =======================================================================
