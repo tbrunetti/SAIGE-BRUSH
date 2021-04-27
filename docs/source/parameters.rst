@@ -18,7 +18,7 @@ Minimum Required Parameters for Each Step
 Full List of User Input Data Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ..	csv-table:: Definitions and Use
-	:file: /home/brunettt/Downloads/software/github_repos/CCPM_Biobank_GWAS_Pipeline/docs/source/parametersTable.csv
+	:file: /home/tonya/Downloads/software/github_repos/SAIGE-BRUSH/docs/source/parametersTable.csv
 	:widths: 20, 20, 10, 40, 10
 	:header-rows: 1
 	:align: center
