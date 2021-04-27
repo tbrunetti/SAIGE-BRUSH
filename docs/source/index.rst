@@ -1,5 +1,7 @@
-Welcome to the CCPM Biobank GWAS Pipeline documentation!
+Welcome to the SAIGE-BRUSH documentation!
 ========================================================
+
+**SAIGE-B**\ iobank **R**\ e-\ **U**\ sable **S**\ AIGE **H**\ elper (SAIGE-BRUSH) is an implementation of the popular SAIGE GWAS software.  Fully containerized and ready for use without installation or any code handling.  Submit your configuration file and the rest is done.
 
 Installation
 ^^^^^^^^^^^^^

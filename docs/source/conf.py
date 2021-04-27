@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'CCPM Biobank GWAS Pipeline'
+project = 'SAIGE-BRUSH'
 copyright = '2020, Tonya Brunetti'
 author = 'Tonya Brunetti'
 
