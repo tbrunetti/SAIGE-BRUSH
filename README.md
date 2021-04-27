@@ -1,2 +1,2 @@
-# CCPM_Biobank_GWAS_Pipeline
+# SAIGE-BRUSH
 Implementation of SAIGE GWAS software with modifications, scalability, and GUI
