@@ -75,7 +75,7 @@
 
 
 \title{CCPM Biobank GWAS Pipeline}
-\date{Jan 05, 2021}
+\date{Jan 29, 2021}
 \release{0.1.0}
 \author{Tonya Brunetti}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -110,6 +110,11 @@ Golang version \textgreater{}= go1.13.5 (has been tested on versions go1.13.5 an
 \end{itemize}
 
 If not, you can \sphinxhref{https://sylabs.io/docs/}{install Singularity} and \sphinxhref{https://golang.org/doc/install}{install Golang} using the links on your local computer.  Both should be available across OS platforms for Windows, MacOS, and Linux.
+
+
+\chapter{Full Pipeline Overview}
+\label{\detokenize{index:full-pipeline-overview}}
+\noindent\sphinxincludegraphics[width=800\sphinxpxdimen]{{fullPipeline}.png}
 
 
 \chapter{Getting Started}
@@ -195,6 +200,17 @@ The remainder of the keywords are parameters offered to the user and the user ca
 \PYG{n}{VarianceRatioFile}\PYG{p}{:}\PYG{o}{/}\PYG{n}{path}\PYG{o}{/}\PYG{n}{to}\PYG{o}{/}\PYG{n}{variance}\PYG{o}{/}\PYG{n}{ratio}\PYG{o}{/}\PYG{n}{file}\PYG{o}{.}\PYG{n}{txt}
 \PYG{n}{AssociationFile}\PYG{p}{:}\PYG{o}{/}\PYG{n}{path}\PYG{o}{/}\PYG{n}{to}\PYG{o}{/}\PYG{n}{concatenated}\PYG{o}{/}\PYG{n}{association}\PYG{o}{/}\PYG{n}{results}\PYG{o}{/}\PYG{n}{file}\PYG{o}{.}\PYG{n}{txt}
 \end{sphinxVerbatim}
+
+
+\subsubsection{User Data Input: Parameters that are paths to files}
+\label{\detokenize{decipheringConfig:user-data-input-parameters-that-are-paths-to-files}}
+
+\sphinxstrong{See also:}
+
+
+{\hyperref[\detokenize{parameters::doc}]{\sphinxcrossref{\DUrole{doc}{parameters}}}} under the section: Full List of User Input Data Parameters.  This will prodvide keyword descriptions and types.  For file and name formatting of keyword values see {\hyperref[\detokenize{fileFormats::doc}]{\sphinxcrossref{\DUrole{doc}{fileFormats}}}}.
+
+
 
 
 \section{Parameters}
@@ -569,7 +585,9 @@ ChunkVariants
 int
 &
 1000000
-&&
+&
+The window of base pairs to chunk imputation files.  It is recommended to keep this at the default of 1000000.
+&
 if \sphinxcode{\sphinxupquote{GenerateNull:true}} and \sphinxcode{\sphinxupquote{SkipChunking:false}}
 \\
 \hline
@@ -645,7 +663,7 @@ The pipeline does require some formatting for file names and contents within fil
 
 
 \subsection{Parameter: ChromosomeLengthFile}
-\label{\detokenize{fileFormats:parameter-chromosomelengthfile}}
+\label{\detokenize{fileFormats:parameter-chromosomelengthfile}}\label{\detokenize{fileFormats:chromosome-length-file-format}}
 The \sphinxcode{\sphinxupquote{ChromsomeLengthFile}} parameter is a file that can be downloaded and modified from sources such as \sphinxhref{https://www.ncbi.nlm.nih.gov/grc/human/data/}{NCBI} and \sphinxhref{http://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes}{UCSC}.  It should be a tab\sphinxhyphen{}delimted file with chromosomes 1\sphinxhyphen{}22 listed in the first column and the length of the chromosome in the second column. This file contains \sphinxstylestrong{no header}.  The build you select should be based upon the build used for your imputation file.  If only using genotyping file, base this file on the genotype build.
 
 \noindent\sphinxincludegraphics[width=400\sphinxpxdimen]{{chromosomeLengthFile}.png}
@@ -676,7 +694,7 @@ The \sphinxcode{\sphinxupquote{ChromsomeLengthFile}} parameter is a file that ca
 
 
 \subsection{Parameter: ImputeSuffix}
-\label{\detokenize{fileFormats:parameter-imputesuffix}}
+\label{\detokenize{fileFormats:parameter-imputesuffix}}\label{\detokenize{fileFormats:imputation-name-format}}
 This string is the suffix of your imputation file.  The imputation files require to be named and split in a particular way.
 \begin{description}
 \item[{First, all imputation files follow these rules:}] \leavevmode\begin{itemize}
@@ -720,7 +738,7 @@ This is how each imputation file needs to be named:
 
 
 \subsection{Parameter: PhenoFile}
-\label{\detokenize{fileFormats:parameter-phenofile}}
+\label{\detokenize{fileFormats:parameter-phenofile}}\label{\detokenize{fileFormats:phenotype-file-format}}
 This is tab\sphinxhyphen{}delimited txt file that contains all the sample IDs (must be the same IDs used in the plink file, imputation file, GRM, and null model \sphinxhyphen{}\sphinxhyphen{} order agnostic).  In addition to the sample IDs, it also contains any phenotype(s) you may want to run and any covariates you may want to use, although the user is not required to use everything listed in the header/file.
 
 Below is an example of a tab\sphinxhyphen{}delimited \sphinxcode{\sphinxupquote{PhenoFile}}.  Again, none of these header names are required, however, there needs to be a header variable at minimum that denotes the sample ID and a phenotype to analyze.
@@ -733,7 +751,7 @@ It is worthwhile to generate a single PhenoFile that contains many phenotypes an
 
 
 \subsection{Parameter: Plink}
-\label{\detokenize{fileFormats:parameter-plink}}
+\label{\detokenize{fileFormats:parameter-plink}}\label{\detokenize{fileFormats:plink-file-format}}
 
 \subsection{Parameter: Pheno}
 \label{\detokenize{fileFormats:parameter-pheno}}
@@ -745,7 +763,7 @@ It is worthwhile to generate a single PhenoFile that contains many phenotypes an
 \label{\detokenize{fileFormats:parameter-sampleid}}
 
 \subsection{Parameter: InfoFile}
-\label{\detokenize{fileFormats:parameter-infofile}}
+\label{\detokenize{fileFormats:parameter-infofile}}\label{\detokenize{fileFormats:info-file-format}}
 This is a tab\sphinxhyphen{}delimited file that contains information about all snps present in the genotyping chip and imputation files.  This file is really only necessary if \sphinxcode{\sphinxupquote{GenerateResults:}} is set to \sphinxcode{\sphinxupquote{true}}.
 \begin{description}
 \item[{The following headers must be present:}] \leavevmode\begin{itemize}
@@ -932,8 +950,8 @@ return 3
 \chapter{Quick Start and Examples}
 \label{\detokenize{index:quick-start-and-examples}}
 
-\section{Example Work Flows}
-\label{\detokenize{exampleWorkFlows:example-work-flows}}\label{\detokenize{exampleWorkFlows::doc}}
+\section{Tutorials and Examples}
+\label{\detokenize{exampleWorkFlows:tutorials-and-examples}}\label{\detokenize{exampleWorkFlows::doc}}
 
 \subsection{Quick Start Command}
 \label{\detokenize{exampleWorkFlows:quick-start-command}}
@@ -944,8 +962,16 @@ In order to run the pipeline, open a shell or bash prompt (or batch script for a
 \end{sphinxVerbatim}
 
 
-\subsection{Full Pipeline}
-\label{\detokenize{exampleWorkFlows:full-pipeline}}
+\subsection{Tutorials}
+\label{\detokenize{exampleWorkFlows:tutorials}}
+
+\subsubsection{Tutorial: Full Pipeline with Binary Trait}
+\label{\detokenize{fullPipelineBinaryTutorial:tutorial-full-pipeline-with-binary-trait}}\label{\detokenize{fullPipelineBinaryTutorial::doc}}
+This example will walk you through how to run the full pipeline when the phenotype for association analysis if for a binary trait.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.
+
+
+\paragraph{Section: Logic and Overview}
+\label{\detokenize{fullPipelineBinaryTutorial:section-logic-and-overview}}
 \sphinxstylestrong{Full pipline} means you want to run every component of the pipeline from beginning to end in one go, without re\sphinxhyphen{}using any previously calculated data from the pipeline.  This is analagous to setting the pipeline logic kewords to the following:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -956,9 +982,388 @@ In order to run the pipeline, open a shell or bash prompt (or batch script for a
 \PYG{n}{SkipChunking}\PYG{p}{:}\PYG{n}{false}
 \end{sphinxVerbatim}
 
+If the pipeline is set to the above logic, the following workflow will be executed:
 
-\subsection{GRM only}
-\label{\detokenize{exampleWorkFlows:grm-only}}
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=400\sphinxpxdimen]{{fullPipeline_example}.png}\hspace*{\fill}}
+
+
+\paragraph{Section: Step\sphinxhyphen{}by\sphinxhyphen{}Step Tutorial}
+\label{\detokenize{fullPipelineBinaryTutorial:section-step-by-step-tutorial}}
+
+\subparagraph{STEP 1: Set the logic}
+\label{\detokenize{fullPipelineBinaryTutorial:step-1-set-the-logic}}
+As stated about above, open your config file (.txt) and make sure the logic is set to the following:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{GenerateGRM}\PYG{p}{:}\PYG{n}{true}
+\PYG{n}{GenerateNull}\PYG{p}{:}\PYG{n}{true}
+\PYG{n}{GenerateAssociations}\PYG{p}{:}\PYG{n}{true}
+\PYG{n}{GenerateResults}\PYG{p}{:}\PYG{n}{true}
+\PYG{n}{SkipChunking}\PYG{p}{:}\PYG{n}{false}
+\end{sphinxVerbatim}
+
+
+\subparagraph{STEP 2: Set the environment}
+\label{\detokenize{fullPipelineBinaryTutorial:step-2-set-the-environment}}
+Open your config file (.txt) and make sure you set the path to where the bind point, temp bind point, and  container image are located.  I suggest you set the \sphinxcode{\sphinxupquote{BindPoint}} keyword to the same path as where the container is located to avoid any confusion.  If you have a tmp directory you want to use as scratch space, set that path as well.  If this doesn\textquotesingle{}t exist or you choose not to use it, set the keyword \sphinxcode{\sphinxupquote{BindPointTemp}} to be the same as the path listed in the keyword \sphinxcode{\sphinxupquote{BindPoint}}.
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{BindPoint}\PYG{p}{:}\PYG{o}{/}\PYG{n}{path}\PYG{o}{/}\PYG{n}{to}\PYG{o}{/}\PYG{n}{bind}\PYG{o}{/}\PYG{n}{container}
+\PYG{n}{BindPointTemp}\PYG{p}{:}\PYG{o}{/}\PYG{n}{path}\PYG{o}{/}\PYG{n}{to}\PYG{o}{/}\PYG{n}{tmp}\PYG{o}{/}
+\PYG{n}{Container}\PYG{p}{:}\PYG{o}{/}\PYG{n}{path}\PYG{o}{/}\PYG{n}{to}\PYG{o}{/}\PYG{n}{SAIGE\PYGZus{}v0}\PYG{o}{.}\PYG{l+m+mi}{39}\PYG{n}{\PYGZus{}CCPM\PYGZus{}biobank\PYGZus{}singularity\PYGZus{}recipe\PYGZus{}file\PYGZus{}11162020}\PYG{o}{.}\PYG{n}{simg}
+\end{sphinxVerbatim}
+
+
+\subparagraph{STEP 3: Ensure you have all the files required}
+\label{\detokenize{fullPipelineBinaryTutorial:step-3-ensure-you-have-all-the-files-required}}
+For running the full pipeline, including chunking the imputation files, you will need access to the following files:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} \begin{description}
+\item[{\sphinxstylestrong{LD\sphinxhyphen{}pruned plink file}}] \leavevmode\begin{itemize}
+\item {} 
+used for when logic parameters \sphinxcode{\sphinxupquote{GenerateGRM}} is set to true and/or \sphinxcode{\sphinxupquote{GenerateNull}} is set to true.
+
+\item {} 
+fulfills parameter \sphinxcode{\sphinxupquote{Plink}}
+
+\item {} 
+see {\hyperref[\detokenize{fileFormats:plink-file-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Parameter: Plink}}}} for formatting
+
+\end{itemize}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{\sphinxstylestrong{phenotype and covariates file}}] \leavevmode\begin{itemize}
+\item {} 
+used for when logic parameter \sphinxcode{\sphinxupquote{GenerateNull}} is set to true
+
+\item {} 
+fulfills parameter \sphinxcode{\sphinxupquote{PhenoFile}}
+
+\item {} 
+see {\hyperref[\detokenize{fileFormats:phenotype-file-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Parameter: PhenoFile}}}} for formatting
+
+\end{itemize}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{\sphinxstylestrong{chromosome lengths file}}] \leavevmode\begin{itemize}
+\item {} 
+used for when logic parameter, \sphinxcode{\sphinxupquote{SkipChunking}} is set to true.
+
+\item {} 
+fulfills parameter \sphinxcode{\sphinxupquote{ChromosomeLengthFile}}
+
+\item {} 
+see {\hyperref[\detokenize{fileFormats:chromosome-length-file-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Parameter: ChromosomeLengthFile}}}} for formatting
+
+\end{itemize}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{\sphinxstylestrong{imputation files properly named and formatted or genotype files formatted in same way as imputation files}}] \leavevmode\begin{itemize}
+\item {} 
+used for when logic paramters \sphinxcode{\sphinxupquote{SkipChunking}} is set to true and/or \sphinxcode{\sphinxupquote{GenerateAssociations}} is set to true.
+
+\item {} 
+fulfills parameter \sphinxcode{\sphinxupquote{ImputeSuffix}}
+
+\item {} 
+see {\hyperref[\detokenize{fileFormats:imputation-name-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Parameter: ImputeSuffix}}}} for formatting
+
+\end{itemize}
+
+\end{description}
+
+\item {} \begin{description}
+\item[{\sphinxstylestrong{SNP information file}}] \leavevmode\begin{itemize}
+\item {} 
+use for when logic parameter \sphinxcode{\sphinxupquote{GenerateResults}} is set to true
+
+\item {} 
+fulfills parameter :code: \sphinxtitleref{InfoFile}
+
+\item {} 
+see {\hyperref[\detokenize{fileFormats:info-file-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Parameter: InfoFile}}}} for formatting
+
+\end{itemize}
+
+\end{description}
+
+\end{enumerate}
+
+
+\sphinxstrong{See also:}
+
+
+For a complete list of files and name formatting of keyword values listed in the config file see {\hyperref[\detokenize{fileFormats::doc}]{\sphinxcrossref{\DUrole{doc}{Formatting the Required Files}}}}.
+
+
+
+
+\subparagraph{STEP 4: Set the path and values to all the required input parameters}
+\label{\detokenize{fullPipelineBinaryTutorial:step-4-set-the-path-and-values-to-all-the-required-input-parameters}}
+Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+This \sphinxcode{\sphinxupquote{RUNTYPE}} parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists.
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{RUNTYPE}\PYG{p}{:}\PYG{n}{FULL}
+\end{sphinxVerbatim}
+
+\item {} 
+The next set of parameters are the keywords that relate to file inputs:
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_fileparamters}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+Here are some required general keyword parameters that need to be set:
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_generalParameter}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+The following two sets of keyword parameters affect the GRM step, i.e. \sphinxcode{\sphinxupquote{GenerateGRM:true}} :
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_grmParametres}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+The following sets of keyword parameters affect the null model step, i.e. \sphinxcode{\sphinxupquote{GenerateNull:true}} :
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_nullParameters}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+The following sets of keyword parameters affect the association analysis step, i.e. \sphinxcode{\sphinxupquote{GenerateAssociations:true}} :
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_AssociationParameters}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+The following sets of keyword parameters affect the results step, i.e. \sphinxcode{\sphinxupquote{GenerateResults:true}} :
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_resultsParameters}.png}\hspace*{\fill}}
+\end{quote}
+
+\item {} 
+These parameters I recommend to keep as is, unless you are familiar with the pipeline and have a reason to change them:
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=700\sphinxpxdimen]{{fullPipeline_otherParameters}.png}\hspace*{\fill}}
+\end{quote}
+
+\end{enumerate}
+
+
+\subparagraph{STEP 5: Running the pipeline}
+\label{\detokenize{fullPipelineBinaryTutorial:step-5-running-the-pipeline}}
+To run the pipeline make sure the files are all accessible to the container relative to the bindpoint.
+
+Once all the files are accessible and the config is ready, the following command will run the pipeline:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYGZdl{} ./CCPM\PYGZus{}GWAS\PYGZus{}pipeline myConfigFile.txt
+\end{sphinxVerbatim}
+
+
+\paragraph{Section: Generated Output}
+\label{\detokenize{fullPipelineBinaryTutorial:section-generated-output}}
+The following graphic shows how all the data generated from running the logic of this pipeline will be organized and which files are present.  One thing to notice is the list of files generated in each directory based on whether the pipeline logic is set to \sphinxcode{\sphinxupquote{true}} or \sphinxcode{\sphinxupquote{false}}.  Many of these outputs and be re\sphinxhyphen{}used under certain circumstances to save time and bypass running certain steps of the pipeline in the next run.
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=1000\sphinxpxdimen]{{fullPipeline_output}.png}\hspace*{\fill}}
+\end{quote}
+
+\begin{sphinxadmonition}{warning}{Warning:}
+\sphinxstylestrong{IMPORTANT PLEASE READ!} Although the pipeline tries its best to not generate output as critical errors occur, this is not always the case.  It is particularly important to parse through the standard error output, as well as the log file produced in the \sphinxcode{\sphinxupquote{other}} directory of your output directory.  The log file can be quite large, therefore, it is recommended to use \sphinxcode{\sphinxupquote{grep}} to seach for keywords.  I would recommend the following: \sphinxcode{\sphinxupquote{grep \sphinxhyphen{}i "err" other/*.log}}, \sphinxcode{\sphinxupquote{grep \sphinxhyphen{}i "warn" other/*.log}}, and \sphinxcode{\sphinxupquote{grep \sphinxhyphen{}i "exit" other/.*log}}.  Also, please see the note below, for additional ways to parse the log file.
+\end{sphinxadmonition}
+
+
+\sphinxstrong{See also:}
+
+
+For a interpreting and searching the log files for potential pipeline errors, see {\hyperref[\detokenize{parsingStdErrOut::doc}]{\sphinxcrossref{\DUrole{doc}{Parsing Through StdErr and StdOut}}}}.
+
+
+
+Once it is confirmed that the error and log files ran successfully without major errors, the results and files are ready for viewing.  The directory of highest interest will be the \sphinxcode{\sphinxupquote{association\_analysis\_results}} directory.
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=1000\sphinxpxdimen]{{fullPipeline_output_results}.png}\hspace*{\fill}}
+\end{quote}
+
+When \sphinxcode{\sphinxupquote{GenerateAssociations:true}}, the pipeline generates raw association analysis data of all SNPs.  This set of data does have the allele flips in place, it is uncleaned and unfiltered, unannotated, lacking additional calculations and will not generate any visuals.  The file is the \sphinxcode{\sphinxupquote{*allChromosomeResultsMerged.txt}} files.
+
+Now, when \sphinxcode{\sphinxupquote{GenerateResults:true}}, it takes that file, \sphinxcode{\sphinxupquote{*allChromosomeResultsMerged.txt}} and applies allele flips to ensure allele2 is always the minor allele, cleans the data using the \sphinxcode{\sphinxupquote{MAC}} filter, annotates the data with ER2, R2, and whether the SNP/Indel is imputed/genotyed/both.  This will also split your data in to common vs rare variants as defined by \sphinxcode{\sphinxupquote{MAF}} and generate qqplots and Manhattan plots for each.  The plots are put in a pdf report, \sphinxcode{\sphinxupquote{*finalGWASresults.pdf}}.  Each plot is also reported as individual pngs so they can easily be embedded into presentations and documents.  Here is an example of one of the pdf reports:
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=400\sphinxpxdimen]{{fullPipeline_pdf_example}.png}\hspace*{\fill}}
+\end{quote}
+
+If you open any of the \sphinxcode{\sphinxupquote{.txt.gz}} files in located in the \sphinxcode{\sphinxupquote{association\_analysis\_results}} directory produced by \sphinxcode{\sphinxupquote{GenerateResults:true}}, the following headers are listed for all the SNPs/indels, in a tab\sphinxhyphen{}delimited file:
+
+
+\begin{savenotes}\sphinxattablestart
+\centering
+\begin{tabulary}{\linewidth}[t]{|T|T|}
+\hline
+\sphinxstyletheadfamily 
+Header
+&\sphinxstyletheadfamily 
+Definintion
+\\
+\hline
+CHR
+&
+chromosome name/ID
+\\
+\hline
+POS
+&
+position in chromosome, build is based on input imputation file build
+\\
+\hline
+majorAllele
+&
+major allele based on the allele frequency of your project
+\\
+\hline
+minorAllele
+&
+minor allele based on the allele frequency of your project
+\\
+\hline
+SNPID
+&
+snpID/name
+\\
+\hline
+BETA
+&
+beta value
+\\
+\hline
+SE
+&
+standard error of the beta
+\\
+\hline
+OR
+&
+odds ratio
+\\
+\hline
+LogOR
+&
+log(odds ratio)
+\\
+\hline
+Lower95OR
+&
+the lower 95\% confidence interval of the odds ratio
+\\
+\hline
+Upper95OR
+&
+the upper 95\% confidence interval of the odds ratio
+\\
+\hline
+MAF
+&
+minor allele frequency
+\\
+\hline
+MAC
+&
+minor allele count
+\\
+\hline
+p.value
+&
+pvalue significance of association (note, for GWAS sig p\textless{}5e\sphinxhyphen{}08)
+\\
+\hline
+N
+&
+total samples used in this snp analysis
+\\
+\hline
+N.Cases
+&
+total number of case samples
+\\
+\hline
+N.Controls
+&
+total number of control samples
+\\
+\hline
+casesHomMinor
+&
+total number of cases that have homozygous minor alleles
+\\
+\hline
+casesHet
+&
+total number of cases that are heterozygous
+\\
+\hline
+controlHomMinor
+&
+total number of controls that have homozygous minor alleles
+\\
+\hline
+controlHet
+&
+total number of controls that are heterozygous
+\\
+\hline
+negLog10pvalue
+&
+\sphinxhyphen{}log10(p.value)
+\\
+\hline
+R2
+&
+imputation R2 quality
+\\
+\hline
+ER2
+&
+empirical R2 quality  \sphinxhyphen{}\sphinxhyphen{} only for genotyped variants
+\\
+\hline
+GENTOYPE\_STATUS
+&
+whether a SNP is genotyped/imputed/both
+\\
+\hline
+\end{tabulary}
+\par
+\sphinxattableend\end{savenotes}
+
+
+\subsubsection{Tutorial: Generate GRM Only}
+\label{\detokenize{generateGRMonlyTutorial:tutorial-generate-grm-only}}\label{\detokenize{generateGRMonlyTutorial::doc}}
+This example will show you how to generate the GRM step only.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.
+
+
+\paragraph{Section: Logic and Overview}
+\label{\detokenize{generateGRMonlyTutorial:section-logic-and-overview}}
 \sphinxstylestrong{GRM only} means you want to run the GRM step.  This is analagous to setting the pipeline logic kewords to the following:
 
 \sphinxstyleemphasis{Note,} \sphinxcode{\sphinxupquote{SkipChunking}} \sphinxstyleemphasis{can be set to either} \sphinxcode{\sphinxupquote{true}} \sphinxstyleemphasis{or} \sphinxcode{\sphinxupquote{false}} \sphinxstyleemphasis{because it is only used if} \sphinxcode{\sphinxupquote{GenerateAssociation}} \sphinxstyleemphasis{is set to} \sphinxcode{\sphinxupquote{true}}.
@@ -972,8 +1377,27 @@ In order to run the pipeline, open a shell or bash prompt (or batch script for a
 \end{sphinxVerbatim}
 
 
-\subsection{Null Model only}
-\label{\detokenize{exampleWorkFlows:null-model-only}}
+\paragraph{Section: Step\sphinxhyphen{}by\sphinxhyphen{}Step Tutorial}
+\label{\detokenize{generateGRMonlyTutorial:section-step-by-step-tutorial}}
+
+\paragraph{Section: Generated Output}
+\label{\detokenize{generateGRMonlyTutorial:section-generated-output}}
+
+\sphinxstrong{See also:}
+
+
+For a interpreting and searching the log files for potential pipeline errors, see {\hyperref[\detokenize{parsingStdErrOut::doc}]{\sphinxcrossref{\DUrole{doc}{Parsing Through StdErr and StdOut}}}}.
+
+
+
+
+\subsubsection{Tutorial: Generate Null Model only}
+\label{\detokenize{generateNullonlyTutorial:tutorial-generate-null-model-only}}\label{\detokenize{generateNullonlyTutorial::doc}}
+This example will show you how to generate the null model step only.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.
+
+
+\paragraph{Section: Logic and Overview}
+\label{\detokenize{generateNullonlyTutorial:section-logic-and-overview}}
 \sphinxstylestrong{Null Model only} means you want to run the Null Model only.  It makes an assumption that you already have the GRM pre\sphinxhyphen{}calculated and want to re\sphinxhyphen{}use it in this step by setting the keywords \sphinxcode{\sphinxupquote{SparseGRM}} and \sphinxcode{\sphinxupquote{SampleIDFile}} located in the config file.  These two files are the result of running \sphinxcode{\sphinxupquote{GenerateGRM:true}}.
 
 Choosing to run just the null model generation step is analagous to setting the pipeline logic kewords to the following:
@@ -989,9 +1413,28 @@ Choosing to run just the null model generation step is analagous to setting the 
 \sphinxcode{\sphinxupquote{SkipChunking}} \sphinxstyleemphasis{can be set to either} \sphinxcode{\sphinxupquote{true}} \sphinxstyleemphasis{or} \sphinxcode{\sphinxupquote{false}} \sphinxstyleemphasis{because it is only used if} \sphinxcode{\sphinxupquote{GenerateAssociation}} \sphinxstyleemphasis{is set to} \sphinxcode{\sphinxupquote{true}}.
 
 
-\subsection{Association Analyses Only}
-\label{\detokenize{exampleWorkFlows:association-analyses-only}}
-\sphinxstylestrong{Association Analyses only} means you only want to run the association anlysis.  It makes an assumption that you already have the null model file (.rda) pre\sphinxhyphen{}calculated and have a pre\sphinxhyphen{}calculate variance ratio file (.varianceRatio.txt) and want to re\sphinxhyphen{}use/use it in this step by setting the keywords \sphinxcode{\sphinxupquote{NullModelFile}} and \sphinxcode{\sphinxupquote{VarianceRatioFile}} located in the config file.  These two files are the result of running \sphinxcode{\sphinxupquote{GenerateNull:true}}.
+\paragraph{Section: Step\sphinxhyphen{}by\sphinxhyphen{}Step Tutorial}
+\label{\detokenize{generateNullonlyTutorial:section-step-by-step-tutorial}}
+
+\paragraph{Section: Generated Output}
+\label{\detokenize{generateNullonlyTutorial:section-generated-output}}
+
+\sphinxstrong{See also:}
+
+
+For a interpreting and searching the log files for potential pipeline errors, see {\hyperref[\detokenize{parsingStdErrOut::doc}]{\sphinxcrossref{\DUrole{doc}{Parsing Through StdErr and StdOut}}}}.
+
+
+
+
+\subsubsection{Tutorial: Generate Association Analysis Only}
+\label{\detokenize{generateAssociationOnlyTutorial:tutorial-generate-association-analysis-only}}\label{\detokenize{generateAssociationOnlyTutorial::doc}}
+This example will show you how to generate the association analysis step only.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.
+
+
+\paragraph{Section: Logic and Overview}
+\label{\detokenize{generateAssociationOnlyTutorial:section-logic-and-overview}}
+\sphinxstylestrong{Association Analysis only} means you only want to run the association anlysis.  It makes an assumption that you already have the null model file (.rda) pre\sphinxhyphen{}calculated and have a pre\sphinxhyphen{}calculate variance ratio file (.varianceRatio.txt) and want to re\sphinxhyphen{}use/use it in this step by setting the keywords \sphinxcode{\sphinxupquote{NullModelFile}} and \sphinxcode{\sphinxupquote{VarianceRatioFile}} located in the config file.  These two files are the result of running \sphinxcode{\sphinxupquote{GenerateNull:true}}.
 
 Choosing to run just the association analysis step is analagous to setting the pipeline logic kewords to the following:
 
@@ -1009,22 +1452,38 @@ This step produces the raw associaions results concatenated into a file.  It doe
 \end{sphinxadmonition}
 
 
-\subsection{Results and Graphs Only}
-\label{\detokenize{exampleWorkFlows:results-and-graphs-only}}
-\sphinxstylestrong{Results and Graphs Only} cleans up raw data that was previously generated from an association analysis and generates cleaned data in addition to some figures/graphs.  You can use any association analysis here as long as it meets the file formatting specifications for supplying results in \sphinxcode{\sphinxupquote{AssociationFile}}.
+\paragraph{Section: Step\sphinxhyphen{}by\sphinxhyphen{}Step Tutorial}
+\label{\detokenize{generateAssociationOnlyTutorial:section-step-by-step-tutorial}}
+
+\paragraph{Section: Generated Output}
+\label{\detokenize{generateAssociationOnlyTutorial:section-generated-output}}
+
+\sphinxstrong{See also:}
 
 
-\subsection{Reuse Previously Indexed and Chunked Files}
-\label{\detokenize{exampleWorkFlows:reuse-previously-indexed-and-chunked-files}}
+For a interpreting and searching the log files for potential pipeline errors, see {\hyperref[\detokenize{parsingStdErrOut::doc}]{\sphinxcrossref{\DUrole{doc}{Parsing Through StdErr and StdOut}}}}.
 
-\subsection{Combinations of Logic}
-\label{\detokenize{exampleWorkFlows:combinations-of-logic}}
+
+
+
+\subsection{FAQs}
+\label{\detokenize{exampleWorkFlows:faqs}}
 
 \chapter{FAQs}
 \label{\detokenize{index:faqs}}
 
 \chapter{Acknowledgements}
 \label{\detokenize{index:acknowledgements}}
+The most important acknowledgment is for the group of developers, investigaters, scientists, and researchers of SAIGE .  This pipline is honestly just an automated wrapper to most of their work.  They have an excellent github page here at \sphinxurl{https://github.com/weizhouUMICH/SAIGE} \sphinxhyphen{}\sphinxhyphen{} The entire team is very responsive to github questions.  They are tirelessy working on newer and more complex versions of SAIGE, and for that I must thank them.  It is an amazing piece of software!  Please read their publication:
+
+\sphinxstyleemphasis{Zhou, W., Nielsen, J. B., Fritsche, L. G., Dey, R., Gabrielsen, M. E., Wolford, B. N., LeFaive, J., VandeHaar, P., Gagliano, S. A., Gifford, A., Bastarache, L. A., Wei, W. Q., Denny, J. C., Lin, M., Hveem, K., Kang, H. M., Abecasis, G. R., Willer, C. J., \& Lee, S. (2018). Efficiently controlling for case\sphinxhyphen{}control imbalance and sample relatedness in large\sphinxhyphen{}scale genetic association studies. Nature genetics, 50(9), 1335\textendash{}1341. https://doi.org/10.1038/s41588\sphinxhyphen{}018\sphinxhyphen{}0184\sphinxhyphen{}y}
+
+All of this work could not be done without the full support of the Colorado Center for Personalized Medicine (CCPM) under the guidance of their Biobank, and the Translation Informatics Services (TIS) sector, among several input from exerpienced scientists and professor within CCPM whose expertise is in GWAS.
+\begin{quote}
+
+\noindent{\hspace*{\fill}\sphinxincludegraphics[width=200\sphinxpxdimen]{{tis_logo}.png}\hspace*{\fill}}
+\end{quote}
+
 
 \chapter{Indices and tables}
 \label{\detokenize{index:indices-and-tables}}\begin{itemize}

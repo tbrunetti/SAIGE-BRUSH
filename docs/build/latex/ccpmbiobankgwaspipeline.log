@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.25)  5 JAN 2021 12:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.6.25)  29 JAN 2021 12:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1167,231 +1167,244 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 
 ]
 Chapter 2.
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 118.
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 127.
+<fullPipeline.png, id=101, 614.295pt x 868.74562pt>
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 117.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-) [3]
+)
+File: fullPipeline.png Graphic file (type png)
+<use fullPipeline.png>
+Package pdftex.def Info: fullPipeline.png  used on input line 117.
+(pdftex.def)             Requested size: 459.89525pt x 650.47063pt.
+ [3]
+Overfull \vbox (260.0pt too high) has occurred while \output is active []
+
+ [4 <./fullPipeline.png>]
+Chapter 3.
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 123.
+[5
+
+]
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 177.
- [4]
-Overfull \hbox (12.15417pt too wide) in paragraph at lines 270--273
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 182.
+ [6] [7]
+Overfull \hbox (12.15417pt too wide) in paragraph at lines 286--289
 []|\T1/phv/m/n/10 Relevance| 
  []
 
 
-Overfull \hbox (12.15417pt too wide) in paragraph at lines 287--290
+Overfull \hbox (12.15417pt too wide) in paragraph at lines 303--306
 []|\T1/phv/m/n/10 Relevance| 
  []
 
 
-Overfull \hbox (16.30797pt too wide) in paragraph at lines 299--300
+Overfull \hbox (16.30797pt too wide) in paragraph at lines 315--316
 []|\T1/ptm/m/n/10 ChromosomeLengthFile| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 305--307
+Underfull \hbox (badness 10000) in paragraph at lines 321--323
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 305--307
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 321--323
 \T1/pcr/m/n/10 skipChunking:false| 
  []
 
 
-Underfull \hbox (badness 7759) in paragraph at lines 310--312
+Underfull \hbox (badness 7759) in paragraph at lines 326--328
 []|\T1/ptm/m/n/10 option: hg19 or
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 326--328
+Underfull \hbox (badness 10000) in paragraph at lines 342--344
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 326--328
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 342--344
 \T1/pcr/m/n/10 GenerateAssociations:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 335--337
+Underfull \hbox (badness 10000) in paragraph at lines 351--353
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 335--337
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 351--353
 \T1/pcr/m/n/10 GenerateAssociations:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 335--337
+Underfull \hbox (badness 10000) in paragraph at lines 351--353
 \T1/ptm/m/n/10 and
  []
 
 
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 335--337
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 351--353
 \T1/pcr/m/n/10 skipChunking:false| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 344--346
+Underfull \hbox (badness 10000) in paragraph at lines 360--362
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 344--346
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 360--362
 \T1/pcr/m/n/10 GenerateAssociations:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 371--373
+Underfull \hbox (badness 10000) in paragraph at lines 387--389
 []|\T1/ptm/m/n/10 If
  []
 
 
-Overfull \hbox (70.24438pt too wide) in paragraph at lines 371--373
+Overfull \hbox (70.24438pt too wide) in paragraph at lines 387--389
 \T1/ptm/m/n/10 :\T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 380--382
+Underfull \hbox (badness 10000) in paragraph at lines 396--398
 []|\T1/ptm/m/n/10 If
  []
 
 
-Overfull \hbox (61.4645pt too wide) in paragraph at lines 380--382
+Overfull \hbox (61.4645pt too wide) in paragraph at lines 396--398
 \T1/pcr/m/n/10 GenerateGRM:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 380--382
+Underfull \hbox (badness 10000) in paragraph at lines 396--398
 \T1/ptm/m/n/10 or
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 380--382
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 396--398
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 389--391
+Underfull \hbox (badness 10000) in paragraph at lines 405--407
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 389--391
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 405--407
 \T1/pcr/m/n/10 GenerateNull:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 389--391
+Underfull \hbox (badness 10000) in paragraph at lines 405--407
 \T1/ptm/m/n/10 or
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 389--391
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 405--407
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 398--400
+Underfull \hbox (badness 10000) in paragraph at lines 414--416
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 398--400
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 414--416
 \T1/pcr/m/n/10 GenerateNull:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 398--400
+Underfull \hbox (badness 10000) in paragraph at lines 414--416
 \T1/ptm/m/n/10 or
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 398--400
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 414--416
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 409--411
+Underfull \hbox (badness 10000) in paragraph at lines 425--427
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 409--411
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 425--427
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 414--415
+Underfull \hbox (badness 10000) in paragraph at lines 430--431
 []|\T1/ptm/m/n/10 comma-separated
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 418--420
+Underfull \hbox (badness 10000) in paragraph at lines 434--436
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 418--420
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 434--436
 \T1/pcr/m/n/10 GenerateNull:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 418--420
+Underfull \hbox (badness 10000) in paragraph at lines 434--436
 \T1/ptm/m/n/10 or
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 418--420
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 434--436
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 427--429
+Underfull \hbox (badness 10000) in paragraph at lines 443--445
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 427--429
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 443--445
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 447--449
+Underfull \hbox (badness 10000) in paragraph at lines 463--465
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 447--449
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 463--465
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 458--460
+Underfull \hbox (badness 10000) in paragraph at lines 474--476
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 458--460
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 474--476
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 469--471
+Underfull \hbox (badness 10000) in paragraph at lines 485--487
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (61.4645pt too wide) in paragraph at lines 469--471
+Overfull \hbox (61.4645pt too wide) in paragraph at lines 485--487
 \T1/pcr/m/n/10 GenerateGRM:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 478--479
+Underfull \hbox (badness 10000) in paragraph at lines 494--495
 []|\T1/ptm/m/n/10 Leave-One-Chromosome-Out method.
  []
 
@@ -1399,38 +1412,38 @@ LaTeX Font Info:    Try loading font information for TS1+pcr on input line 1.
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 480--482
+Underfull \hbox (badness 10000) in paragraph at lines 496--498
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (91.4645pt too wide) in paragraph at lines 480--482
+Overfull \hbox (91.4645pt too wide) in paragraph at lines 496--498
 \T1/pcr/m/n/10 GenerateNull:true\TS1/pcr/m/n/10 `\T1/pcr/m/n/10 and
  []
 
 
-Overfull \hbox (157.4645pt too wide) in paragraph at lines 480--482
+Overfull \hbox (157.4645pt too wide) in paragraph at lines 496--498
 \T1/pcr/m/n/10 :code:\TS1/pcr/m/n/10 `\T1/pcr/m/n/10 GenerateAssociations:true|
  
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 491--493
+Underfull \hbox (badness 10000) in paragraph at lines 507--509
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 491--493
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 507--509
 \T1/pcr/m/n/10 GenerateNull:true| 
  []
 
-[5]
-Underfull \hbox (badness 10000) in paragraph at lines 502--504
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--520
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 502--504
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 518--520
 \T1/pcr/m/n/10 GenerateAssociations:true| 
  []
 
@@ -1442,172 +1455,132 @@ See the inputenc package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.511 ...s those with a minor allele frequency ≤
+l.527 ...s those with a minor allele frequency ≤
                                                    5\%.  THIS IS NOT A FILTER!
 ? 
 
-Underfull \hbox (badness 10000) in paragraph at lines 513--515
+Underfull \hbox (badness 10000) in paragraph at lines 529--531
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 513--515
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 529--531
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 524--526
+Underfull \hbox (badness 10000) in paragraph at lines 540--542
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 524--526
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 540--542
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Overfull \hbox (12.40787pt too wide) in paragraph at lines 527--528
+Overfull \hbox (12.40787pt too wide) in paragraph at lines 543--544
 []|\T1/ptm/m/n/10 IsDropMissingDosages| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 533--535
+Underfull \hbox (badness 10000) in paragraph at lines 549--551
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 533--535
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 549--551
 \T1/pcr/m/n/10 GenerateAssociations:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 542--544
+Underfull \hbox (badness 10000) in paragraph at lines 558--560
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 542--544
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 558--560
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 553--555
+Underfull \hbox (badness 10000) in paragraph at lines 569--571
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 553--555
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 569--571
 \T1/pcr/m/n/10 GenerateAssociations:true
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 553--555
+Underfull \hbox (badness 10000) in paragraph at lines 569--571
 \T1/ptm/m/n/10 and
  []
 
 
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 553--555
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 569--571
 \T1/pcr/m/n/10 skipChunking:false| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 564--566
+Underfull \hbox (badness 10000) in paragraph at lines 580--582
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (61.4645pt too wide) in paragraph at lines 564--566
+Overfull \hbox (61.4645pt too wide) in paragraph at lines 580--582
 \T1/pcr/m/n/10 GenerateGRM:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 573--575
-[]|\T1/ptm/m/n/10 if
- []
-
-
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 573--575
-\T1/pcr/m/n/10 GenerateNull:true
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 573--575
-\T1/ptm/m/n/10 and
- []
-
-
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 573--575
-\T1/pcr/m/n/10 SkipChunking:false| 
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 591--593
 []|\T1/ptm/m/n/10 if
- []
-
-
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 591--593
-\T1/pcr/m/n/10 GenerateAssociations:true
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 591--593
-\T1/ptm/m/n/10 and
  []
 
 
 Overfull \hbox (67.4645pt too wide) in paragraph at lines 591--593
+\T1/pcr/m/n/10 GenerateNull:true
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 591--593
+\T1/ptm/m/n/10 and
+ []
+
+
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 591--593
+\T1/pcr/m/n/10 SkipChunking:false| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 609--611
+[]|\T1/ptm/m/n/10 if
+ []
+
+
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 609--611
+\T1/pcr/m/n/10 GenerateAssociations:true
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 609--611
+\T1/ptm/m/n/10 and
+ []
+
+
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 609--611
 \T1/pcr/m/n/10 skipChunking:true| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 600--602
-[]|\T1/ptm/m/n/10 if
- []
-
-
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 600--602
-\T1/pcr/m/n/10 GenerateGRM:false
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 600--602
-\T1/ptm/m/n/10 and
- []
-
-
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 600--602
-\T1/pcr/m/n/10 GenerateNull:true| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 609--611
-[]|\T1/ptm/m/n/10 if
- []
-
-
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 609--611
-\T1/pcr/m/n/10 GenerateGRM:false
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 609--611
-\T1/ptm/m/n/10 and
- []
-
-
-Overfull \hbox (67.4645pt too wide) in paragraph at lines 609--611
-\T1/pcr/m/n/10 GenerateNull:true| 
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 618--620
 []|\T1/ptm/m/n/10 if
  []
 
 
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 618--620
-\T1/pcr/m/n/10 GenerateNull:false
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 618--620
+\T1/pcr/m/n/10 GenerateGRM:false
  []
 
 
@@ -1616,8 +1589,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 618--620
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 618--620
-\T1/pcr/m/n/10 GenerateAssociations:true| 
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 618--620
+\T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
@@ -1626,8 +1599,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 627--629
  []
 
 
-Overfull \hbox (73.4645pt too wide) in paragraph at lines 627--629
-\T1/pcr/m/n/10 GenerateNull:false
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 627--629
+\T1/pcr/m/n/10 GenerateGRM:false
  []
 
 
@@ -1636,119 +1609,296 @@ Underfull \hbox (badness 10000) in paragraph at lines 627--629
  []
 
 
-Overfull \hbox (115.4645pt too wide) in paragraph at lines 627--629
-\T1/pcr/m/n/10 GenerateAssociations:true| 
+Overfull \hbox (67.4645pt too wide) in paragraph at lines 627--629
+\T1/pcr/m/n/10 GenerateNull:true| 
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 636--638
+[]|\T1/ptm/m/n/10 if
+ []
+
+
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 636--638
+\T1/pcr/m/n/10 GenerateNull:false
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 636--638
+\T1/ptm/m/n/10 and
+ []
+
+
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 636--638
+\T1/pcr/m/n/10 GenerateAssociations:true| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 645--647
+[]|\T1/ptm/m/n/10 if
+ []
+
+
+Overfull \hbox (73.4645pt too wide) in paragraph at lines 645--647
+\T1/pcr/m/n/10 GenerateNull:false
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 645--647
+\T1/ptm/m/n/10 and
+ []
+
+
+Overfull \hbox (115.4645pt too wide) in paragraph at lines 645--647
+\T1/pcr/m/n/10 GenerateAssociations:true| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 654--656
 []|\T1/ptm/m/n/10 If
  []
 
 
-Overfull \hbox (121.4645pt too wide) in paragraph at lines 636--638
+Overfull \hbox (121.4645pt too wide) in paragraph at lines 654--656
 \T1/pcr/m/n/10 GenerateAssociations:false
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 636--638
+Underfull \hbox (badness 10000) in paragraph at lines 654--656
 \T1/ptm/m/n/10 and
  []
 
 
-Overfull \hbox (85.4645pt too wide) in paragraph at lines 636--638
+Overfull \hbox (85.4645pt too wide) in paragraph at lines 654--656
 \T1/pcr/m/n/10 GenerateResults:true| 
  []
 
-[6] [7] [8]
-<chromosomeLengthFile.png, id=148, 290.58563pt x 231.11343pt>
+[8] [9] [10]
+<chromosomeLengthFile.png, id=165, 290.58563pt x 231.11343pt>
 File: chromosomeLengthFile.png Graphic file (type png)
 <use chromosomeLengthFile.png>
-Package pdftex.def Info: chromosomeLengthFile.png  used on input line 651.
+Package pdftex.def Info: chromosomeLengthFile.png  used on input line 669.
 (pdftex.def)             Requested size: 301.12305pt x 239.50946pt.
- [9 <./chromosomeLengthFile.png>]
-<imputationSuffix_hg38.png, id=158, 651.93562pt x 231.11343pt>
+ [11 <./chromosomeLengthFile.png>]
+<imputationSuffix_hg38.png, id=173, 651.93562pt x 231.11343pt>
 File: imputationSuffix_hg38.png Graphic file (type png)
 <use imputationSuffix_hg38.png>
-Package pdftex.def Info: imputationSuffix_hg38.png  used on input line 703.
+Package pdftex.def Info: imputationSuffix_hg38.png  used on input line 721.
 (pdftex.def)             Requested size: 469.7713pt x 166.5426pt.
-<imputationSuffix_hg19.png, id=159, 651.93562pt x 231.11343pt>
+<imputationSuffix_hg19.png, id=174, 651.93562pt x 231.11343pt>
 File: imputationSuffix_hg19.png Graphic file (type png)
 <use imputationSuffix_hg19.png>
-Package pdftex.def Info: imputationSuffix_hg19.png  used on input line 707.
+Package pdftex.def Info: imputationSuffix_hg19.png  used on input line 725.
 (pdftex.def)             Requested size: 469.7713pt x 166.5426pt.
- [10 <./imputationSuffix_hg38.png> <./imputationSuffix_hg19.png>]
-<phenoFile.png, id=167, 796.47563pt x 252.945pt>
+ [12 <./imputationSuffix_hg38.png>]
+<phenoFile.png, id=181, 796.47563pt x 252.945pt>
 File: phenoFile.png Graphic file (type png)
 <use phenoFile.png>
-Package pdftex.def Info: phenoFile.png  used on input line 728.
+Package pdftex.def Info: phenoFile.png  used on input line 746.
 (pdftex.def)             Requested size: 469.74641pt x 149.18994pt.
- [11 <./phenoFile.png>]
-<infoFile.png, id=179, 796.47563pt x 303.38344pt>
+ [13 <./imputationSuffix_hg19.png> <./phenoFile.png>]
+<infoFile.png, id=189, 796.47563pt x 303.38344pt>
 File: infoFile.png Graphic file (type png)
 <use infoFile.png>
-Package pdftex.def Info: infoFile.png  used on input line 777.
+Package pdftex.def Info: infoFile.png  used on input line 795.
 (pdftex.def)             Requested size: 469.74641pt x 178.93912pt.
-<messageFormat.png, id=180, 796.47563pt x 231.11343pt>
+ [14 <./infoFile.png>]
+<messageFormat.png, id=200, 796.47563pt x 231.11343pt>
 File: messageFormat.png Graphic file (type png)
 <use messageFormat.png>
-Package pdftex.def Info: messageFormat.png  used on input line 807.
+Package pdftex.def Info: messageFormat.png  used on input line 825.
 (pdftex.def)             Requested size: 469.74641pt x 136.31342pt.
- [12 <./infoFile.png>]
-[13 <./messageFormat.png>] [14
 
-]
-Chapter 3.
-[15] [16] [17] [18
-
-]
+[15 <./messageFormat.png>] [16]
 Chapter 4.
-[19] [20
+<fullPipeline_example.png, id=221, 614.295pt x 868.74562pt>
+File: fullPipeline_example.png Graphic file (type png)
+<use fullPipeline_example.png>
+Package pdftex.def Info: fullPipeline_example.png  used on input line 987.
+(pdftex.def)             Requested size: 301.12305pt x 425.8614pt.
+[17
 
-]
+] [18 <./fullPipeline_example.png>]
+
+LaTeX Warning: Hyper reference `fileFormats:plink-file-format' on page 19 undef
+ined on input line 1031.
+
+
+LaTeX Warning: Hyper reference `fileFormats:phenotype-file-format' on page 19 u
+ndefined on input line 1046.
+
+
+LaTeX Warning: Hyper reference `fileFormats:chromosome-length-file-format' on p
+age 19 undefined on input line 1061.
+
+
+Overfull \hbox (13.16064pt too wide) in paragraph at lines 1068--1068
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1068--1068
+
+ []
+
+
+LaTeX Warning: Hyper reference `fileFormats:imputation-name-format' on page 19 
+undefined on input line 1076.
+
+
+LaTeX Warning: Hyper reference `fileFormats:info-file-format' on page 19 undefi
+ned on input line 1091.
+
+[19]
+<fullPipeline_fileparamters.png, id=251, 578.16pt x 180.675pt>
+File: fullPipeline_fileparamters.png Graphic file (type png)
+<use fullPipeline_fileparamters.png>
+Package pdftex.def Info: fullPipeline_fileparamters.png  used on input line 112
+4.
+(pdftex.def)             Requested size: 400.74815pt x 125.24205pt.
+<fullPipeline_generalParameter.png, id=252, 578.16pt x 180.675pt>
+File: fullPipeline_generalParameter.png Graphic file (type png)
+<use fullPipeline_generalParameter.png>
+Package pdftex.def Info: fullPipeline_generalParameter.png  used on input line 
+1131.
+(pdftex.def)             Requested size: 400.74815pt x 125.24205pt.
+<fullPipeline_grmParametres.png, id=253, 505.89pt x 137.01187pt>
+File: fullPipeline_grmParametres.png Graphic file (type png)
+<use fullPipeline_grmParametres.png>
+Package pdftex.def Info: fullPipeline_grmParametres.png  used on input line 113
+8.
+(pdftex.def)             Requested size: 400.76028pt x 108.54132pt.
+<fullPipeline_nullParameters.png, id=254, 614.295pt x 325.215pt>
+File: fullPipeline_nullParameters.png Graphic file (type png)
+<use fullPipeline_nullParameters.png>
+Package pdftex.def Info: fullPipeline_nullParameters.png  used on input line 11
+45.
+(pdftex.def)             Requested size: 400.75864pt x 212.18121pt.
+ [20 <./fullPipeline_fileparamters.png> <./fullPipeline_generalParameter.png> <
+./fullPipeline_grmParametres.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1149--1150
+[]\T1/ptm/m/n/10 The fol-low-ing sets of key-word pa-ram-e-ters af-fect the as-
+so-ci-a-tion anal-y-sis step, i.e.
+ []
+
+<fullPipeline_AssociationParameters.png, id=268, 614.295pt x 180.675pt>
+File: fullPipeline_AssociationParameters.png Graphic file (type png)
+<use fullPipeline_AssociationParameters.png>
+Package pdftex.def Info: fullPipeline_AssociationParameters.png  used on input 
+line 1152.
+(pdftex.def)             Requested size: 400.75864pt x 117.87569pt.
+<fullPipeline_resultsParameters.png, id=269, 614.295pt x 180.675pt>
+File: fullPipeline_resultsParameters.png Graphic file (type png)
+<use fullPipeline_resultsParameters.png>
+Package pdftex.def Info: fullPipeline_resultsParameters.png  used on input line
+ 1159.
+(pdftex.def)             Requested size: 400.75864pt x 117.87569pt.
+<fullPipeline_otherParameters.png, id=270, 578.16pt x 252.945pt>
+File: fullPipeline_otherParameters.png Graphic file (type png)
+<use fullPipeline_otherParameters.png>
+Package pdftex.def Info: fullPipeline_otherParameters.png  used on input line 1
+166.
+(pdftex.def)             Requested size: 400.74815pt x 175.34276pt.
+[21 <./fullPipeline_nullParameters.png> <./fullPipeline_AssociationParameters.p
+ng> <./fullPipeline_resultsParameters.png>]
+<fullPipeline_output.png, id=282, 796.47563pt x 289.08pt>
+File: fullPipeline_output.png Graphic file (type png)
+<use fullPipeline_output.png>
+Package pdftex.def Info: fullPipeline_output.png  used on input line 1188.
+(pdftex.def)             Requested size: 419.74805pt x 152.35152pt.
+ [22 <./fullPipeline_otherParameters.png> <./fullPipeline_output.png>]
+<fullPipeline_output_results.png, id=292, 796.47563pt x 289.08pt>
+File: fullPipeline_output_results.png Graphic file (type png)
+<use fullPipeline_output_results.png>
+Package pdftex.def Info: fullPipeline_output_results.png  used on input line 12
+06.
+(pdftex.def)             Requested size: 419.74805pt x 152.35152pt.
+<fullPipeline_pdf_example.png, id=293, 433.62pt x 397.485pt>
+File: fullPipeline_pdf_example.png Graphic file (type png)
+<use fullPipeline_pdf_example.png>
+Package pdftex.def Info: fullPipeline_pdf_example.png  used on input line 1214.
+
+(pdftex.def)             Requested size: 301.12305pt x 276.04202pt.
+ [23 <./fullPipeline_output_results.png> <./fullPipeline_pdf_example.png>] [24]
+ [25] [26]
 Chapter 5.
-[21] [22
+[27
+
+] [28
 
 ]
 Chapter 6.
-(./ccpmbiobankgwaspipeline.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1046.
- [23]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1046.
- (./ccpmbiobankgwaspipeline.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1046.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1046.
+<tis_logo.png, id=339, 96.36pt x 97.36375pt>
+File: tis_logo.png Graphic file (type png)
+<use tis_logo.png>
+Package pdftex.def Info: tis_logo.png  used on input line 1484.
+(pdftex.def)             Requested size: 150.56152pt x 152.13045pt.
+[29 <./tis_logo.png>] [30
 
-Package rerunfilecheck Info: File `ccpmbiobankgwaspipeline.out' has not changed
-.
-(rerunfilecheck)             Checksum: 18760E3B4202BA1EB9356631CE08F7B4;1752.
+]
+Chapter 7.
+(./ccpmbiobankgwaspipeline.ind)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1505.
+ [31]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1505.
+ (./ccpmbiobankgwaspipeline.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1505.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1505.
+
+
+
+Package rerunfilecheck Warning: File `ccpmbiobankgwaspipeline.out' has changed.
+
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `ccpmbiobankgwaspipeline.out':
+(rerunfilecheck)             Before: 18760E3B4202BA1EB9356631CE08F7B4;1752
+(rerunfilecheck)             After:  D560BB52D4A23B22464948BCDBF6EA13;1932.
+
+LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1046.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1505.
  ) 
 Here is how much of TeX's memory you used:
- 13820 strings out of 494847
- 192805 string characters out of 6179080
- 315269 words of memory out of 5000000
- 16742 multiletter control sequences out of 15000+600000
+ 13974 strings out of 494847
+ 197230 string characters out of 6179080
+ 312269 words of memory out of 5000000
+ 16839 multiletter control sequences out of 15000+600000
  53898 words of font info for 73 fonts, out of 8000000 for 9000
  60 hyphenation exceptions out of 8191
- 37i,11n,48p,786b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/hel
-vetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvbo8
-a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts
-/type1/urw/times/utmri8a.pfb>
-Output written on ccpmbiobankgwaspipeline.pdf (27 pages, 524345 bytes).
+ 37i,12n,49p,872b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{section.2.5} has been referenced but does not exi
+st, replaced by a fixed one
+
+pdfTeX warning (dest): name{section.2.4} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{section.2.3} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{section.2.2} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{section.2.1} has been referenced but does not exist
+, replaced by a fixed one
+
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/ty
+pe1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helve
+tic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/times/utmri8a.pfb>
+Output written on ccpmbiobankgwaspipeline.pdf (35 pages, 1295091 bytes).
 PDF statistics:
- 301 PDF objects out of 1000 (max. 8388607)
- 243 compressed objects within 3 object streams
- 80 named destinations out of 1000 (max. 500000)
- 147 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 414 PDF objects out of 1000 (max. 8388607)
+ 321 compressed objects within 4 object streams
+ 124 named destinations out of 1000 (max. 500000)
+ 212 words of extra memory for PDF output out of 10000 (max. 10000000)
 

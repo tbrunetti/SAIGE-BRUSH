@@ -1,46 +1,64 @@
 \babel@toc {english}{}
 \contentsline {chapter}{\numberline {1}Installation}{1}{chapter.1}
-\contentsline {chapter}{\numberline {2}Getting Started}{3}{chapter.2}
-\contentsline {section}{\numberline {2.1}Deciphering the config file}{3}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Pipeline Logic}{3}{subsection.2.1.1}
-\contentsline {subsection}{\numberline {2.1.2}Environment Setup}{3}{subsection.2.1.2}
-\contentsline {subsection}{\numberline {2.1.3}User Data Input}{4}{subsection.2.1.3}
-\contentsline {section}{\numberline {2.2}Parameters}{5}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Minimum Required Parameters for Each Step}{5}{subsection.2.2.1}
-\contentsline {subsubsection}{Minimum Requirements to Run Genetic Relatedness Matrix}{5}{subsubsection*.3}
-\contentsline {subsubsection}{Minimum Requirements to Run Null Model}{5}{subsubsection*.4}
-\contentsline {subsubsection}{Minimum Requirements to Run Association Analysis}{5}{subsubsection*.5}
-\contentsline {subsubsection}{Minimum Requirements to Run Results}{5}{subsubsection*.6}
-\contentsline {subsection}{\numberline {2.2.2}Full List of User Input Data Parameters}{5}{subsection.2.2.2}
-\contentsline {section}{\numberline {2.3}Formatting the Required Files}{9}{section.2.3}
-\contentsline {subsection}{\numberline {2.3.1}Parameter: ChromosomeLengthFile}{9}{subsection.2.3.1}
-\contentsline {subsection}{\numberline {2.3.2}Parameter: ImputeSuffix}{10}{subsection.2.3.2}
-\contentsline {subsection}{\numberline {2.3.3}Parameter: PhenoFile}{11}{subsection.2.3.3}
-\contentsline {subsection}{\numberline {2.3.4}Parameter: Plink}{11}{subsection.2.3.4}
-\contentsline {subsection}{\numberline {2.3.5}Parameter: Pheno}{11}{subsection.2.3.5}
-\contentsline {subsection}{\numberline {2.3.6}Parameter: Covars}{11}{subsection.2.3.6}
-\contentsline {subsection}{\numberline {2.3.7}Parameter: SampleID}{11}{subsection.2.3.7}
-\contentsline {subsection}{\numberline {2.3.8}Parameter: InfoFile}{11}{subsection.2.3.8}
-\contentsline {subsection}{\numberline {2.3.9}Parameter: ImputationFileList}{12}{subsection.2.3.9}
-\contentsline {subsection}{\numberline {2.3.10}Parameter: SparseGRM}{12}{subsection.2.3.10}
-\contentsline {subsection}{\numberline {2.3.11}Parameter: SampleIDFile}{12}{subsection.2.3.11}
-\contentsline {subsection}{\numberline {2.3.12}Parameter: NullModelFile}{12}{subsection.2.3.12}
-\contentsline {subsection}{\numberline {2.3.13}Parameter: VarianceRatioFile}{12}{subsection.2.3.13}
-\contentsline {subsection}{\numberline {2.3.14}Parameter: AssociationFile}{12}{subsection.2.3.14}
-\contentsline {section}{\numberline {2.4}Output Generated}{12}{section.2.4}
-\contentsline {section}{\numberline {2.5}Parsing Through StdErr and StdOut}{12}{section.2.5}
-\contentsline {subsection}{\numberline {2.5.1}Logging Levels}{13}{subsection.2.5.1}
-\contentsline {subsection}{\numberline {2.5.2}Exit Status Codes}{13}{subsection.2.5.2}
-\contentsline {chapter}{\numberline {3}Quick Start and Examples}{15}{chapter.3}
-\contentsline {section}{\numberline {3.1}Example Work Flows}{15}{section.3.1}
-\contentsline {subsection}{\numberline {3.1.1}Quick Start Command}{15}{subsection.3.1.1}
-\contentsline {subsection}{\numberline {3.1.2}Full Pipeline}{15}{subsection.3.1.2}
-\contentsline {subsection}{\numberline {3.1.3}GRM only}{16}{subsection.3.1.3}
-\contentsline {subsection}{\numberline {3.1.4}Null Model only}{16}{subsection.3.1.4}
-\contentsline {subsection}{\numberline {3.1.5}Association Analyses Only}{16}{subsection.3.1.5}
-\contentsline {subsection}{\numberline {3.1.6}Results and Graphs Only}{17}{subsection.3.1.6}
-\contentsline {subsection}{\numberline {3.1.7}Reuse Previously Indexed and Chunked Files}{17}{subsection.3.1.7}
-\contentsline {subsection}{\numberline {3.1.8}Combinations of Logic}{17}{subsection.3.1.8}
-\contentsline {chapter}{\numberline {4}FAQs}{19}{chapter.4}
-\contentsline {chapter}{\numberline {5}Acknowledgements}{21}{chapter.5}
-\contentsline {chapter}{\numberline {6}Indices and tables}{23}{chapter.6}
+\contentsline {chapter}{\numberline {2}Full Pipeline Overview}{3}{chapter.2}
+\contentsline {chapter}{\numberline {3}Getting Started}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}Deciphering the config file}{5}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Pipeline Logic}{5}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Environment Setup}{5}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}User Data Input}{6}{subsection.3.1.3}
+\contentsline {subsubsection}{User Data Input: Parameters that are paths to files}{7}{subsubsection*.3}
+\contentsline {section}{\numberline {3.2}Parameters}{7}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Minimum Required Parameters for Each Step}{7}{subsection.3.2.1}
+\contentsline {subsubsection}{Minimum Requirements to Run Genetic Relatedness Matrix}{7}{subsubsection*.4}
+\contentsline {subsubsection}{Minimum Requirements to Run Null Model}{7}{subsubsection*.5}
+\contentsline {subsubsection}{Minimum Requirements to Run Association Analysis}{7}{subsubsection*.6}
+\contentsline {subsubsection}{Minimum Requirements to Run Results}{8}{subsubsection*.7}
+\contentsline {subsection}{\numberline {3.2.2}Full List of User Input Data Parameters}{8}{subsection.3.2.2}
+\contentsline {section}{\numberline {3.3}Formatting the Required Files}{11}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Parameter: ChromosomeLengthFile}{11}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Parameter: ImputeSuffix}{12}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.3}Parameter: PhenoFile}{13}{subsection.3.3.3}
+\contentsline {subsection}{\numberline {3.3.4}Parameter: Plink}{14}{subsection.3.3.4}
+\contentsline {subsection}{\numberline {3.3.5}Parameter: Pheno}{14}{subsection.3.3.5}
+\contentsline {subsection}{\numberline {3.3.6}Parameter: Covars}{14}{subsection.3.3.6}
+\contentsline {subsection}{\numberline {3.3.7}Parameter: SampleID}{14}{subsection.3.3.7}
+\contentsline {subsection}{\numberline {3.3.8}Parameter: InfoFile}{14}{subsection.3.3.8}
+\contentsline {subsection}{\numberline {3.3.9}Parameter: ImputationFileList}{15}{subsection.3.3.9}
+\contentsline {subsection}{\numberline {3.3.10}Parameter: SparseGRM}{15}{subsection.3.3.10}
+\contentsline {subsection}{\numberline {3.3.11}Parameter: SampleIDFile}{15}{subsection.3.3.11}
+\contentsline {subsection}{\numberline {3.3.12}Parameter: NullModelFile}{15}{subsection.3.3.12}
+\contentsline {subsection}{\numberline {3.3.13}Parameter: VarianceRatioFile}{15}{subsection.3.3.13}
+\contentsline {subsection}{\numberline {3.3.14}Parameter: AssociationFile}{15}{subsection.3.3.14}
+\contentsline {section}{\numberline {3.4}Output Generated}{15}{section.3.4}
+\contentsline {section}{\numberline {3.5}Parsing Through StdErr and StdOut}{15}{section.3.5}
+\contentsline {subsection}{\numberline {3.5.1}Logging Levels}{15}{subsection.3.5.1}
+\contentsline {subsection}{\numberline {3.5.2}Exit Status Codes}{16}{subsection.3.5.2}
+\contentsline {chapter}{\numberline {4}Quick Start and Examples}{17}{chapter.4}
+\contentsline {section}{\numberline {4.1}Tutorials and Examples}{17}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Quick Start Command}{17}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Tutorials}{17}{subsection.4.1.2}
+\contentsline {subsubsection}{Tutorial: Full Pipeline with Binary Trait}{17}{subsubsection*.8}
+\contentsline {paragraph}{Section: Logic and Overview}{17}{paragraph*.9}
+\contentsline {paragraph}{Section: Step\sphinxhyphen {}by\sphinxhyphen {}Step Tutorial}{18}{paragraph*.10}
+\contentsline {subparagraph}{STEP 1: Set the logic}{18}{subparagraph*.11}
+\contentsline {subparagraph}{STEP 2: Set the environment}{19}{subparagraph*.12}
+\contentsline {subparagraph}{STEP 3: Ensure you have all the files required}{19}{subparagraph*.13}
+\contentsline {subparagraph}{STEP 4: Set the path and values to all the required input parameters}{20}{subparagraph*.14}
+\contentsline {subparagraph}{STEP 5: Running the pipeline}{22}{subparagraph*.15}
+\contentsline {paragraph}{Section: Generated Output}{22}{paragraph*.16}
+\contentsline {subsubsection}{Tutorial: Generate GRM Only}{24}{subsubsection*.17}
+\contentsline {paragraph}{Section: Logic and Overview}{24}{paragraph*.18}
+\contentsline {paragraph}{Section: Step\sphinxhyphen {}by\sphinxhyphen {}Step Tutorial}{25}{paragraph*.19}
+\contentsline {paragraph}{Section: Generated Output}{25}{paragraph*.20}
+\contentsline {subsubsection}{Tutorial: Generate Null Model only}{25}{subsubsection*.21}
+\contentsline {paragraph}{Section: Logic and Overview}{25}{paragraph*.22}
+\contentsline {paragraph}{Section: Step\sphinxhyphen {}by\sphinxhyphen {}Step Tutorial}{25}{paragraph*.23}
+\contentsline {paragraph}{Section: Generated Output}{25}{paragraph*.24}
+\contentsline {subsubsection}{Tutorial: Generate Association Analysis Only}{25}{subsubsection*.25}
+\contentsline {paragraph}{Section: Logic and Overview}{26}{paragraph*.26}
+\contentsline {paragraph}{Section: Step\sphinxhyphen {}by\sphinxhyphen {}Step Tutorial}{26}{paragraph*.27}
+\contentsline {paragraph}{Section: Generated Output}{26}{paragraph*.28}
+\contentsline {subsection}{\numberline {4.1.3}FAQs}{26}{subsection.4.1.3}
+\contentsline {chapter}{\numberline {5}FAQs}{27}{chapter.5}
+\contentsline {chapter}{\numberline {6}Acknowledgements}{29}{chapter.6}
+\contentsline {chapter}{\numberline {7}Indices and tables}{31}{chapter.7}
