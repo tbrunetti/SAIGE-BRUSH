@@ -18,7 +18,7 @@ Minimum Required Parameters for Each Step
 Full List of User Input Data Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ..	csv-table:: Definitions and Use
-	:file: source/parametersTable.csv
+	:file: parametersTable.csv
 	:widths: 20, 20, 10, 40, 10
 	:header-rows: 1
 	:align: center
