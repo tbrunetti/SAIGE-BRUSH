@@ -17,12 +17,10 @@ Minimum Required Parameters for Each Step
 
 Full List of User Input Data Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-..	csv-table:: Definitions and Use
-   :url: https://github.com/tbrunetti/SAIGE-BRUSH/blob/main/docs/source/parametersTable.csv
-	:widths: 20, 20, 10, 40, 10
-	:header-rows: 1
-   :class: longtable
-	:align: center
+.. csv-table:: 
+   :file: _files/parametersTable.csv
+
+
 
 
 
