@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files &#8212; SAIGE-BRUSH 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorial: Generate Association Analysis Only" href="generateAssociationOnlyTutorial.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="generateAssociationOnlyTutorial.html" title="Tutorial: Generate Association Analysis Only"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" accesskey="U">Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tutorial-full-pipeline-with-binary-trait-re-use-previously-chunked-imputation-files">
+<h1>Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files<a class="headerlink" href="#tutorial-full-pipeline-with-binary-trait-re-use-previously-chunked-imputation-files" title="Permalink to this headline">¶</a></h1>
+<p>This example will walk you through how to run the full pipeline when the phenotype for association analysis if for a binary trait.  It will guide you through how to properly set the logic, remind you to set the environment, list all the additional files you need, and finally which user parameters need to be set.</p>
+<div class="section" id="section-logic-and-overview">
+<h2>Section: Logic and Overview<a class="headerlink" href="#section-logic-and-overview" title="Permalink to this headline">¶</a></h2>
+<p><strong>Full pipline with Re-Use Previously Chunked Imputation Files</strong> means you want to run every component of the pipeline from beginning to end in one go, while re-using the previous set of imputation files that were chunked from a previous analysis.  This is analagous to setting the pipeline logic kewords to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">true</span>
+</pre></div>
+</div>
+<p>If the pipeline is set to the above logic, the following workflow will be executed:</p>
+<a class="reference internal image-reference" href="_images/fullPipelineReuse_example.png"><img alt="_images/fullPipelineReuse_example.png" class="align-center" src="_images/fullPipelineReuse_example.png" style="width: 400px;" /></a>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files</a><ul>
+<li><a class="reference internal" href="#section-logic-and-overview">Section: Logic and Overview</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="generateAssociationOnlyTutorial.html"
+                        title="previous chapter">Tutorial: Generate Association Analysis Only</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/fullPipelineReuseChunksTutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="generateAssociationOnlyTutorial.html" title="Tutorial: Generate Association Analysis Only"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="exampleWorkFlows.html" >Tutorials and Examples</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+    </div>
+  </body>
+</html>

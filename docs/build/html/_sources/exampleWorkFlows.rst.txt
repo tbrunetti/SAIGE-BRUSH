@@ -19,6 +19,7 @@ Tutorials
    generateGRMonlyTutorial
    generateNullonlyTutorial
    generateAssociationOnlyTutorial
+   fullPipelineReuseChunksTutorial
 
 
 FAQs
