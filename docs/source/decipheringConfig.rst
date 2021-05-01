@@ -20,7 +20,7 @@ There are three keywords that control the environment setup of the pipeline. It 
 
 	BindPoint:/path/to/bind/container
 	BindPointTemp:/path/to/tmp/
-	Container:/path/to/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg
+	Container:/path/to/saige-brush-v039.sif
 
 :code:`BindPoint` and :code:`BindPointTemp` are directories to where you want the container to be mounted.  :code:`BindPointTemp` allows you to give the container a secondary binding point where all temp files and calculations will be performed, and once finished will move the final files to the :code:`BindPoint`.  The files generated in :code:`BindPointTemp` will be deleted after the run completes.  
 

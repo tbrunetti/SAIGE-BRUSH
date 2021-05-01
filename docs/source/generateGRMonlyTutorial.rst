@@ -44,7 +44,7 @@ Open your config file (.txt) and make sure you set the path to where the bind po
 
 	BindPoint:/path/to/bind/container
 	BindPointTemp:/path/to/tmp/
-	Container:/path/to/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg
+	Container:/path/to/saige-brush-v039.sif
 
 
 STEP 3: Ensure you have all the files required
@@ -103,7 +103,7 @@ Once all the files are accessible and the config is ready, the following command
 
 .. code-block:: bash 
 
-	$ ./CCPM_GWAS_pipeline myConfigFile.txt 
+	$ ./saigeBrush myConfigFile.txt 
 
 
 Section: Generated Output

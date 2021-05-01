@@ -8,7 +8,7 @@ In order to run the pipeline, open a shell or bash prompt (or batch script for a
 
 .. code-block:: bash 
 
-	$ ./CCPM_GWAS_pipeline myConfigFile.txt 
+	$ ./saigeBrush myConfigFile.txt 
 
 Tutorials
 ^^^^^^^^^^
