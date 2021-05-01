@@ -31,10 +31,16 @@ Getting Started
 
    decipheringConfig
    parameters
-   fileFormats
    output
    parsingStdErrOut
 
+
+Understanding File Formats  
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. toctree::
+   :maxdepth: 2
+
+   fileFormats
 
 
 Quick Start and Examples
@@ -47,6 +53,17 @@ Quick Start and Examples
 
 FAQs
 ^^^^
+.. toctree::
+   :maxdepth: 1
+
+   commonQuestions
+
+.. seealso::
+
+	Need more help? Please submit any questions or bugs to the `SAIGE-BRUSH github issues page`_  
+
+   .. _SAIGE-BRUSH github issues page: https://github.com/tbrunetti/SAIGE-BRUSH/issues
+
 
 
 Acknowledgements

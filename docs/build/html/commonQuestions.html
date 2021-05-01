@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+
+<html lang="ls">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frequently Asked Questions &#8212; SAIGE-BRUSH 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files" href="fullPipelineReuseChunksTutorial.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fullPipelineReuseChunksTutorial.html" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Frequently Asked Questions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="is-saige-brush-able-to-handle-non-autosomal-chromsomes-x-y-mitochondrial">
+<h2>Is SAIGE-BRUSH able to handle non-autosomal chromsomes (X, Y, mitochondrial)?<a class="headerlink" href="#is-saige-brush-able-to-handle-non-autosomal-chromsomes-x-y-mitochondrial" title="Permalink to this headline">¶</a></h2>
+<p>At the moment SAIGE-BRUSH is limited to autosomal chromosomes only.</p>
+</div>
+<div class="section" id="is-saige-brush-able-to-handle-other-organisms-besides-human-data">
+<h2>Is SAIGE-BRUSH able to handle other organisms besides human data?<a class="headerlink" href="#is-saige-brush-able-to-handle-other-organisms-besides-human-data" title="Permalink to this headline">¶</a></h2>
+<p>SAIGE-BRUSH was designed with human genetic data in mind.  However, if base SAIGE v.0.39.0 is able to
+handle other organisms, one can still use the containerized full implementaion of SAIGE v.0.39.0
+within the contianer, but it not be able to handle the go implementation or config file.  It will require the
+user to use base SAIGE as intended by SAIGE docs.  SAIGE-BRUSH will only save you the time of installing a working version
+of SAIGE by using the Singularity container.</p>
+</div>
+</div>
+<div class="section" id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="error-inv-sympd-matrix-is-singular-or-not-positive-definite">
+<h2><code class="code docutils literal notranslate"><span class="pre">error:</span> <span class="pre">inv_sympd():</span> <span class="pre">matrix</span> <span class="pre">is</span> <span class="pre">singular</span> <span class="pre">or</span> <span class="pre">not</span> <span class="pre">positive</span> <span class="pre">definite</span></code><a class="headerlink" href="#error-inv-sympd-matrix-is-singular-or-not-positive-definite" title="Permalink to this headline">¶</a></h2>
+<p>This usually means there are covariates or data in your phenotype file that have no variance or are collinear with eachother.
+You should double check the phenotype and covariates listed your your config file and make sure there is no collinearity
+or lack of variance. Once this is resolved, re-run the pipeline again.</p>
+</div>
+<div class="section" id="glm-fit-fitted-probabilities-numerically-0-or-1-occurred">
+<h2><code class="code docutils literal notranslate"><span class="pre">glm.fit:</span> <span class="pre">fitted</span> <span class="pre">probabilities</span> <span class="pre">numerically</span> <span class="pre">0</span> <span class="pre">or</span> <span class="pre">1</span> <span class="pre">occurred</span></code><a class="headerlink" href="#glm-fit-fitted-probabilities-numerically-0-or-1-occurred" title="Permalink to this headline">¶</a></h2>
+<p>Similar to above, this usually means there are covariates or data in your phenotype file that have no variance or are collinear with eachother.
+You should double check the phenotype and covariates listed your your config file and make sure there is no collinearity
+or lack of variance. Once this is resolved, re-run the pipeline again.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#is-saige-brush-able-to-handle-non-autosomal-chromsomes-x-y-mitochondrial">Is SAIGE-BRUSH able to handle non-autosomal chromsomes (X, Y, mitochondrial)?</a></li>
+<li><a class="reference internal" href="#is-saige-brush-able-to-handle-other-organisms-besides-human-data">Is SAIGE-BRUSH able to handle other organisms besides human data?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#error-inv-sympd-matrix-is-singular-or-not-positive-definite"><code class="code docutils literal notranslate"><span class="pre">error:</span> <span class="pre">inv_sympd():</span> <span class="pre">matrix</span> <span class="pre">is</span> <span class="pre">singular</span> <span class="pre">or</span> <span class="pre">not</span> <span class="pre">positive</span> <span class="pre">definite</span></code></a></li>
+<li><a class="reference internal" href="#glm-fit-fitted-probabilities-numerically-0-or-1-occurred"><code class="code docutils literal notranslate"><span class="pre">glm.fit:</span> <span class="pre">fitted</span> <span class="pre">probabilities</span> <span class="pre">numerically</span> <span class="pre">0</span> <span class="pre">or</span> <span class="pre">1</span> <span class="pre">occurred</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fullPipelineReuseChunksTutorial.html"
+                        title="previous chapter">Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/commonQuestions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fullPipelineReuseChunksTutorial.html" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Frequently Asked Questions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Tonya Brunetti.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+    </div>
+  </body>
+</html>
