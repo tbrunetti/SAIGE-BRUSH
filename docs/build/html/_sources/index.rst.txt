@@ -64,10 +64,3 @@ All of this work could not be done without the full support of the Colorado Cent
 		:width: 200
 		:align: center
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

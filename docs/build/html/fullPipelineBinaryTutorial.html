@@ -74,7 +74,7 @@
 <p>Open your config file (.txt) and make sure you set the path to where the bind point, temp bind point, and  container image are located.  I suggest you set the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> keyword to the same path as where the container is located to avoid any confusion.  If you have a tmp directory you want to use as scratch space, set that path as well.  If this doesn't exist or you choose not to use it, set the keyword <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> to be the same as the path listed in the keyword <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
 <span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
-<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">SAIGE_v0</span><span class="o">.</span><span class="mi">39</span><span class="n">_CCPM_biobank_singularity_recipe_file_11162020</span><span class="o">.</span><span class="n">simg</span>
+<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">saige</span><span class="o">-</span><span class="n">brush</span><span class="o">-</span><span class="n">v039</span><span class="o">.</span><span class="n">sif</span>
 </pre></div>
 </div>
 </div>
@@ -183,7 +183,7 @@
 <h3>STEP 5: Running the pipeline<a class="headerlink" href="#step-5-running-the-pipeline" title="Permalink to this headline">¶</a></h3>
 <p>To run the pipeline make sure the files are all accessible to the container relative to the bindpoint.</p>
 <p>Once all the files are accessible and the config is ready, the following command will run the pipeline:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./CCPM_GWAS_pipeline myConfigFile.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./saigeBrush myConfigFile.txt
 </pre></div>
 </div>
 </div>
