@@ -123,8 +123,12 @@ Parameter: SparseGRM
 Parameter: SampleIDFile
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. _Null-Model-File-Format:
+
 Parameter: NullModelFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _VarianceRatio-File-Format:
 
 Parameter: VarianceRatioFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

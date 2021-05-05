@@ -14,6 +14,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files" href="fullPipelineReuseChunksTutorial.html" />
     <link rel="prev" title="Tutorial: Generate Null Model only" href="generateNullonlyTutorial.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -22,6 +23,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fullPipelineReuseChunksTutorial.html" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="generateNullonlyTutorial.html" title="Tutorial: Generate Null Model only"
              accesskey="P">previous</a> |</li>
@@ -49,14 +53,236 @@
 <span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
 </pre></div>
 </div>
-<p>When <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code>, the <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> logic comes into play.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This step produces the raw associaions results concatenated into a file.  It does not clean up the data, perform the proper flips, or generate graphs/figures.  If you want the raw data in addition to the previously mentioned actions, be sure to also set <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code>.</p>
+<dl class="simple">
+<dt>When <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations:true</span></code>, the <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> logic comes into play. This logic parameter depends upon whether you have already chunked the genotype and/or imputation files into windows and saved those from a previous run.</dt><dd><ul class="simple">
+<li><p>If you <strong>have not</strong> chunked or didn't save them you will set <code class="code docutils literal notranslate"><span class="pre">SkipChunking:false</span></code>.  You will be following all the <a class="reference internal" href="#option-a"><span class="std std-ref">OPTION A: Imputation files need window chunking</span></a> steps.</p></li>
+<li><p>If you <strong>have</strong> saved chunks, then you can reuse those chunked files and set <code class="code docutils literal notranslate"><span class="pre">SkipChunking:true</span></code>.  You will be following all the <a class="reference internal" href="#option-b"><span class="std std-ref">OPTION B: Imputation files do not need window chunking and will be reused</span></a> steps.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This step produces the raw associaions results concatenated into a file.  It <strong>does not</strong> clean up the data, perform the proper flips, or generate graphs/figures.  If you want the raw data in addition to the previously mentioned actions, be sure to also set <code class="code docutils literal notranslate"><span class="pre">GenerateResults:true</span></code>.</p>
 </div>
 </div>
 <div class="section" id="section-step-by-step-tutorial">
 <h2>Section: Step-by-Step Tutorial<a class="headerlink" href="#section-step-by-step-tutorial" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="option-a-imputation-files-need-window-chunking">
+<span id="option-a"></span><h3>OPTION A: Imputation files need window chunking<a class="headerlink" href="#option-a-imputation-files-need-window-chunking" title="Permalink to this headline">¶</a></h3>
+<p>If the pipeline is set to the above logic with <code class="code docutils literal notranslate"><span class="pre">SkipChunking:false</span></code>, the following workflow will be executed:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/assocOnly_example.png"><img alt="_images/assocOnly_example.png" class="align-center" src="_images/assocOnly_example.png" style="width: 400px;" /></a>
+</div></blockquote>
+</div>
+<div class="section" id="a-step-1-set-the-logic-if-window-chunking-is-needed">
+<h3>(A) STEP 1: Set the logic  -- if window chunking is needed<a class="headerlink" href="#a-step-1-set-the-logic-if-window-chunking-is-needed" title="Permalink to this headline">¶</a></h3>
+<p>As stated about above, open your config file (.txt) and make sure the logic is set to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-step-2-set-the-environment">
+<h3>(A) STEP 2: Set the environment<a class="headerlink" href="#a-step-2-set-the-environment" title="Permalink to this headline">¶</a></h3>
+<p>Open your config file (.txt) and make sure you set the path to where the bind point, temp bind point, and  container image are located.  I suggest you set the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> keyword to the same path as where the container is located to avoid any confusion.  If you have a tmp directory you want to use as scratch space, set that path as well.  If this doesn't exist or you choose not to use it, set the keyword <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> to be the same as the path listed in the keyword <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
+<span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
+<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">saige</span><span class="o">-</span><span class="n">brush</span><span class="o">-</span><span class="n">v039</span><span class="o">.</span><span class="n">sif</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-step-3-ensure-you-have-all-the-files-required">
+<h3>(A) STEP 3: Ensure you have all the files required<a class="headerlink" href="#a-step-3-ensure-you-have-all-the-files-required" title="Permalink to this headline">¶</a></h3>
+<p>For running the null model only, you will need access to the following files:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><dl class="simple">
+<dt><strong>LD-pruned plink file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameters <code class="code docutils literal notranslate"><span class="pre">GenerateGRM</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateAssociation</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">Plink</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#plink-file-format"><span class="std std-ref">Parameter: Plink</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phenotype and covariates file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#phenotype-file-format"><span class="std std-ref">Parameter: PhenoFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>chromosome lengths file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> is set to false</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">ChromosomeLengthFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#chromosome-length-file-format"><span class="std std-ref">Parameter: ChromosomeLengthFile</span></a> for file formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>imputation files or genotype files in vcf.gz format with .tbi index</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">ImputeDir</span></code> and <code class="code docutils literal notranslate"><span class="pre">ImputeSuffix</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#imputation-name-format"><span class="std std-ref">Parameter: ImputeSuffix</span></a> for file input and naming expectations</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>pre-calculated GRM with corresponding sample order file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true.</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">SparseGRM</span></code> and <code class="code docutils literal notranslate"><span class="pre">SampleIDFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#sparsegrm-file-format"><span class="std std-ref">Parameter: SparseGRM</span></a> and <a class="reference internal" href="fileFormats.html#sampleid-file-format"><span class="std std-ref">Parameter: SampleIDFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>pre-calculated Null model with corresponding variance ratio file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">NullModelFile</span></code> and <code class="code docutils literal notranslate"><span class="pre">VarianceRatioFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#null-model-file-format"><span class="std std-ref">Parameter: NullModelFile</span></a> and <a class="reference internal" href="fileFormats.html#varianceratio-file-format"><span class="std std-ref">Parameter: VarianceRatioFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Missing the pre-calculated GRM files?</strong>  No problem. If you set the logic to <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code>, one will be calculated for you! Just make sure you also set the GRM parameters you want and set the appropriate paths to the required input files you want.  For more information on what parameters you need to fill out, see <a class="reference internal" href="grmParameters.html"><span class="doc">Minimum requirements for Generating a GRM</span></a> or look at the <a class="reference internal" href="generateGRMonlyTutorial.html"><span class="doc">GRM only tutorial</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Missing the pre-calculation null model files?</strong> No problem. If you set the logic to <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code>, one will be calculated for you! Just make sure you also set the Null parameters you want and set the appropriate paths to the required input files.  For more information on what parameters you need to fill out, see <a class="reference internal" href="nullModelParameters.html"><span class="doc">Minimum requirements for Generating a Null Model</span></a> or look at the <a class="reference internal" href="generateNullonlyTutorial.html"><span class="doc">Null model only tutorial</span></a>.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For a complete list of files and name formatting of keyword values listed in the config file see <a class="reference internal" href="fileFormats.html"><span class="doc">Formatting the Required Files</span></a>.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="a-step-4-set-the-path-and-values-to-all-the-required-input-parameters">
+<h3>(A) STEP 4: Set the path and values to all the required input parameters<a class="headerlink" href="#a-step-4-set-the-path-and-values-to-all-the-required-input-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:</p>
+<ol class="arabic">
+<li><p>This <code class="code docutils literal notranslate"><span class="pre">RUNTYPE</span></code> parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUNTYPE</span><span class="p">:</span><span class="n">FULL</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="option-b-imputation-files-do-not-need-window-chunking-and-will-be-reused">
+<span id="option-b"></span><h3>OPTION B: Imputation files do not need window chunking and will be reused<a class="headerlink" href="#option-b-imputation-files-do-not-need-window-chunking-and-will-be-reused" title="Permalink to this headline">¶</a></h3>
+<p>If the pipeline is set to the above logic with <code class="code docutils literal notranslate"><span class="pre">SkipChunking:true</span></code>, the following workflow will be executed:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/assocOnlyReuse_example.png"><img alt="_images/assocOnlyReuse_example.png" class="align-center" src="_images/assocOnlyReuse_example.png" style="width: 400px;" /></a>
+</div></blockquote>
+</div>
+<div class="section" id="b-step-1-set-the-logic-if-reusing-pre-chunked-imputation-files">
+<h3>(B) STEP 1: Set the logic  -- if reusing pre-chunked imputation files<a class="headerlink" href="#b-step-1-set-the-logic-if-reusing-pre-chunked-imputation-files" title="Permalink to this headline">¶</a></h3>
+<p>As stated about above, open your config file (.txt) and make sure the logic is set to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="b-step-2-set-the-environment">
+<h3>(B) STEP 2: Set the environment<a class="headerlink" href="#b-step-2-set-the-environment" title="Permalink to this headline">¶</a></h3>
+<p>Open your config file (.txt) and make sure you set the path to where the bind point, temp bind point, and  container image are located.  I suggest you set the <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code> keyword to the same path as where the container is located to avoid any confusion.  If you have a tmp directory you want to use as scratch space, set that path as well.  If this doesn't exist or you choose not to use it, set the keyword <code class="code docutils literal notranslate"><span class="pre">BindPointTemp</span></code> to be the same as the path listed in the keyword <code class="code docutils literal notranslate"><span class="pre">BindPoint</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BindPoint</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">bind</span><span class="o">/</span><span class="n">container</span>
+<span class="n">BindPointTemp</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span>
+<span class="n">Container</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">saige</span><span class="o">-</span><span class="n">brush</span><span class="o">-</span><span class="n">v039</span><span class="o">.</span><span class="n">sif</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="b-step-3-ensure-you-have-all-the-files-required">
+<h3>(B) STEP 3: Ensure you have all the files required<a class="headerlink" href="#b-step-3-ensure-you-have-all-the-files-required" title="Permalink to this headline">¶</a></h3>
+<p>For running the null model only, you will need access to the following files:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><dl class="simple">
+<dt><strong>LD-pruned plink file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameters <code class="code docutils literal notranslate"><span class="pre">GenerateGRM</span></code> is set to true <strong>and/or</strong> <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true <strong>and/or</strong> <code class="code docutils literal notranslate"><span class="pre">GenerateAssociation</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">Plink</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#plink-file-format"><span class="std std-ref">Parameter: Plink</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phenotype and covariates file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true <strong>and/or</strong> <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true.</p></li>
+<li><p>fulfills parameter <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#phenotype-file-format"><span class="std std-ref">Parameter: PhenoFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>imputation files or genotype files in vcf.gz format with .tbi index pre-chunked</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true <strong>and</strong> <code class="code docutils literal notranslate"><span class="pre">SkipChunking</span></code> is set to true.</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">ImputeDir</span></code>, <code class="code docutils literal notranslate"><span class="pre">ImputeSuffix</span></code>, and <code class="code docutils literal notranslate"><span class="pre">ImputationFileList:</span></code></p></li>
+<li><p>when <code class="code docutils literal notranslate"><span class="pre">SkipChunking:true</span></code>, the <code class="code docutils literal notranslate"><span class="pre">ImputeDir</span></code> parameter in the config file should be the directory where all your <strong>chunked imputation files are located</strong>.  The suffix remains the same as the original imputation suffix prior to chunking.</p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#imputation-name-format"><span class="std std-ref">Parameter: ImputeSuffix</span></a> and <a class="reference internal" href="fileFormats.html#pre-chunked-imputation-file-list-format"><span class="std std-ref">Parameter: ImputationFileList</span></a> for file input and naming expectations</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>pre-calculated GRM with corresponding sample order file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateNull</span></code> is set to true and/or <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true.</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">SparseGRM</span></code> and <code class="code docutils literal notranslate"><span class="pre">SampleIDFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#sparsegrm-file-format"><span class="std std-ref">Parameter: SparseGRM</span></a> and <a class="reference internal" href="fileFormats.html#sampleid-file-format"><span class="std std-ref">Parameter: SampleIDFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>pre-calculated Null model with corresponding variance ratio file</strong></dt><dd><ul class="simple">
+<li><p>used for when logic parameter <code class="code docutils literal notranslate"><span class="pre">GenerateAssociations</span></code> is set to true</p></li>
+<li><p>fulfills parameters <code class="code docutils literal notranslate"><span class="pre">NullModelFile</span></code> and <code class="code docutils literal notranslate"><span class="pre">VarianceRatioFile</span></code></p></li>
+<li><p>see <a class="reference internal" href="fileFormats.html#null-model-file-format"><span class="std std-ref">Parameter: NullModelFile</span></a> and <a class="reference internal" href="fileFormats.html#varianceratio-file-format"><span class="std std-ref">Parameter: VarianceRatioFile</span></a> for formatting</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Missing the pre-calculated GRM files?</strong>  No problem. If you set the logic to <code class="code docutils literal notranslate"><span class="pre">GenerateGRM:true</span></code>, one will be calculated for you! Just make sure you also set the GRM parameters you want and set the appropriate paths to the required input files you want.  For more information on what parameters you need to fill out, see <a class="reference internal" href="grmParameters.html"><span class="doc">Minimum requirements for Generating a GRM</span></a> or look at the <a class="reference internal" href="generateGRMonlyTutorial.html"><span class="doc">GRM only tutorial</span></a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Missing the pre-calculation null model files?</strong> No problem. If you set the logic to <code class="code docutils literal notranslate"><span class="pre">GenerateNull:true</span></code>, one will be calculated for you! Just make sure you also set the Null parameters you want and set the appropriate paths to the required input files.  For more information on what parameters you need to fill out, see <a class="reference internal" href="nullModelParameters.html"><span class="doc">Minimum requirements for Generating a Null Model</span></a> or look at the <a class="reference internal" href="generateNullonlyTutorial.html"><span class="doc">Null model only tutorial</span></a>.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For a complete list of files and name formatting of keyword values listed in the config file see <a class="reference internal" href="fileFormats.html"><span class="doc">Formatting the Required Files</span></a>.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="b-step-4-set-the-path-and-values-to-all-the-required-input-parameters">
+<h3>(B) STEP 4: Set the path and values to all the required input parameters<a class="headerlink" href="#b-step-4-set-the-path-and-values-to-all-the-required-input-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Now that you have all the required files, it is time to set the values and locations within your config file using the keywords expected.  Here are the required keywords and how to specify them:</p>
+<ol class="arabic">
+<li><p>This <code class="code docutils literal notranslate"><span class="pre">RUNTYPE</span></code> parameter need to just be here for placeholder purposes, however it is required.  It has no impact on the pipeline, except as a header to check that it exists.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUNTYPE</span><span class="p">:</span><span class="n">FULL</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
 </div>
 <div class="section" id="section-generated-output">
 <h2>Section: Generated Output<a class="headerlink" href="#section-generated-output" title="Permalink to this headline">¶</a></h2>
@@ -78,7 +304,19 @@
   <ul>
 <li><a class="reference internal" href="#">Tutorial: Generate Association Analysis Only</a><ul>
 <li><a class="reference internal" href="#section-logic-and-overview">Section: Logic and Overview</a></li>
-<li><a class="reference internal" href="#section-step-by-step-tutorial">Section: Step-by-Step Tutorial</a></li>
+<li><a class="reference internal" href="#section-step-by-step-tutorial">Section: Step-by-Step Tutorial</a><ul>
+<li><a class="reference internal" href="#option-a-imputation-files-need-window-chunking">OPTION A: Imputation files need window chunking</a></li>
+<li><a class="reference internal" href="#a-step-1-set-the-logic-if-window-chunking-is-needed">(A) STEP 1: Set the logic  -- if window chunking is needed</a></li>
+<li><a class="reference internal" href="#a-step-2-set-the-environment">(A) STEP 2: Set the environment</a></li>
+<li><a class="reference internal" href="#a-step-3-ensure-you-have-all-the-files-required">(A) STEP 3: Ensure you have all the files required</a></li>
+<li><a class="reference internal" href="#a-step-4-set-the-path-and-values-to-all-the-required-input-parameters">(A) STEP 4: Set the path and values to all the required input parameters</a></li>
+<li><a class="reference internal" href="#option-b-imputation-files-do-not-need-window-chunking-and-will-be-reused">OPTION B: Imputation files do not need window chunking and will be reused</a></li>
+<li><a class="reference internal" href="#b-step-1-set-the-logic-if-reusing-pre-chunked-imputation-files">(B) STEP 1: Set the logic  -- if reusing pre-chunked imputation files</a></li>
+<li><a class="reference internal" href="#b-step-2-set-the-environment">(B) STEP 2: Set the environment</a></li>
+<li><a class="reference internal" href="#b-step-3-ensure-you-have-all-the-files-required">(B) STEP 3: Ensure you have all the files required</a></li>
+<li><a class="reference internal" href="#b-step-4-set-the-path-and-values-to-all-the-required-input-parameters">(B) STEP 4: Set the path and values to all the required input parameters</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#section-generated-output">Section: Generated Output</a></li>
 </ul>
 </li>
@@ -87,6 +325,9 @@
   <h4>Previous topic</h4>
   <p class="topless"><a href="generateNullonlyTutorial.html"
                         title="previous chapter">Tutorial: Generate Null Model only</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fullPipelineReuseChunksTutorial.html"
+                        title="next chapter">Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -114,6 +355,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="fullPipelineReuseChunksTutorial.html" title="Tutorial: Full Pipeline with Binary Trait - Re-use Previously Chunked Imputation Files"
+             >next</a> |</li>
         <li class="right" >
           <a href="generateNullonlyTutorial.html" title="Tutorial: Generate Null Model only"
              >previous</a> |</li>
