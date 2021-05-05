@@ -57,10 +57,6 @@ For running the GRM only, you will need access to the following files:
 	* fulfills parameter :code:`Plink`
 	* see :ref:`Plink-File-Format` for formatting
 
-.. seealso::
-
-	For a interpreting and searching the log files for potential pipeline errors, see :doc:`Parsing Through StdErr and StdOut <parsingStdErrOut>`.
-
 
 STEP 4: Set the path and values to all the required input parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

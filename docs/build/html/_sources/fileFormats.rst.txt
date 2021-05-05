@@ -109,12 +109,16 @@ The following headers must be present:
    :width: 800
 
 
+.. _Pre-Chunked-Imputation-File-List-Format:
+
 Parameter: ImputationFileList
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _SparseGRM-File-Format:
 
 Parameter: SparseGRM
 ^^^^^^^^^^^^^^^^^^^^^
 
+.. _SampleID-File-Format:
 
 Parameter: SampleIDFile
 ^^^^^^^^^^^^^^^^^^^^^^^^
