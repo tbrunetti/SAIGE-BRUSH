@@ -22,6 +22,3 @@ Tutorials
    fullPipelineReuseChunksTutorial
 
 
-FAQs
-^^^^^
-

@@ -16,6 +16,13 @@ If not, you can `install Singularity`_ and `install Golang`_ using the links on 
 .. _install Golang: https://golang.org/doc/install
 
 
+
+**If you haven't visited our github repository, please do so by visiting the** `SAIGE-BRUSH github repo`_.  The repo has all the information on how to access the executable and pull down the container.
+
+
+.. _SAIGE-BRUSH github repo: https://github.com/tbrunetti/SAIGE-BRUSH
+
+
 Full Pipeline Overview
 ^^^^^^^^^^^^^^^^^^^^^^^
 
