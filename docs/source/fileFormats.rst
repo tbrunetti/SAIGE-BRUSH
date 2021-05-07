@@ -77,15 +77,84 @@ Below is an example of a tab-delimited :code:`PhenoFile`.  Again, none of these 
 
 Parameter: Plink
 ^^^^^^^^^^^^^^^^
+`Plink`_ is a software tool that produces a commonly used format for storing genotype/variant data, is generally computationally inexpensive and can be converted easily between common genotype formats such as vcf, bgen, on-binary plinks (.ped/.map) etc. For SAIGE-BRUSH, we recommend the following:
+	#. Convert your genotyped data for use in either GRM or null model steps into binary plink format (i.e., these are 3 files that have the suffix, `.bed`_, `.bim`_, `.fam`_)  
+		For example if your dataset is called :code:`myInputGenoData`, then you will have 3 plink files: 
+        	
+    		* myInputGenoData.bed
+        	* myInputGenoData.bim
+        	* myInputGenoData.fam
+	
+	#. LD-prune this set along with adding a minor allele frequency threshold using plink.  For example, if you wanted to LD-prune and apply a minor-allele frequency of 5%, you would do this: ::  
 
+			plink --bfile myInputGenoData --indep 50kb 5 2 --maf 0.05  --make-bed --out myNewLDdata
+	
+	#.  The file is ready and the path and the prefix can be included in the config file for the :code:`Plink` parameter:
+
+	.. image:: images/plink_file_explanation.png
+	   :width: 800
+
+.. warning:: **Sample Name Formatting**  The sample names/IDs in the plink file must be exactly the same as in the association files and throughout the entire analysis!!  
+
+
+.. _Plink: https://www.cog-genomics.org/plink/1.9/
+.. _.bed: https://www.cog-genomics.org/plink/1.9/formats#bed
+.. _.bim: https://www.cog-genomics.org/plink/1.9/formats#bim
+.. _.fam: https://www.cog-genomics.org/plink/1.9/formats#fam
+
+
+.. _Pheno-Format:  
 
 Parameter: Pheno
 ^^^^^^^^^^^^^^^^^
+The :code:`Pheno` parameter refers to a column name that exists in the :code:`PhenoFile`.  There are a few rules you must follow to format your phenotype columns:  
 
+*  For binary phenotypes, they **must be coded in true binary format** (0 or 1 for control and cases)  
+*  For quantitative phenotypes, be sure **all values are numeric** (no >, <, = symbols)  
+*  If a value is missing, it can be listed as NA or leave the position blank and tab-over to the next column in the :code:`PhenoFile`.  
+*  You can list as many phenotype columns as you would like in the :code:`PhenoFile` and re-use the file for another analysis.
+*  The :code:`Pheno` parameter **can only take in one phenotype per analysis run!**  Only the phenotype listed will have the analysis performed.  All other phenotype columns in the :code:`PhenoFile` will be ignored.  
+
+Here are some examples of phenotype columns that are both formatted correctly and incorrectly to illustrate some common pitfalls:  
+
+.. image:: images/dos_donts_phenotype.png
+   :width: 800
+
+
+Here is an example of how to fill out the phenotype and trait information in the config file:  
+
+.. image:: images/pheno_parameter_explanation.png
+   :width: 800
+
+
+
+.. seealso::
+
+	For more information on formatting the :code:`PhenoFile` see :ref:`Phenotype-File-Format`.
+
+
+.. _Covars-Format:  
 
 Parameter: Covars
 ^^^^^^^^^^^^^^^^^^
+Unlike the :code:`Pheno` parameter, the :code:`Covars` parameters can take in a comma-separted list of covariates you want to use in your analysis, as long as it meets the following requirements:  
 
+*  Follows the same formatting conventions and rules as the :code:`Pheno` and :code:`PhenoFile` parameters and files  
+*  Covariate name(s) must be present in the :code:`PhenoFile` tab-delimited file  
+*  If using more than 1 covariate, it must be a comma-separted list with **no spaces**  
+  
+Here is an example of how to fill out the parameter :code:`Covars` in the config file:  
+
+.. image:: images/covars_parameter_explanation.png
+   :width: 800
+
+
+.. seealso::
+
+	For more information on formatting the :code:`PhenoFile` see :ref:`Phenotype-File-Format`.  For formatting conventions see :ref:`Pheno-Format`.
+
+
+.. _SampleName-Format:  
 
 Parameter: SampleID
 ^^^^^^^^^^^^^^^^^^^
@@ -132,6 +201,8 @@ Parameter: NullModelFile
 
 Parameter: VarianceRatioFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _Assoc-File-Format:  
 
 Parameter: AssociationFile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

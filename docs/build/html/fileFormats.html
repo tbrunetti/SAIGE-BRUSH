@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Formatting the Required Files &#8212; SAIGE-BRUSH 0.1.0 documentation</title>
+    <title>Formatting the Required Files &#8212; SAIGE-BRUSH v0.39 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH v0.39 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Formatting the Required Files</a></li> 
       </ul>
     </div>  
@@ -100,15 +100,69 @@
 </div>
 <div class="section" id="parameter-plink">
 <span id="plink-file-format"></span><h2>Parameter: Plink<a class="headerlink" href="#parameter-plink" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/">Plink</a> is a software tool that produces a commonly used format for storing genotype/variant data, is generally computationally inexpensive and can be converted easily between common genotype formats such as vcf, bgen, on-binary plinks (.ped/.map) etc. For SAIGE-BRUSH, we recommend the following:</dt><dd><ol class="arabic">
+<li><dl class="simple">
+<dt>Convert your genotyped data for use in either GRM or null model steps into binary plink format (i.e., these are 3 files that have the suffix, <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#bed">.bed</a>, <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#bim">.bim</a>, <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#fam">.fam</a>)</dt><dd><p>For example if your dataset is called <code class="code docutils literal notranslate"><span class="pre">myInputGenoData</span></code>, then you will have 3 plink files:</p>
+<ul class="simple">
+<li><p>myInputGenoData.bed</p></li>
+<li><p>myInputGenoData.bim</p></li>
+<li><p>myInputGenoData.fam</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>LD-prune this set along with adding a minor allele frequency threshold using plink.  For example, if you wanted to LD-prune and apply a minor-allele frequency of 5%, you would do this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plink</span> <span class="o">--</span><span class="n">bfile</span> <span class="n">myInputGenoData</span> <span class="o">--</span><span class="n">indep</span> <span class="mi">50</span><span class="n">kb</span> <span class="mi">5</span> <span class="mi">2</span> <span class="o">--</span><span class="n">maf</span> <span class="mf">0.05</span>  <span class="o">--</span><span class="n">make</span><span class="o">-</span><span class="n">bed</span> <span class="o">--</span><span class="n">out</span> <span class="n">myNewLDdata</span>
+</pre></div>
+</div>
+</li>
+<li><p>The file is ready and the path and the prefix can be included in the config file for the <code class="code docutils literal notranslate"><span class="pre">Plink</span></code> parameter:</p></li>
+</ol>
+<a class="reference internal image-reference" href="_images/plink_file_explanation.png"><img alt="_images/plink_file_explanation.png" src="_images/plink_file_explanation.png" style="width: 800px;" /></a>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Sample Name Formatting</strong>  The sample names/IDs in the plink file must be exactly the same as in the association files and throughout the entire analysis!!</p>
+</div>
 </div>
 <div class="section" id="parameter-pheno">
-<h2>Parameter: Pheno<a class="headerlink" href="#parameter-pheno" title="Permalink to this headline">¶</a></h2>
+<span id="pheno-format"></span><h2>Parameter: Pheno<a class="headerlink" href="#parameter-pheno" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">Pheno</span></code> parameter refers to a column name that exists in the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code>.  There are a few rules you must follow to format your phenotype columns:</p>
+<ul class="simple">
+<li><p>For binary phenotypes, they <strong>must be coded in true binary format</strong> (0 or 1 for control and cases)</p></li>
+<li><p>For quantitative phenotypes, be sure <strong>all values are numeric</strong> (no &gt;, &lt;, = symbols)</p></li>
+<li><p>If a value is missing, it can be listed as NA or leave the position blank and tab-over to the next column in the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code>.</p></li>
+<li><p>You can list as many phenotype columns as you would like in the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> and re-use the file for another analysis.</p></li>
+<li><p>The <code class="code docutils literal notranslate"><span class="pre">Pheno</span></code> parameter <strong>can only take in one phenotype per analysis run!</strong>  Only the phenotype listed will have the analysis performed.  All other phenotype columns in the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> will be ignored.</p></li>
+</ul>
+<p>Here are some examples of phenotype columns that are both formatted correctly and incorrectly to illustrate some common pitfalls:</p>
+<a class="reference internal image-reference" href="_images/dos_donts_phenotype.png"><img alt="_images/dos_donts_phenotype.png" src="_images/dos_donts_phenotype.png" style="width: 800px;" /></a>
+<p>Here is an example of how to fill out the phenotype and trait information in the config file:</p>
+<a class="reference internal image-reference" href="_images/pheno_parameter_explanation.png"><img alt="_images/pheno_parameter_explanation.png" src="_images/pheno_parameter_explanation.png" style="width: 800px;" /></a>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For more information on formatting the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> see <a class="reference internal" href="#phenotype-file-format"><span class="std std-ref">Parameter: PhenoFile</span></a>.</p>
+</div>
 </div>
 <div class="section" id="parameter-covars">
-<h2>Parameter: Covars<a class="headerlink" href="#parameter-covars" title="Permalink to this headline">¶</a></h2>
+<span id="covars-format"></span><h2>Parameter: Covars<a class="headerlink" href="#parameter-covars" title="Permalink to this headline">¶</a></h2>
+<p>Unlike the <code class="code docutils literal notranslate"><span class="pre">Pheno</span></code> parameter, the <code class="code docutils literal notranslate"><span class="pre">Covars</span></code> parameters can take in a comma-separted list of covariates you want to use in your analysis, as long as it meets the following requirements:</p>
+<ul class="simple">
+<li><p>Follows the same formatting conventions and rules as the <code class="code docutils literal notranslate"><span class="pre">Pheno</span></code> and <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> parameters and files</p></li>
+<li><p>Covariate name(s) must be present in the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> tab-delimited file</p></li>
+<li><p>If using more than 1 covariate, it must be a comma-separted list with <strong>no spaces</strong></p></li>
+</ul>
+<p>Here is an example of how to fill out the parameter <code class="code docutils literal notranslate"><span class="pre">Covars</span></code> in the config file:</p>
+<a class="reference internal image-reference" href="_images/covars_parameter_explanation.png"><img alt="_images/covars_parameter_explanation.png" src="_images/covars_parameter_explanation.png" style="width: 800px;" /></a>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For more information on formatting the <code class="code docutils literal notranslate"><span class="pre">PhenoFile</span></code> see <a class="reference internal" href="#phenotype-file-format"><span class="std std-ref">Parameter: PhenoFile</span></a>.  For formatting conventions see <a class="reference internal" href="#pheno-format"><span class="std std-ref">Parameter: Pheno</span></a>.</p>
+</div>
 </div>
 <div class="section" id="parameter-sampleid">
-<h2>Parameter: SampleID<a class="headerlink" href="#parameter-sampleid" title="Permalink to this headline">¶</a></h2>
+<span id="samplename-format"></span><h2>Parameter: SampleID<a class="headerlink" href="#parameter-sampleid" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="parameter-infofile">
 <span id="info-file-format"></span><h2>Parameter: InfoFile<a class="headerlink" href="#parameter-infofile" title="Permalink to this headline">¶</a></h2>
@@ -143,7 +197,7 @@
 <span id="varianceratio-file-format"></span><h2>Parameter: VarianceRatioFile<a class="headerlink" href="#parameter-varianceratiofile" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="parameter-associationfile">
-<h2>Parameter: AssociationFile<a class="headerlink" href="#parameter-associationfile" title="Permalink to this headline">¶</a></h2>
+<span id="assoc-file-format"></span><h2>Parameter: AssociationFile<a class="headerlink" href="#parameter-associationfile" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -214,7 +268,7 @@
         <li class="right" >
           <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH v0.39 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Formatting the Required Files</a></li> 
       </ul>
     </div>

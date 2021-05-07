@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Output Generated &#8212; SAIGE-BRUSH 0.1.0 documentation</title>
+    <title>Output Generated &#8212; SAIGE-BRUSH v0.39 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Parsing Through StdErr and StdOut" href="parsingStdErrOut.html" />
-    <link rel="prev" title="Formatting the Required Files" href="fileFormats.html" /> 
+    <link rel="prev" title="Minimum Requirements to Run Results" href="resultsParameters.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -27,9 +27,9 @@
           <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="fileFormats.html" title="Formatting the Required Files"
+          <a href="resultsParameters.html" title="Minimum Requirements to Run Results"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH v0.39 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Output Generated</a></li> 
       </ul>
     </div>  
@@ -41,6 +41,78 @@
             
   <div class="section" id="output-generated">
 <h1>Output Generated<a class="headerlink" href="#output-generated" title="Permalink to this headline">¶</a></h1>
+<p>This summarizes the expected output depending on how the pipeline logic boolean values are set in the config file.</p>
+<div class="section" id="full-pipeline-with-chunking">
+<h2>Full Pipeline with Chunking<a class="headerlink" href="#full-pipeline-with-chunking" title="Permalink to this headline">¶</a></h2>
+<p>Setting this logic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">true</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SaveChunks</span><span class="p">:</span><span class="n">true</span>
+</pre></div>
+</div>
+<p>Returns this output:</p>
+<a class="reference internal image-reference" href="_images/fullPipeline_output.png"><img alt="_images/fullPipeline_output.png" class="align-center" src="_images/fullPipeline_output.png" style="width: 1000px;" /></a>
+<p>What can be reused?</p>
+</div>
+<div class="section" id="genetic-relatedness-matrix-grm-only">
+<h2>Genetic Relatedness Matrix (GRM) only<a class="headerlink" href="#genetic-relatedness-matrix-grm-only" title="Permalink to this headline">¶</a></h2>
+<p>Setting this logic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p>Returns this output:</p>
+<a class="reference internal image-reference" href="_images/grmOnly_output.png"><img alt="_images/grmOnly_output.png" class="align-center" src="_images/grmOnly_output.png" style="width: 1000px;" /></a>
+<p>What can be reused?</p>
+<a class="reference internal image-reference" href="_images/grmOnly_output_results_nextSteps.png"><img alt="_images/grmOnly_output_results_nextSteps.png" class="align-center" src="_images/grmOnly_output_results_nextSteps.png" style="width: 1000px;" /></a>
+</div>
+<div class="section" id="null-model-only">
+<h2>Null Model only<a class="headerlink" href="#null-model-only" title="Permalink to this headline">¶</a></h2>
+<p>Setting this logic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+</pre></div>
+</div>
+<p>Returns this output:</p>
+<a class="reference internal image-reference" href="_images/nullOnly_output.png"><img alt="_images/nullOnly_output.png" class="align-center" src="_images/nullOnly_output.png" style="width: 1000px;" /></a>
+<p>What can be reused?</p>
+<a class="reference internal image-reference" href="_images/nullOnly_output_results_nextSteps.png"><img alt="_images/nullOnly_output_results_nextSteps.png" class="align-center" src="_images/nullOnly_output_results_nextSteps.png" style="width: 1000px;" /></a>
+</div>
+<div class="section" id="association-analysis-only">
+<h2>Association Analysis only<a class="headerlink" href="#association-analysis-only" title="Permalink to this headline">¶</a></h2>
+<p>Setting this logic (see <a class="reference internal" href="generateAssociationOnlyTutorial.html#option-a"><span class="std std-ref">OPTION A: Imputation files need window chunking</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SaveChunks</span><span class="p">:</span><span class="n">true</span>
+</pre></div>
+</div>
+<p>Returns this output:</p>
+<p>What can be reused?</p>
+<blockquote>
+<div><p>Setting this logic (see <a class="reference internal" href="generateAssociationOnlyTutorial.html#option-b"><span class="std std-ref">OPTION B: Imputation files do not need window chunking and will be reused</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GenerateGRM</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateNull</span><span class="p">:</span><span class="n">false</span>
+<span class="n">GenerateAssociations</span><span class="p">:</span><span class="n">true</span>
+<span class="n">GenerateResults</span><span class="p">:</span><span class="n">false</span>
+<span class="n">SkipChunking</span><span class="p">:</span><span class="n">true</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Returns this output:</p>
+<p>What can be reused?</p>
+</div>
 </div>
 
 
@@ -50,9 +122,20 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Output Generated</a><ul>
+<li><a class="reference internal" href="#full-pipeline-with-chunking">Full Pipeline with Chunking</a></li>
+<li><a class="reference internal" href="#genetic-relatedness-matrix-grm-only">Genetic Relatedness Matrix (GRM) only</a></li>
+<li><a class="reference internal" href="#null-model-only">Null Model only</a></li>
+<li><a class="reference internal" href="#association-analysis-only">Association Analysis only</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="fileFormats.html"
-                        title="previous chapter">Formatting the Required Files</a></p>
+  <p class="topless"><a href="resultsParameters.html"
+                        title="previous chapter">Minimum Requirements to Run Results</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="parsingStdErrOut.html"
                         title="next chapter">Parsing Through StdErr and StdOut</a></p>
@@ -87,9 +170,9 @@
           <a href="parsingStdErrOut.html" title="Parsing Through StdErr and StdOut"
              >next</a> |</li>
         <li class="right" >
-          <a href="fileFormats.html" title="Formatting the Required Files"
+          <a href="resultsParameters.html" title="Minimum Requirements to Run Results"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SAIGE-BRUSH v0.39 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Output Generated</a></li> 
       </ul>
     </div>
