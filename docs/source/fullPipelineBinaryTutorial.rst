@@ -140,11 +140,20 @@ STEP 5: Running the pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To run the pipeline make sure the files are all accessible to the container relative to the bindpoint.
 
-Once all the files are accessible and the config is ready, the following command will run the pipeline:
+Once all the files are accessible and the config is ready, the following command will run the pipeline.
+For those running this through a **job-scheduler such as SLURM, LSF, PBS, etc...** the log and error files will output to the scheduler keyworkds for log and error so please set those in your job submission.  Then you can put the following line in your batch script to run the pipeline:
 
 .. code-block:: bash 
 
 	$ ./saigeBrush myConfigFile.txt 
+
+
+For those running this ** without a job-scheduler** the log and error files will output/print to your screen/standard out.  Therefore, please specify log and error files by running the pipeline as follows:
+
+.. code-block:: bash 
+
+	$ ./saigeBrush myConfigFile.txt 1> myLogName.log 2> myLogName.err
+
 
 
 Section: Generated Output
