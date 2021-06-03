@@ -1,2 +1,4 @@
 container/custom_SAIGEbuild_v0.39_CCPM_biobank_07292020.simg filter=lfs diff=lfs merge=lfs -text
 container/SAIGE_v0.39_CCPM_biobank_singularity_recipe_file_11162020.simg filter=lfs diff=lfs merge=lfs -text
+*.sif filter=lfs diff=lfs merge=lfs -text
+*.simg filter=lfs diff=lfs merge=lfs -text
