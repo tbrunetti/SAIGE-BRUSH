@@ -182,8 +182,13 @@
 <div class="section" id="step-5-running-the-pipeline">
 <h3>STEP 5: Running the pipeline<a class="headerlink" href="#step-5-running-the-pipeline" title="Permalink to this headline">¶</a></h3>
 <p>To run the pipeline make sure the files are all accessible to the container relative to the bindpoint.</p>
-<p>Once all the files are accessible and the config is ready, the following command will run the pipeline:</p>
+<p>Once all the files are accessible and the config is ready, the following command will run the pipeline.
+For those running this through a <strong>job-scheduler such as SLURM, LSF, PBS, etc...</strong> the log and error files will output to the scheduler keyworkds for log and error so please set those in your job submission.  Then you can put the following line in your batch script to run the pipeline:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./saigeBrush myConfigFile.txt
+</pre></div>
+</div>
+<p>For those running this ** without a job-scheduler** the log and error files will output/print to your screen/standard out.  Therefore, please specify log and error files by running the pipeline as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./saigeBrush myConfigFile.txt <span class="m">1</span>&gt; myLogName.log <span class="m">2</span>&gt; myLogName.err
 </pre></div>
 </div>
 </div>

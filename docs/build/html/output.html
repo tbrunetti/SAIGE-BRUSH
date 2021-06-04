@@ -114,6 +114,189 @@
 <p>What can be reused?</p>
 </div>
 </div>
+<div class="section" id="output-files-generated">
+<h1>Output Files Generated<a class="headerlink" href="#output-files-generated" title="Permalink to this headline">¶</a></h1>
+<p>This section describes the file format output and what is located in each result file.</p>
+<p>For association analysis results file per snp.  This is for text files generated with the suffix:
+* *_allSNPs_noFiltering.txt.gz
+* *_commonSNPs_cleaned.txt.gz
+* *_rareSNPs_cleaned.txt.gz</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 86%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Interpretation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CHR</p></td>
+<td><p>chromosome the variant is located</p></td>
+</tr>
+<tr class="row-odd"><td><p>POS</p></td>
+<td><p>base position of the variant (hg19 vs hg38 is based upon what was specified at runtime)</p></td>
+</tr>
+<tr class="row-even"><td><p>majorAllele</p></td>
+<td><p>major allele (most common frequency in the input population)</p></td>
+</tr>
+<tr class="row-odd"><td><p>minorAllele</p></td>
+<td><p>minor allele (lesser common frequency in the input population)</p></td>
+</tr>
+<tr class="row-even"><td><p>SNPID</p></td>
+<td><p>variant name</p></td>
+</tr>
+<tr class="row-odd"><td><p>BETA</p></td>
+<td><p>effect size based on the minor allele</p></td>
+</tr>
+<tr class="row-even"><td><p>SE</p></td>
+<td><p>standard error of beta</p></td>
+</tr>
+<tr class="row-odd"><td><p>OR</p></td>
+<td><p>odds Ratio</p></td>
+</tr>
+<tr class="row-even"><td><p>LogOR</p></td>
+<td><p>log(odds ratio)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lower95OR</p></td>
+<td><p>lower 95% confidence interval of the odds ratio</p></td>
+</tr>
+<tr class="row-even"><td><p>Upper95OR</p></td>
+<td><p>upper 95% confidence interval of the odds ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p>MAF</p></td>
+<td><p>minor allele frequency</p></td>
+</tr>
+<tr class="row-even"><td><p>MAC</p></td>
+<td><p>minor allele count</p></td>
+</tr>
+<tr class="row-odd"><td><p>p.value</p></td>
+<td><p>p-value of the variant</p></td>
+</tr>
+<tr class="row-even"><td><p>N.Cases</p></td>
+<td><p>number of cases evaluated for this variant (binary traits only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>N.Controls</p></td>
+<td><p>number of controls evaluated for this variant (binary traits only)</p></td>
+</tr>
+<tr class="row-even"><td><p>casesHomMinor</p></td>
+<td><p>number of cases evaluated for this variant that are homozygous for the minor allele (binary traits only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>casesHet</p></td>
+<td><p>number of cases evaluated for this variant that are heterozygous (binary traits only)</p></td>
+</tr>
+<tr class="row-even"><td><p>controlHomMinor</p></td>
+<td><p>number of control evaluated for this variant that are homozygous for the minor allele (binary traits only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>controlHet</p></td>
+<td><p>number of controls evaluated for this variant that are heterozygous (binary traits only)</p></td>
+</tr>
+<tr class="row-even"><td><p>negLog10pvalue</p></td>
+<td><p>negative log base 10 of the p-value</p></td>
+</tr>
+<tr class="row-odd"><td><p>R2</p></td>
+<td><p>imputation quality for imputed variants</p></td>
+</tr>
+<tr class="row-even"><td><p>ER2</p></td>
+<td><p>empirical R2 quality extracted from info file from imputation -- for genoytyped variants only</p></td>
+</tr>
+<tr class="row-odd"><td><p>GENOTYPE_STATUS</p></td>
+<td><p>imputed, genotyped or genotyped and imputed status for the variant</p></td>
+</tr>
+</tbody>
+</table>
+<p>There is an intermediate file also output with the suffix <code class="code docutils literal notranslate"><span class="pre">allChromosomeResultsMerged.txt</span></code>.  This is output directly from SAIGE,
+however, it is not cleaned and alleles and betas have not been corrected for minor allele basis.  All GWAS results, including the graphs
+generated from the pipeline are based on the files above ending in <code class="code docutils literal notranslate"><span class="pre">_commonSNPs_cleaned.txt.gz</span></code> and <code class="code docutils literal notranslate"><span class="pre">_rareSNPs_cleaned.txt.gz</span></code>.</p>
+<p>However, some T statistics and variance calculations are included in this file, along if the variant converged or not.  Therefore, it is still
+saved in the output so it can easily be searched and referenced for particular variants, if needed.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Interpretation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CHR</p></td>
+<td><p>chromosome the variant is located</p></td>
+</tr>
+<tr class="row-odd"><td><p>POS</p></td>
+<td><p>base position of the variant</p></td>
+</tr>
+<tr class="row-even"><td><p>SNPID</p></td>
+<td><p>variant name</p></td>
+</tr>
+<tr class="row-odd"><td><p>Allele1</p></td>
+<td><p>allele 1 (careful, not necessarily major allele)</p></td>
+</tr>
+<tr class="row-even"><td><p>Allele2</p></td>
+<td><p>allele 2 (careful, not necessarily minor allele)</p></td>
+</tr>
+<tr class="row-odd"><td><p>AC_Allele2</p></td>
+<td><p>allele count of allele 2</p></td>
+</tr>
+<tr class="row-even"><td><p>AF_Allele2</p></td>
+<td><p>allele frequency of allele 2 (not necessarily minor allele)</p></td>
+</tr>
+<tr class="row-odd"><td><p>imputationInfo</p></td>
+<td><p>imputation quality score</p></td>
+</tr>
+<tr class="row-even"><td><p>N</p></td>
+<td><p>total samples considered in model for this variant</p></td>
+</tr>
+<tr class="row-odd"><td><p>BETA</p></td>
+<td><p>effect size of allele 2 (not necessarily minor allele)</p></td>
+</tr>
+<tr class="row-even"><td><p>SE</p></td>
+<td><p>standard error of beta</p></td>
+</tr>
+<tr class="row-odd"><td><p>p.value</p></td>
+<td><p>p-value of the variant</p></td>
+</tr>
+<tr class="row-even"><td><p>p.value.NA</p></td>
+<td><p>p-value of variant when SPA is not applied</p></td>
+</tr>
+<tr class="row-odd"><td><p>Is.SPA.converge</p></td>
+<td><p>whether saddle point approximation (SPA) converged for this variant</p></td>
+</tr>
+<tr class="row-even"><td><p>Tstat</p></td>
+<td><p>estimated variance of score statistic with sample related incorporated</p></td>
+</tr>
+<tr class="row-odd"><td><p>varTstar</p></td>
+<td><p>variance of score statistic without sample related incorporated</p></td>
+</tr>
+<tr class="row-even"><td><p>AF.Cases</p></td>
+<td><p>allele frequency of allele 2 in cases (only for binary trait)</p></td>
+</tr>
+<tr class="row-odd"><td><p>AF.Controls</p></td>
+<td><p>allele frequency of allele 2 in controls (only for binary traits)</p></td>
+</tr>
+<tr class="row-even"><td><p>N.Cases</p></td>
+<td><p>total cases considered in model for this variant (only for binary traits)</p></td>
+</tr>
+<tr class="row-odd"><td><p>N.Controls</p></td>
+<td><p>total controls considered in model for this variant (only for binary traits)</p></td>
+</tr>
+<tr class="row-even"><td><p>homN_Allele2_cases</p></td>
+<td><p>homozygote counts in cases</p></td>
+</tr>
+<tr class="row-odd"><td><p>hetN_Allele2_cases</p></td>
+<td><p>heterozygote counts in cases</p></td>
+</tr>
+<tr class="row-even"><td><p>homN_Allele2_ctrls</p></td>
+<td><p>homozygote counts in controls</p></td>
+</tr>
+<tr class="row-odd"><td><p>hetN_Allele2_ctrls</p></td>
+<td><p>heterozygote counts in controls</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
             <div class="clearer"></div>
@@ -131,6 +314,7 @@
 <li><a class="reference internal" href="#association-analysis-only">Association Analysis only</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#output-files-generated">Output Files Generated</a></li>
 </ul>
 
   <h4>Previous topic</h4>
